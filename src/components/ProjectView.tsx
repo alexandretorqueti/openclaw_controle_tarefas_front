@@ -611,7 +611,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
             </button>
             <button
               onClick={handleCreateProject}
-              disabled={!newProjectData.name || (newProjectData.description && newProjectData.description.length < 10)}
+              disabled={!newProjectData.name || (newProjectData.description ? newProjectData.description.length < 10 : false)}
               style={{
                 padding: '10px 20px',
                 backgroundColor: newProjectData.name && (!newProjectData.description || newProjectData.description.length >= 10) ? '#4ECDC4' : '#ccc',
