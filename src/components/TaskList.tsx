@@ -1,0 +1,664 @@
+import React, { useState } from 'react';
+import { Task, User, Status, Priority, Project } from '../types';
+import TaskCard from './TaskCard';
+import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft } from 'react-icons/fa';
+
+interface TaskListProps {
+  tasks: Task[];
+  users: User[];
+  statuses: Status[];
+  priorities: Priority[];
+  projects: Project[];
+  selectedProject: Project | null;
+  onTaskSelect: (task: Task) => void;
+  onBackToProjects?: () => void;
+  onCreateTask?: (taskData: Partial<Task>) => Promise<Task>;
+  onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
+  onDeleteTask?: (id: string) => Promise<void>;
+  onToggleCompletion?: (id: string) => Promise<void>;
+}
+
+const TaskList: React.FC<TaskListProps> = ({ 
+  tasks, 
+  users, 
+  statuses, 
+  priorities, 
+  projects,
+  selectedProject,
+  onTaskSelect,
+  onBackToProjects,
+  onCreateTask,
+  onUpdateTask,
+  onDeleteTask,
+  onToggleCompletion
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [selectedPriority, setSelectedPriority] = useState<string>('');
+  const [sortBy, setSortBy] = useState<'deadline' | 'priority' | 'title'>('deadline');
+  const [isCreatingTask, setIsCreatingTask] = useState(false);
+  const [newTaskData, setNewTaskData] = useState<Partial<Task>>({
+    title: '',
+    description: '',
+    projectId: selectedProject?.id || '',
+    statusId: statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '',
+    priorityId: priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '',
+    assignedToId: users[0]?.id || ''
+  });
+
+  // Update defaults when data loads
+  React.useEffect(() => {
+    const defaultStatus = statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id;
+    const defaultPriority = priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id;
+    const defaultUser = users[0]?.id;
+    
+    setNewTaskData(prev => ({
+      ...prev,
+      statusId: defaultStatus || prev.statusId || '',
+      priorityId: defaultPriority || prev.priorityId || '',
+      assignedToId: defaultUser || prev.assignedToId || ''
+    }));
+  }, [statuses, priorities, users]);
+
+  // Update projectId when selectedProject changes
+  React.useEffect(() => {
+    if (selectedProject) {
+      setNewTaskData(prev => ({
+        ...prev,
+        projectId: selectedProject.id
+      }));
+    }
+  }, [selectedProject]);
+
+  const filteredTasks = tasks.filter(task => {
+    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         task.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = !selectedStatus || task.statusId === selectedStatus;
+    const matchesPriority = !selectedPriority || task.priorityId === selectedPriority;
+
+    return matchesSearch && matchesStatus && matchesPriority;
+  });
+
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    switch (sortBy) {
+      case 'deadline':
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      case 'priority':
+        const priorityA = priorities.find(p => p.id === a.priorityId)?.weight || 0;
+        const priorityB = priorities.find(p => p.id === b.priorityId)?.weight || 0;
+        return priorityB - priorityA;
+      case 'title':
+        return a.title.localeCompare(b.title);
+      default:
+        return 0;
+    }
+  });
+
+  const getProjectName = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    return project ? project.name : 'Projeto não encontrado';
+  };
+
+  const getTaskCountByStatus = (statusId: string) => {
+    return tasks.filter(task => task.statusId === statusId).length;
+  };
+
+  const handleCreateTask = async () => {
+    console.log('🔄 handleCreateTask called');
+    console.log('📝 Current newTaskData:', newTaskData);
+    console.log('👥 Users:', users.length, 'Statuses:', statuses.length, 'Priorities:', priorities.length);
+    console.log('🔍 onCreateTask exists:', !!onCreateTask);
+    console.log('🔍 Title exists:', !!newTaskData.title);
+    console.log('🔍 ProjectId exists:', !!newTaskData.projectId);
+    
+    if (!onCreateTask || !newTaskData.title || !newTaskData.projectId) {
+      console.error('❌ Missing required data for task creation');
+      return;
+    }
+
+    try {
+      // Debug: log what we're sending
+      console.log('📤 Enviando dados da tarefa:', newTaskData);
+      
+      // Set default deadline to 7 days from now
+      const deadline = new Date();
+      deadline.setDate(deadline.getDate() + 7);
+      
+      const taskData = {
+        ...newTaskData,
+        deadline: deadline.toISOString(),
+        createdById: users[0]?.id || 'f23d0cc1-8908-47a9-b615-0393fb77ae92',
+        position: tasks.length
+      };
+
+      console.log('📤 Dados completos:', taskData);
+      
+      await onCreateTask(taskData);
+      
+      // Reset form with current values (not empty strings)
+      const defaultStatus = statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '';
+      const defaultPriority = priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '';
+      const defaultUser = users[0]?.id || 'f23d0cc1-8908-47a9-b615-0393fb77ae92';
+      
+      setNewTaskData({
+        title: '',
+        description: '',
+        projectId: selectedProject?.id || '',
+        statusId: defaultStatus,
+        priorityId: defaultPriority,
+        assignedToId: defaultUser
+      });
+      setIsCreatingTask(false);
+    } catch (error) {
+      console.error('❌ Failed to create task:', error);
+    }
+  };
+
+  return (
+    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <div style={{ marginBottom: '32px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+          <div>
+            <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#333', marginBottom: '8px' }}>
+              {selectedProject ? `Tarefas do Projeto: ${selectedProject.name}` : 'Todas as Tarefas'}
+            </h1>
+            <p style={{ fontSize: '16px', color: '#666' }}>
+              {selectedProject 
+                ? selectedProject.description
+                : 'Gerencie todas as tarefas de todos os projetos em um único lugar'}
+            </p>
+          </div>
+          
+          {selectedProject && onBackToProjects && (
+            <button
+              onClick={onBackToProjects}
+              style={{
+                padding: '10px 16px',
+                backgroundColor: '#f8f9fa',
+                color: '#333',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'all 0.2s',
+                fontWeight: 500
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#e9ecef';
+                e.currentTarget.style.borderColor = '#ccc';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#f8f9fa';
+                e.currentTarget.style.borderColor = '#ddd';
+              }}
+            >
+              <FaArrowLeft size={14} />
+              Voltar para Projetos
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Filtros e Controles */}
+      <div style={{
+        backgroundColor: '#f8f9fa',
+        padding: '20px',
+        borderRadius: '12px',
+        marginBottom: '24px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+      }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+          {/* Barra de Pesquisa */}
+          <div style={{ flex: '1', minWidth: '300px' }}>
+            <div style={{ position: 'relative' }}>
+              <FaSearch style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#666'
+              }} />
+              <input
+                type="text"
+                placeholder="Pesquisar tarefas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px 12px 12px 40px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Filtro de Status */}
+          <div style={{ minWidth: '200px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <FaFilter size={14} color="#666" />
+              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                Status
+              </label>
+            </div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                outline: 'none'
+              }}
+            >
+              <option value="">Todos os status</option>
+              {statuses.map(status => (
+                <option key={status.id} value={status.id}>
+                  {status.name} ({getTaskCountByStatus(status.id)})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Filtro de Prioridade */}
+          <div style={{ minWidth: '200px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <FaFlag size={14} color="#666" />
+              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                Prioridade
+              </label>
+            </div>
+            <select
+              value={selectedPriority}
+              onChange={(e) => setSelectedPriority(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                outline: 'none'
+              }}
+            >
+              <option value="">Todas as prioridades</option>
+              {priorities.map(priority => (
+                <option key={priority.id} value={priority.id}>
+                  {priority.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Botão Nova Tarefa */}
+          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+            <button
+              onClick={() => setIsCreatingTask(!isCreatingTask)}
+              style={{
+                padding: '12px 24px',
+                backgroundColor: '#4ECDC4',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                fontWeight: 500,
+                transition: 'background-color 0.2s',
+                height: '44px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+            >
+              <FaPlus size={16} />
+              Nova Tarefa
+            </button>
+          </div>
+        </div>
+
+        {/* Formulário de Nova Tarefa */}
+        {isCreatingTask && (
+          <div style={{
+            backgroundColor: '#fff',
+            padding: '20px',
+            borderRadius: '8px',
+            marginTop: '20px',
+            border: '1px solid #e0e0e0'
+          }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
+              Criar Nova Tarefa
+            </h3>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Título *
+                </label>
+                <input
+                  type="text"
+                  value={newTaskData.title}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, title: e.target.value })}
+                  placeholder="Digite o título da tarefa"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+
+              {selectedProject ? (
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                    Projeto
+                  </label>
+                  <div style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #4ECDC4',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#f0f9f8',
+                    color: '#2a7c74',
+                    fontWeight: 500
+                  }}>
+                    {selectedProject.name}
+                    <input type="hidden" value={selectedProject.id} />
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    Tarefa será criada neste projeto
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                    Projeto *
+                  </label>
+                  <select
+                    value={newTaskData.projectId}
+                    onChange={(e) => setNewTaskData({ ...newTaskData, projectId: e.target.value })}
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  >
+                    <option value="">Selecione um projeto</option>
+                    {projects.map(project => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Status
+                </label>
+                <select
+                  value={newTaskData.statusId}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, statusId: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  {statuses.map(status => (
+                    <option key={status.id} value={status.id}>
+                      {status.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Prioridade
+                </label>
+                <select
+                  value={newTaskData.priorityId}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, priorityId: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  {priorities.map(priority => (
+                    <option key={priority.id} value={priority.id}>
+                      {priority.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Atribuído a
+                </label>
+                <select
+                  value={newTaskData.assignedToId}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, assignedToId: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  {users.map(user => (
+                    <option key={user.id} value={user.id}>
+                      {user.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Descrição
+                </label>
+                <textarea
+                  value={newTaskData.description}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, description: e.target.value })}
+                  placeholder="Descreva a tarefa..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', marginTop: '20px' }}>
+              <button
+                onClick={() => setIsCreatingTask(false)}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#f8f9fa',
+                  color: '#333',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCreateTask}
+                disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId) ? '#4ECDC4' : '#ccc',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId) ? 'pointer' : 'not-allowed'
+                }}
+              >
+                Criar Tarefa
+                {(!newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId) && ' (carregando...)'}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Ordenação */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <FaSortAmountDown size={16} color="#666" />
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as any)}
+              style={{
+                padding: '8px 12px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                backgroundColor: '#fff',
+                outline: 'none'
+              }}
+            >
+              <option value="deadline">Ordenar por Prazo</option>
+              <option value="priority">Ordenar por Prioridade</option>
+              <option value="title">Ordenar por Título</option>
+            </select>
+          </div>
+
+          {/* Contadores */}
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 700, color: '#333' }}>
+                {tasks.length}
+              </div>
+              <div style={{ fontSize: '12px', color: '#666' }}>Total de Tarefas</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 700, color: '#06D6A0' }}>
+                {tasks.filter(t => t.isCompleted).length}
+              </div>
+              <div style={{ fontSize: '12px', color: '#666' }}>Concluídas</div>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: '24px', fontWeight: 700, color: '#FF6B6B' }}>
+                {tasks.filter(t => !t.isCompleted && new Date(t.deadline) < new Date()).length}
+              </div>
+              <div style={{ fontSize: '12px', color: '#666' }}>Atrasadas</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Lista de Tarefas */}
+      <div>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '16px' 
+        }}>
+          <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#333' }}>
+            Tarefas ({filteredTasks.length})
+          </h2>
+          {!selectedProject && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <FaProjectDiagram size={16} color="#666" />
+              <span style={{ fontSize: '14px', color: '#666' }}>
+                Mostrando tarefas de {projects.length} projetos
+              </span>
+            </div>
+          )}
+        </div>
+
+        {sortedTasks.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '48px',
+            backgroundColor: '#f8f9fa',
+            borderRadius: '12px',
+            color: '#666'
+          }}>
+            <p style={{ fontSize: '16px', marginBottom: '8px' }}>
+              {searchTerm || selectedStatus || selectedPriority
+                ? 'Nenhuma tarefa encontrada com os filtros atuais.'
+                : selectedProject
+                ? 'Nenhuma tarefa encontrada neste projeto.'
+                : 'Nenhuma tarefa encontrada.'}
+            </p>
+            <button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedStatus('');
+                setSelectedPriority('');
+              }}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: '#4ECDC4',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+            >
+              Limpar Filtros
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: '16px' }}>
+            {sortedTasks.map(task => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                users={users}
+                statuses={statuses}
+                priorities={priorities}
+                projects={projects}
+                onTaskClick={onTaskSelect}
+                onUpdateTask={onUpdateTask}
+                onDeleteTask={onDeleteTask}
+                onToggleCompletion={onToggleCompletion}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TaskList;
