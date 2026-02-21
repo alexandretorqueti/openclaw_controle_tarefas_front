@@ -128,7 +128,7 @@ const TaskList: React.FC<TaskListProps> = ({
       const taskData = {
         ...newTaskData,
         deadline: deadline.toISOString(),
-        createdById: users[0]?.id || 'f23d0cc1-8908-47a9-b615-0393fb77ae92',
+        // createdById will be set by the parent component (App.tsx)
         position: tasks.length
       };
 
@@ -139,7 +139,7 @@ const TaskList: React.FC<TaskListProps> = ({
       // Reset form with current values (not empty strings)
       const defaultStatus = statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '';
       const defaultPriority = priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '';
-      const defaultUser = users[0]?.id || 'f23d0cc1-8908-47a9-b615-0393fb77ae92';
+      const defaultUser = users[0]?.id || '';
       
       setNewTaskData({
         title: '',

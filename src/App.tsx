@@ -2,9 +2,11 @@ import React, { useState, useEffect, Component, ErrorInfo } from 'react';
 import TaskList from './components/TaskList';
 import TaskDetail from './components/TaskDetail';
 import ProjectView from './components/ProjectView';
+import Login from './components/Login';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
-import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner } from 'react-icons/fa';
+import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt } from 'react-icons/fa';
 
 // Error Boundary para capturar erros no React
 class ErrorBoundary extends Component<
@@ -69,7 +71,9 @@ class ErrorBoundary extends Component<
 
 type ViewMode = 'tasks' | 'projects' | 'task-detail';
 
-function App() {
+// Main app content that requires authentication
+const AppContent: React.FC = () => {
+  const { user, logout } = useAuth();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('projects');
@@ -83,47 +87,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Mock data for development (fallback) - Usar UUIDs reais do banco
-  const mockUsers: User[] = [
-    {
-      id: 'f23d0cc1-8908-47a9-b615-0393fb77ae92',
-      name: 'Alexandre Bragato',
-      email: 'alexandre@example.com',
-      avatarUrl: 'https://i.pravatar.cc/150?img=1',
-      role: 'Admin'
-    },
-    {
-      id: 'd4f168ae-18a8-40f1-bc52-8f7e4c90bccf',
-      name: 'Maria Silva',
-      email: 'maria@example.com',
-      avatarUrl: 'https://i.pravatar.cc/150?img=2',
-      role: 'Editor'
-    },
-    {
-      id: 'dcfd8a39-ccff-4715-9472-2882d365b85a',
-      name: 'João Santos',
-      email: 'joao@example.com',
-      avatarUrl: 'https://i.pravatar.cc/150?img=3',
-      role: 'Viewer'
-    }
-  ];
-
-  // Usar UUIDs reais do banco de dados (obtidos do seed)
-  const mockStatuses: Status[] = [
-    { id: '0df1e0ec-81d4-4579-846f-a7f5eff6fe9c', name: 'Pendente', colorCode: '#FF6B6B', isFinalState: false },
-    { id: '467c1869-3183-46cd-a728-83260efe3c78', name: 'Em Andamento', colorCode: '#4ECDC4', isFinalState: false },
-    { id: 'dafbdd51-259a-4983-8dd8-09f53674108a', name: 'Em Revisão', colorCode: '#FFD166', isFinalState: false },
-    { id: '0a7bcff9-7faa-4e88-be5b-195d7f4b2a49', name: 'Concluído', colorCode: '#06D6A0', isFinalState: true },
-    { id: '6d321ee5-3e70-4538-b9bb-e840adf30b83', name: 'Bloqueado', colorCode: '#118AB2', isFinalState: false }
-  ];
-
-  const mockPriorities: Priority[] = [
-    { id: 'e9f574bb-c40f-49e5-9028-c3e8a60673ec', name: 'Baixa', weight: 1 },
-    { id: '3f15e98b-490c-42f1-97db-479ccb3a6404', name: 'Média', weight: 2 },
-    { id: 'f3a32119-31dd-4b72-ae74-784d8f2b706b', name: 'Alta', weight: 3 },
-    { id: 'dce48482-9215-4dff-8c5b-e66bf7ab12a3', name: 'Crítica', weight: 4 }
-  ];
-
   // Load initial data
   useEffect(() => {
     loadInitialData();
@@ -134,31 +97,31 @@ function App() {
       setLoading(true);
       setError(null);
 
-      // Try to load from API
-      const [projectsData, tasksData] = await Promise.all([
+      // Load all data from API
+      const [projectsData, tasksData, usersData, statusesData, prioritiesData] = await Promise.all([
         apiService.getProjects().catch(() => ({ projects: [] })),
-        apiService.getTasks().catch(() => ({ tasks: [] }))
+        apiService.getTasks().catch(() => ({ tasks: [] })),
+        apiService.getUsers().catch(() => ({ users: [] })),
+        apiService.getStatuses().catch(() => ({ statuses: [] })),
+        apiService.getPriorities().catch(() => ({ priorities: [] }))
       ]);
 
       setProjects(projectsData.projects || []);
       setTasks(tasksData.tasks || []);
-      
-      // For now, use mock data for users, statuses, priorities
-      // In a real app, these would come from the API too
-      setUsers(mockUsers);
-      setStatuses(mockStatuses);
-      setPriorities(mockPriorities);
+      setUsers(usersData.users || []);
+      setStatuses(statusesData.statuses || []);
+      setPriorities(prioritiesData.priorities || []);
 
     } catch (err) {
       console.error('Failed to load data:', err);
-      setError('Falha ao carregar dados. Usando dados de exemplo.');
+      setError('Falha ao carregar dados. Tente novamente.');
       
-      // Fallback to mock data
+      // Clear all data on error
       setProjects([]);
       setTasks([]);
-      setUsers(mockUsers);
-      setStatuses(mockStatuses);
-      setPriorities(mockPriorities);
+      setUsers([]);
+      setStatuses([]);
+      setPriorities([]);
     } finally {
       setLoading(false);
     }
@@ -202,11 +165,11 @@ function App() {
 
   const handleCreateProject = async (projectData: Partial<Project>) => {
     try {
-      // O ProjectView já adiciona o createdById correto
-      // Não precisamos sobrescrevê-lo aqui
+      // Use logged in user's ID
       const data = {
         ...projectData,
-        status: true
+        status: true,
+        createdById: user?.id || ''
       };
 
       const response = await apiService.createProject(data);
@@ -246,7 +209,13 @@ function App() {
 
   const handleCreateTask = async (taskData: Partial<Task>) => {
     try {
-      const response = await apiService.createTask(taskData);
+      // Use logged in user's ID for createdById
+      const data = {
+        ...taskData,
+        createdById: user?.id || ''
+      };
+
+      const response = await apiService.createTask(data);
       setTasks(prev => [response.task, ...prev]);
       return response.task;
     } catch (err) {
@@ -506,14 +475,48 @@ function App() {
                 backgroundColor: '#e3f2fd'
               }}>
                 <img 
-                  src={users[0]?.avatarUrl || 'https://i.pravatar.cc/150?img=1'} 
-                  alt={users[0]?.name || 'Usuário'}
+                  src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=1'} 
+                  alt={user?.name || 'Usuário'}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               </div>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                {users[0]?.name || 'Usuário'}
-              </span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <span style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                  {user?.name || 'Usuário'}
+                </span>
+                <span style={{ fontSize: '12px', color: '#666' }}>
+                  {user?.role || 'Usuário'}
+                </span>
+              </div>
+              <button
+                onClick={logout}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'transparent',
+                  color: '#666',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8f9fa';
+                  e.currentTarget.style.color = '#FF6B6B';
+                  e.currentTarget.style.borderColor = '#FF6B6B';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#666';
+                  e.currentTarget.style.borderColor = '#ddd';
+                }}
+              >
+                <FaSignOutAlt size={12} />
+                Sair
+              </button>
             </div>
           </div>
         </div>
@@ -629,6 +632,40 @@ function App() {
       </div>
     </ErrorBoundary>
   );
-}
+};
 
-export default App;
+// Main App component with AuthProvider
+const App: React.FC = () => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f5f5f5'
+      }}>
+        <FaSpinner size={48} className="spin" style={{ animation: 'spin 1s linear infinite', color: '#4ECDC4' }} />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Login />;
+  }
+
+  return <AppContent />;
+};
+
+// Wrap the main App with AuthProvider
+const AppWithAuth: React.FC = () => {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+};
+
+export default AppWithAuth;

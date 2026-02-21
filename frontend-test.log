@@ -1,0 +1,12 @@
+
+> task-manager-app@1.0.0 dev
+> vite
+
+Re-optimizing dependencies because lockfile has changed
+
+  VITE v5.4.21  ready in 139 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://192.168.1.70:3000/
+01:06:10 [vite] hmr update /src/App.tsx
+01:06:34 [vite] hmr update /src/App.tsx

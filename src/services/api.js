@@ -1,10 +1,32 @@
 import { convertToCamelCase, convertToSnakeCase } from '../types';
 
-const API_BASE_URL = 'http://localhost:3001/api';
+// Use relative URL or detect environment
+const getApiBaseUrl = () => {
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  
+  // For localhost (development)
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return 'http://localhost:3001/api';
+  }
+  // For IP address access (network)
+  else if (hostname === '192.168.1.70') {
+    return 'http://192.168.1.70:3001/api';
+  }
+  // For domain access (tarefas.local)
+  else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
+    return 'http://api.tarefas.local:3001/api';
+  }
+  // For any other hostname
+  else {
+    // Try to use same host with port 3001
+    return `http://${hostname}:3001/api`;
+  }
+};
 
 class ApiService {
   constructor() {
-    this.baseUrl = API_BASE_URL;
+    this.baseUrl = getApiBaseUrl();
   }
 
   async request(endpoint, options = {}) {
@@ -14,7 +36,7 @@ class ApiService {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Include credentials for CORS with cookies/auth
+      credentials: 'include', // Include cookies for session authentication
     };
 
     const config = {
@@ -145,6 +167,21 @@ class ApiService {
       ? `/tasks/project/${projectId}?${queryParams}` 
       : `/tasks/project/${projectId}`;
     return this.request(endpoint);
+  }
+
+  // Status endpoints
+  async getStatuses() {
+    return this.request('/statuses');
+  }
+
+  // Priority endpoints
+  async getPriorities() {
+    return this.request('/priorities');
+  }
+
+  // User endpoints
+  async getUsers() {
+    return this.request('/users');
   }
 }
 
