@@ -4,23 +4,46 @@ import { convertToCamelCase, convertToSnakeCase } from '../types';
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   const port = window.location.port;
+  const protocol = window.location.protocol;
   
-  // For localhost (development)
+  // Determine backend port based on frontend port
+  let backendPort = 3001; // Default to development
+  
+  if (port === '8090' || port === '8091') {
+    // Production environment
+    backendPort = 8091;
+  } else if (port === '3000' || port === '3001') {
+    // Development environment
+    backendPort = 3001;
+  } else if (!port) {
+    // No port specified (default ports)
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Default to development for localhost without port
+      backendPort = 3001;
+    } else {
+      // For other hosts without port, try to detect
+      backendPort = 8091; // Assume production
+    }
+  }
+  
+  console.log(`🌐 Frontend: ${hostname}:${port} → Backend: ${hostname}:${backendPort}`);
+  
+  // For localhost (development or production)
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return 'http://localhost:3001/api';
+    return `http://localhost:${backendPort}/api`;
   }
   // For IP address access (network)
   else if (hostname === '192.168.1.70') {
-    return 'http://192.168.1.70:3001/api';
+    return `http://192.168.1.70:${backendPort}/api`;
   }
   // For domain access (tarefas.local)
   else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
-    return 'http://api.tarefas.local:3001/api';
+    return `http://api.tarefas.local:${backendPort}/api`;
   }
   // For any other hostname
   else {
-    // Try to use same host with port 3001
-    return `http://${hostname}:3001/api`;
+    // Use same host with calculated backend port
+    return `http://${hostname}:${backendPort}/api`;
   }
 };
 

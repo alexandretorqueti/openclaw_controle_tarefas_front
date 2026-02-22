@@ -2,6 +2,46 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import apiService from '../services/api';
 import { User } from '../types';
 
+// Helper function to get backend URL based on current frontend URL
+const getBackendUrl = (): string => {
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  
+  // Determine backend port based on frontend port
+  let backendPort = 3001; // Default to development
+  
+  if (port === '8090' || port === '8091') {
+    // Production environment
+    backendPort = 8091;
+  } else if (port === '3000' || port === '3001') {
+    // Development environment
+    backendPort = 3001;
+  } else if (!port) {
+    // No port specified (default ports)
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Default to development for localhost without port
+      backendPort = 3001;
+    } else {
+      // For other hosts without port, assume production
+      backendPort = 8091;
+    }
+  }
+  
+  console.log(`🌐 AuthContext: Frontend ${hostname}:${port} → Backend port ${backendPort}`);
+  
+  // Build backend URL
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `http://localhost:${backendPort}`;
+  } else if (hostname === '192.168.1.70') {
+    return `http://192.168.1.70:${backendPort}`;
+  } else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
+    return `http://api.tarefas.local:${backendPort}`;
+  } else {
+    // For any other hostname
+    return `http://${hostname}:${backendPort}`;
+  }
+};
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -34,15 +74,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // Get current origin to determine backend URL
-      const currentOrigin = window.location.origin;
-      let backendUrl = 'http://localhost:3001';
-      
-      if (currentOrigin.includes('192.168.1.70')) {
-        backendUrl = 'http://192.168.1.70:3001';
-      } else if (currentOrigin.includes('tarefas.local')) {
-        backendUrl = 'http://api.tarefas.local:3001';
-      }
+      // Get backend URL using helper function
+      const backendUrl = getBackendUrl();
       
       const response = await fetch(`${backendUrl}/auth/check`, {
         credentials: 'include'
@@ -66,17 +99,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const login = () => {
-    // Get current origin (supports localhost, IP, or domain)
+    // Get backend URL using helper function
+    const backendUrl = getBackendUrl();
     const currentOrigin = window.location.origin;
-    
-    // Determine backend URL based on current frontend URL
-    let backendUrl = 'http://localhost:3001';
-    
-    if (currentOrigin.includes('192.168.1.70')) {
-      backendUrl = 'http://192.168.1.70:3001';
-    } else if (currentOrigin.includes('tarefas.local')) {
-      backendUrl = 'http://api.tarefas.local:3001';
-    }
     
     // Redirect to Google OAuth with origin parameter
     const authUrl = `${backendUrl}/auth/google?origin=${encodeURIComponent(currentOrigin)}`;
@@ -86,15 +111,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Get current origin to determine backend URL
-      const currentOrigin = window.location.origin;
-      let backendUrl = 'http://localhost:3001';
-      
-      if (currentOrigin.includes('192.168.1.70')) {
-        backendUrl = 'http://192.168.1.70:3001';
-      } else if (currentOrigin.includes('tarefas.local')) {
-        backendUrl = 'http://api.tarefas.local:3001';
-      }
+      // Get backend URL using helper function
+      const backendUrl = getBackendUrl();
       
       await fetch(`${backendUrl}/auth/logout`, {
         method: 'POST',
