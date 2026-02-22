@@ -2,6 +2,46 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { FaGoogle, FaTasks, FaSpinner, FaUser, FaUserPlus, FaSignInAlt } from 'react-icons/fa';
 
+// Helper function to get backend URL based on current frontend URL
+const getBackendUrl = (): string => {
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  
+  // Determine backend port based on frontend port
+  let backendPort = 3001; // Default to development
+  
+  if (port === '8090' || port === '8091') {
+    // Production environment
+    backendPort = 8091;
+  } else if (port === '3000' || port === '3001') {
+    // Development environment
+    backendPort = 3001;
+  } else if (!port) {
+    // No port specified (default ports)
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Default to development for localhost without port
+      backendPort = 3001;
+    } else {
+      // For other hosts without port, assume production
+      backendPort = 8091;
+    }
+  }
+  
+  console.log(`🌐 Login Component: Frontend ${hostname}:${port} → Backend port ${backendPort}`);
+  
+  // Build backend URL
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `http://localhost:${backendPort}`;
+  } else if (hostname === '192.168.1.70') {
+    return `http://192.168.1.70:${backendPort}`;
+  } else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
+    return `http://api.tarefas.local:${backendPort}`;
+  } else {
+    // For any other hostname
+    return `http://${hostname}:${backendPort}`;
+  }
+};
+
 const Login: React.FC = () => {
   const { login, isLoading } = useAuth();
   const [nickname, setNickname] = useState('');
@@ -19,7 +59,8 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/simple-auth/login', {
+      const backendUrl = getBackendUrl();
+      const response = await fetch(`${backendUrl}/api/auth/simple-auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,6 +72,8 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Persist user in localStorage for DEV mode persistence
+        localStorage.setItem('tarefas_user', JSON.stringify(data.user));
         window.location.reload();
       } else {
         setError(data.message || 'Erro ao fazer login');
@@ -53,7 +96,8 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/simple-auth/login', {
+      const backendUrl = getBackendUrl();
+      const response = await fetch(`${backendUrl}/api/auth/simple-auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,6 +109,8 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Persist user in localStorage for DEV mode persistence
+        localStorage.setItem('tarefas_user', JSON.stringify(data.user));
         window.location.reload();
       } else {
         setError(data.message || 'Erro ao criar conta');
@@ -497,7 +543,7 @@ const Login: React.FC = () => {
           color: '#999'
         }}>
           <p style={{ margin: 0 }}>
-            Backend: http://localhost:3001 • Frontend: http://localhost:3000
+            Backend: {getBackendUrl().replace('/api', '')} • Frontend: http://{window.location.hostname}:{window.location.port || (window.location.protocol === 'https:' ? '443' : '80')}
           </p>
         </div>
 

@@ -74,25 +74,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
+      // Check local storage for simple auth user
+      const savedUser = localStorage.getItem('tarefas_user');
+      if (savedUser) {
+        const parsedUser = JSON.parse(savedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return;
+      }
+
       // Get backend URL using helper function
       const backendUrl = getBackendUrl();
       
-      const response = await fetch(`${backendUrl}/auth/check`, {
+      const response = await fetch(`${backendUrl}/api/auth/check`, {
         credentials: 'include'
       });
       
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
-        setIsAuthenticated(data.isAuthenticated);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
+        if (data.isAuthenticated) {
+          setUser(data.user);
+          setIsAuthenticated(data.isAuthenticated);
+        }
       }
     } catch (error) {
       console.error('Error checking auth:', error);
-      setUser(null);
-      setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
     }
@@ -104,17 +111,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const currentOrigin = window.location.origin;
     
     // Redirect to Google OAuth with origin parameter
-    const authUrl = `${backendUrl}/auth/google?origin=${encodeURIComponent(currentOrigin)}`;
+    const authUrl = `${backendUrl}/api/auth/google?origin=${encodeURIComponent(currentOrigin)}`;
     console.log(`🔐 Redirecting to auth: ${authUrl}`);
     window.location.href = authUrl;
   };
 
   const logout = async () => {
     try {
+      // Clear local storage
+      localStorage.removeItem('tarefas_user');
+      
       // Get backend URL using helper function
       const backendUrl = getBackendUrl();
       
-      await fetch(`${backendUrl}/auth/logout`, {
+      await fetch(`${backendUrl}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include'
       });

@@ -8,6 +8,46 @@ import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
 import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt } from 'react-icons/fa';
 
+// Helper function to get backend URL based on current frontend URL
+const getBackendUrl = (): string => {
+  const hostname = window.location.hostname;
+  const port = window.location.port;
+  
+  // Determine backend port based on frontend port
+  let backendPort = 3001; // Default to development
+  
+  if (port === '8090' || port === '8091') {
+    // Production environment
+    backendPort = 8091;
+  } else if (port === '3000' || port === '3001') {
+    // Development environment
+    backendPort = 3001;
+  } else if (!port) {
+    // No port specified (default ports)
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      // Default to development for localhost without port
+      backendPort = 3001;
+    } else {
+      // For other hosts without port, assume production
+      backendPort = 8091;
+    }
+  }
+  
+  console.log(`🌐 App Component: Frontend ${hostname}:${port} → Backend port ${backendPort}`);
+  
+  // Build backend URL
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `http://localhost:${backendPort}`;
+  } else if (hostname === '192.168.1.70') {
+    return `http://192.168.1.70:${backendPort}`;
+  } else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
+    return `http://api.tarefas.local:${backendPort}`;
+  } else {
+    // For any other hostname
+    return `http://${hostname}:${backendPort}`;
+  }
+};
+
 // Error Boundary para capturar erros no React
 class ErrorBoundary extends Component<
   { children: React.ReactNode },
@@ -615,7 +655,7 @@ const AppContent: React.FC = () => {
             {tasks.length} tarefas • {users.length} usuários • {projects.length} projetos
           </p>
           <p style={{ fontSize: '11px', marginTop: '4px', color: '#999' }}>
-            Backend: http://localhost:3001 • Frontend: http://localhost:3000
+            Backend: {getBackendUrl()} • Frontend: http://{window.location.hostname}:{window.location.port || (window.location.protocol === 'https:' ? '443' : '80')}
           </p>
         </div>
 
