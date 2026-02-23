@@ -44,8 +44,7 @@ const TaskList: React.FC<TaskListProps> = ({
     projectId: selectedProject?.id || '',
     statusId: statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '',
     priorityId: priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '',
-    assignedToId: users.length > 0 ? users[0]?.id || '' : '',
-    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias a partir de agora
+    assignedToId: users.length > 0 ? users[0]?.id || '' : ''
   });
 
   // Update defaults when data loads
@@ -113,11 +112,10 @@ const TaskList: React.FC<TaskListProps> = ({
     console.log('🔍 onCreateTask exists:', !!onCreateTask);
     console.log('🔍 Title exists:', !!newTaskData.title);
     console.log('🔍 ProjectId exists:', !!newTaskData.projectId);
-    console.log('🔍 Deadline exists:', !!newTaskData.deadline);
     
-    if (!onCreateTask || !newTaskData.title || !newTaskData.projectId || !newTaskData.deadline) {
+    if (!onCreateTask || !newTaskData.title || !newTaskData.projectId) {
       console.error('❌ Missing required data for task creation');
-      setError('Preencha o título da tarefa e o prazo.');
+      setError('Preencha o título da tarefa.');
       return;
     }
 
@@ -127,8 +125,13 @@ const TaskList: React.FC<TaskListProps> = ({
       // Debug: log what we're sending
       console.log('📤 Enviando dados da tarefa:', newTaskData);
       
+      // Set default deadline to 7 days from now
+      const deadline = new Date();
+      deadline.setDate(deadline.getDate() + 7);
+      
       const taskData = {
         ...newTaskData,
+        deadline: deadline.toISOString(),
         // createdById will be set by the parent component (App.tsx)
         position: tasks.length
       };
@@ -148,8 +151,7 @@ const TaskList: React.FC<TaskListProps> = ({
         projectId: selectedProject?.id || '',
         statusId: defaultStatus,
         priorityId: defaultPriority,
-        assignedToId: defaultUser,
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias a partir de agora
+        assignedToId: defaultUser
       });
       setIsCreatingTask(false);
     } catch (error: any) {
@@ -525,35 +527,6 @@ const TaskList: React.FC<TaskListProps> = ({
                 </select>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  Prazo
-                </label>
-                <input
-                  type="datetime-local"
-                  value={newTaskData.deadline ? new Date(newTaskData.deadline).toISOString().slice(0, 16) : ''}
-                  onChange={(e) => {
-                    const dateValue = e.target.value;
-                    if (dateValue) {
-                      const date = new Date(dateValue);
-                      setNewTaskData({ ...newTaskData, deadline: date.toISOString() });
-                    } else {
-                      setNewTaskData({ ...newTaskData, deadline: '' });
-                    }
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '14px'
-                  }}
-                />
-                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                  Data e hora limite para conclusão
-                </p>
-              </div>
-
               <div style={{ gridColumn: '1 / -1' }}>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
                   Descrição
@@ -592,15 +565,15 @@ const TaskList: React.FC<TaskListProps> = ({
               </button>
               <button
                 onClick={handleCreateTask}
-                disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.deadline}
+                disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId}
                 style={{
                   padding: '10px 20px',
-                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline) ? '#4ECDC4' : '#ccc',
+                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId) ? '#4ECDC4' : '#ccc',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline) ? 'pointer' : 'not-allowed'
+                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId) ? 'pointer' : 'not-allowed'
                 }}
               >
                 Criar Tarefa

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Users API</title>
+</head>
+<body>
+    <h1>Test Users API</h1>
+    <div id="result">Loading...</div>
+    
+    <script>
+        fetch('http://localhost:3001/api/users', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('result').innerHTML = 
+                `Success! Found ${data.count} users: ` + 
+                data.users.map(u => u.name).join(', ');
+        })
+        .catch(error => {
+            document.getElementById('result').innerHTML = 
+                `Error: ${error.message}`;
+        });
+    </script>
+</body>
+</html>

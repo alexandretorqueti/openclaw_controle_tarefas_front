@@ -34,10 +34,15 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   const [newProjectData, setNewProjectData] = useState<Partial<Project>>({
     name: '',
     description: '',
+    regras: '',
     status: true
   });
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editProjectData, setEditProjectData] = useState<Partial<Project>>({});
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   const getProjectTasks = (projectId: string) => {
     return tasks.filter(task => task.projectId === projectId);
@@ -100,6 +105,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
       setNewProjectData({
         name: '',
         description: '',
+        regras: '',
         status: true
       });
       setIsCreatingProject(false);
@@ -204,6 +210,23 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 <p style={{ fontSize: '16px', color: '#666', marginBottom: '20px', lineHeight: 1.6 }}>
                   {selectedProject.description}
                 </p>
+                
+                {selectedProject.regras && (
+                  <div style={{ 
+                    backgroundColor: '#f8f9fa', 
+                    padding: '16px', 
+                    borderRadius: '8px',
+                    marginTop: '16px',
+                    borderLeft: '4px solid #4ECDC4'
+                  }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+                      📋 Regras do Projeto
+                    </h3>
+                    <p style={{ fontSize: '14px', color: '#666', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                      {selectedProject.regras}
+                    </p>
+                  </div>
+                )}
 
                 <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -224,6 +247,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({
               <div style={{ display: 'flex', gap: '12px' }}>
                 {onUpdateProject && (
                   <button
+                    onClick={() => {
+                      setEditingProject(selectedProject);
+                      setEditProjectData({});
+                      setUpdateError(null);
+                    }}
                     style={{
                       padding: '10px 16px',
                       backgroundColor: '#4ECDC4',
@@ -561,6 +589,29 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
             <div>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                Regras (opcional)
+              </label>
+              <textarea
+                value={newProjectData.regras || ''}
+                onChange={(e) => setNewProjectData({ ...newProjectData, regras: e.target.value })}
+                placeholder="Defina as regras específicas deste projeto..."
+                rows={4}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  resize: 'vertical'
+                }}
+              />
+              <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                Sem limite de caracteres. Use para definir regras, políticas ou diretrizes do projeto.
+              </div>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
                 Status
               </label>
               <select
@@ -661,34 +712,73 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
               }}
             >
-              {/* Delete button */}
-              {onDeleteProject && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDeleteProject(project.id);
-                  }}
-                  disabled={isDeleting === project.id}
-                  style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    width: '32px',
-                    height: '32px',
-                    backgroundColor: isDeleting === project.id ? '#ccc' : '#FF6B6B',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: isDeleting === project.id ? 'not-allowed' : 'pointer',
-                    zIndex: 10
-                  }}
-                >
-                  <FaTrash size={14} />
-                </button>
-              )}
+              {/* Action buttons */}
+              <div style={{
+                position: 'absolute',
+                top: '12px',
+                right: '12px',
+                display: 'flex',
+                gap: '8px',
+                zIndex: 10
+              }}>
+                {onUpdateProject && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEditingProject(project);
+                      setEditProjectData({});
+                      setUpdateError(null);
+                    }}
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      backgroundColor: '#4ECDC4',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+                  >
+                    <FaEdit size={14} />
+                  </button>
+                )}
+                {onDeleteProject && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteProject(project.id);
+                    }}
+                    disabled={isDeleting === project.id}
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      backgroundColor: isDeleting === project.id ? '#ccc' : '#FF6B6B',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: isDeleting === project.id ? 'not-allowed' : 'pointer',
+                      transition: 'background-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (isDeleting !== project.id) e.currentTarget.style.backgroundColor = '#e55a5a';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (isDeleting !== project.id) e.currentTarget.style.backgroundColor = '#FF6B6B';
+                    }}
+                  >
+                    <FaTrash size={14} />
+                  </button>
+                )}
+              </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px', marginBottom: '16px' }}>
                 <div style={{
@@ -842,6 +932,271 @@ const ProjectView: React.FC<ProjectViewProps> = ({
             <FaPlus size={16} />
             Criar Primeiro Projeto
           </button>
+        </div>
+      )}
+
+      {/* Edit Project Modal */}
+      {editingProject && onUpdateProject && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '600px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#333' }}>
+                Editar Projeto
+              </h2>
+              <button
+                onClick={() => {
+                  setEditingProject(null);
+                  setEditProjectData({});
+                  setUpdateError(null);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '24px',
+                  color: '#666',
+                  cursor: 'pointer',
+                  padding: '8px',
+                  borderRadius: '4px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                ×
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gap: '20px', marginBottom: '32px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Nome do Projeto *
+                </label>
+                <input
+                  type="text"
+                  value={editProjectData.name || editingProject.name}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, name: e.target.value })}
+                  placeholder="Digite o nome do projeto"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                    Descrição
+                  </label>
+                  <span style={{ fontSize: '12px', color: (editProjectData.description || editingProject.description).length < 10 ? '#FF6B6B' : '#666' }}>
+                    {(editProjectData.description || editingProject.description).length}/10 caracteres mínimos
+                  </span>
+                </div>
+                <textarea
+                  value={editProjectData.description || editingProject.description}
+                  onChange={(e) => {
+                    setEditProjectData({ ...editProjectData, description: e.target.value });
+                    setUpdateError(null);
+                  }}
+                  placeholder="Descreva o propósito deste projeto (mínimo 10 caracteres)..."
+                  rows={3}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: (editProjectData.description || editingProject.description).length < 10 ? '1px solid #FF6B6B' : '1px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    resize: 'vertical'
+                  }}
+                />
+                {(editProjectData.description || editingProject.description).length < 10 && (
+                  <div style={{ fontSize: '12px', color: '#FF6B6B', marginTop: '4px' }}>
+                    A descrição precisa ter pelo menos 10 caracteres
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Regras (opcional)
+                </label>
+                <textarea
+                  value={editProjectData.regras !== undefined ? editProjectData.regras : (editingProject.regras || '')}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, regras: e.target.value })}
+                  placeholder="Defina as regras específicas deste projeto..."
+                  rows={6}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    resize: 'vertical'
+                  }}
+                />
+                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  Sem limite de caracteres. Use para definir regras, políticas ou diretrizes do projeto.
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Status
+                </label>
+                <select
+                  value={editProjectData.status !== undefined ? editProjectData.status.toString() : editingProject.status.toString()}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, status: e.target.value === 'true' })}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '14px'
+                  }}
+                >
+                  <option value="true">Ativo</option>
+                  <option value="false">Inativo</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Update error message */}
+            {updateError && (
+              <div style={{
+                padding: '12px',
+                backgroundColor: '#FF6B6B',
+                color: '#fff',
+                borderRadius: '8px',
+                marginBottom: '16px',
+                fontSize: '14px'
+              }}>
+                {updateError}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+              <button
+                onClick={() => {
+                  setEditingProject(null);
+                  setEditProjectData({});
+                  setUpdateError(null);
+                }}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: '#f8f9fa',
+                  color: '#333',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={async () => {
+                  if (!onUpdateProject || !editingProject) return;
+                  
+                  const data = {
+                    name: editProjectData.name || editingProject.name,
+                    description: editProjectData.description || editingProject.description,
+                    regras: editProjectData.regras !== undefined ? editProjectData.regras : editingProject.regras,
+                    status: editProjectData.status !== undefined ? editProjectData.status : editingProject.status
+                  };
+
+                  // Validation
+                  if (data.description.length < 10) {
+                    setUpdateError('A descrição deve ter pelo menos 10 caracteres');
+                    return;
+                  }
+
+                  setIsUpdating(true);
+                  setUpdateError(null);
+
+                  try {
+                    await onUpdateProject(editingProject.id, data);
+                    
+                    // Close modal
+                    setEditingProject(null);
+                    setEditProjectData({});
+                    setUpdateError(null);
+                    
+                    // If we're viewing this project, refresh the view
+                    // Note: In a real app, you would refresh the project data here
+                    console.log('Project updated, should refresh view');
+                  } catch (error: any) {
+                    console.error('Failed to update project:', error);
+                    
+                    let errorMessage = 'Falha ao atualizar projeto';
+                    if (error.message && error.message.includes('Validation error')) {
+                      errorMessage = 'Erro de validação: ';
+                      if (error.message.includes('Description must be at least 10 characters')) {
+                        errorMessage += 'A descrição deve ter pelo menos 10 caracteres';
+                      } else {
+                        errorMessage += error.message;
+                      }
+                    } else if (error.message) {
+                      errorMessage = error.message;
+                    }
+                    
+                    setUpdateError(errorMessage);
+                  } finally {
+                    setIsUpdating(false);
+                  }
+                }}
+                disabled={isUpdating || (editProjectData.description || editingProject.description).length < 10}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: isUpdating || (editProjectData.description || editingProject.description).length < 10 ? '#ccc' : '#4ECDC4',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: isUpdating || (editProjectData.description || editingProject.description).length < 10 ? 'not-allowed' : 'pointer',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isUpdating && (editProjectData.description || editingProject.description).length >= 10) {
+                    e.currentTarget.style.backgroundColor = '#3db8af';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isUpdating && (editProjectData.description || editingProject.description).length >= 10) {
+                    e.currentTarget.style.backgroundColor = '#4ECDC4';
+                  }
+                }}
+              >
+                {isUpdating ? 'Salvando...' : 'Salvar Alterações'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

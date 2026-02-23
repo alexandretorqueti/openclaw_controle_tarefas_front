@@ -48,18 +48,20 @@ const getApiBaseUrl = () => {
 };
 
 class ApiService {
+  private baseUrl: string;
+
   constructor() {
     this.baseUrl = getApiBaseUrl();
   }
 
-  async request(endpoint, options = {}) {
+  async request(endpoint: string, options: any = {}) {
     const url = `${this.baseUrl}${endpoint}`;
     
-    const defaultOptions = {
+    const defaultOptions: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Include cookies for session authentication
+      credentials: 'include' as RequestCredentials, // Include cookies for session authentication
     };
 
     const config = {

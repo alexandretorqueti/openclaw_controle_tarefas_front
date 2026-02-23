@@ -6,10 +6,11 @@ import Login from './components/Login';
 import FloatingMenu from './components/FloatingMenu';
 import StatusManager from './components/StatusManager';
 import PriorityManager from './components/PriorityManager';
+import RecurrenceManager from './components/RecurrenceManager';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
-import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync } from 'react-icons/fa';
 
 // Helper function to get backend URL based on current frontend URL
 const getBackendUrl = (): string => {
@@ -421,6 +422,13 @@ const AppContent: React.FC = () => {
           />
         );
       
+      case 'recurrence':
+        return (
+          <RecurrenceManager
+            onTaskSelect={handleTaskSelect}
+          />
+        );
+      
       case 'projects':
       default:
         return (
@@ -476,6 +484,30 @@ const AppContent: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('recurrence');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: viewMode === 'recurrence' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'recurrence' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <FaSync size={14} />
+                Recorrência
+              </button>
+              
               <button
                 onClick={() => {
                   setSelectedProject(null);

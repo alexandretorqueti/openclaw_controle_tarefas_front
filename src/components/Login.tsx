@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { FaGoogle, FaTasks, FaSpinner, FaUser, FaUserPlus, FaSignInAlt } from 'react-icons/fa';
+import { FaGoogle, FaTasks, FaSpinner, FaUser, FaUserPlus, FaSignInAlt, FaEnvelope, FaIdCard } from 'react-icons/fa';
 
 // Helper function to get backend URL based on current frontend URL
 const getBackendUrl = (): string => {
@@ -44,35 +44,42 @@ const getBackendUrl = (): string => {
 
 const Login: React.FC = () => {
   const { login, isLoading } = useAuth();
-  const [nickname, setNickname] = useState('');
-  const [isNicknameLoading, setIsNicknameLoading] = useState(false);
+  const [loginNickname, setLoginNickname] = useState('');
+  const [registerData, setRegisterData] = useState({
+    name: '',
+    nickname: '',
+    email: ''
+  });
+  const [isLoadingAction, setIsLoadingAction] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState<'google' | 'login' | 'register'>('google');
 
-  const handleNicknameLogin = async () => {
-    if (!nickname.trim() || nickname.length < 2) {
+  const handleLogin = async () => {
+    if (!loginNickname.trim() || loginNickname.length < 2) {
       setError('O nickname deve ter pelo menos 2 caracteres');
       return;
     }
 
-    setIsNicknameLoading(true);
+    setIsLoadingAction(true);
     setError('');
+    setSuccess('');
 
     try {
       const backendUrl = getBackendUrl();
-      const response = await fetch(`${backendUrl}/api/auth/simple-auth/login`, {
+      const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nickname: nickname.trim() }),
+        body: JSON.stringify({ nickname: loginNickname.trim() }),
         credentials: 'include'
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Persist user in localStorage for DEV mode persistence
+        // Persist user in localStorage
         localStorage.setItem('tarefas_user', JSON.stringify(data.user));
         window.location.reload();
       } else {
@@ -80,47 +87,74 @@ const Login: React.FC = () => {
       }
     } catch (err) {
       setError('Erro de conexão com o servidor');
-      console.error('Erro no login com nickname:', err);
+      console.error('Erro no login:', err);
     } finally {
-      setIsNicknameLoading(false);
+      setIsLoadingAction(false);
     }
   };
 
-  const handleNicknameRegister = async () => {
-    if (!nickname.trim() || nickname.length < 2) {
+  const handleRegister = async () => {
+    // Validações
+    if (!registerData.name.trim() || registerData.name.length < 2) {
+      setError('O nome deve ter pelo menos 2 caracteres');
+      return;
+    }
+    
+    if (!registerData.nickname.trim() || registerData.nickname.length < 2) {
       setError('O nickname deve ter pelo menos 2 caracteres');
       return;
     }
+    
+    // Validação de email opcional, mas se fornecido, deve ser válido
+    if (registerData.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(registerData.email)) {
+      setError('Por favor, insira um email válido');
+      return;
+    }
 
-    setIsNicknameLoading(true);
+    setIsLoadingAction(true);
     setError('');
+    setSuccess('');
 
     try {
       const backendUrl = getBackendUrl();
-      const response = await fetch(`${backendUrl}/api/auth/simple-auth/login`, {
+      const response = await fetch(`${backendUrl}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nickname: nickname.trim() }),
+        body: JSON.stringify({
+          name: registerData.name.trim(),
+          nickname: registerData.nickname.trim(),
+          email: registerData.email.trim() || null
+        }),
         credentials: 'include'
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Persist user in localStorage for DEV mode persistence
-        localStorage.setItem('tarefas_user', JSON.stringify(data.user));
-        window.location.reload();
+        setSuccess('Cadastro realizado com sucesso! Você já pode fazer login.');
+        // Limpar formulário
+        setRegisterData({ name: '', nickname: '', email: '' });
+        // Mudar para aba de login
+        setTimeout(() => {
+          setActiveTab('login');
+          setLoginNickname(registerData.nickname.trim());
+        }, 2000);
       } else {
         setError(data.message || 'Erro ao criar conta');
       }
     } catch (err) {
       setError('Erro de conexão com o servidor');
-      console.error('Erro no registro com nickname:', err);
+      console.error('Erro no registro:', err);
     } finally {
-      setIsNicknameLoading(false);
+      setIsLoadingAction(false);
     }
+  };
+
+  const handleInputChange = (field: keyof typeof registerData, value: string) => {
+    setRegisterData(prev => ({ ...prev, [field]: value }));
+    setError('');
   };
 
   return (
@@ -327,12 +361,12 @@ const Login: React.FC = () => {
               </label>
               <input
                 type="text"
-                value={nickname}
+                value={loginNickname}
                 onChange={(e) => {
-                  setNickname(e.target.value);
+                  setLoginNickname(e.target.value);
                   setError('');
                 }}
-                placeholder="Digite seu nickname (mínimo 2 caracteres)"
+                placeholder="Digite seu nickname"
                 style={{
                   width: '100%',
                   padding: '14px',
@@ -344,7 +378,7 @@ const Login: React.FC = () => {
                 }}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
-                    handleNicknameLogin();
+                    handleLogin();
                   }
                 }}
               />
@@ -361,11 +395,24 @@ const Login: React.FC = () => {
                   {error}
                 </div>
               )}
+              {success && (
+                <div style={{
+                  marginTop: '8px',
+                  padding: '8px 12px',
+                  backgroundColor: '#E5FFE5',
+                  border: '1px solid #06D6A0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  color: '#06D6A0'
+                }}>
+                  {success}
+                </div>
+              )}
             </div>
 
             <button
-              onClick={handleNicknameLogin}
-              disabled={isNicknameLoading || !nickname.trim()}
+              onClick={handleLogin}
+              disabled={isLoadingAction || !loginNickname.trim()}
               style={{
                 width: '100%',
                 padding: '16px',
@@ -381,25 +428,25 @@ const Login: React.FC = () => {
                 justifyContent: 'center',
                 gap: '12px',
                 transition: 'all 0.2s',
-                opacity: (isNicknameLoading || !nickname.trim()) ? 0.7 : 1
+                opacity: (isLoadingAction || !loginNickname.trim()) ? 0.7 : 1
               }}
               onMouseEnter={(e) => {
-                if (!isNicknameLoading && nickname.trim()) {
+                if (!isLoadingAction && loginNickname.trim()) {
                   e.currentTarget.style.backgroundColor = '#3DB8AC';
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isNicknameLoading && nickname.trim()) {
+                if (!isLoadingAction && loginNickname.trim()) {
                   e.currentTarget.style.backgroundColor = '#4ECDC4';
                 }
               }}
             >
-              {isNicknameLoading ? (
+              {isLoadingAction ? (
                 <FaSpinner className="spin" style={{ animation: 'spin 1s linear infinite' }} />
               ) : (
                 <FaSignInAlt size={20} />
               )}
-              {isNicknameLoading ? 'Entrando...' : 'Entrar com Nickname'}
+              {isLoadingAction ? 'Entrando...' : 'Entrar com Nickname'}
             </button>
 
             <div style={{
@@ -412,22 +459,23 @@ const Login: React.FC = () => {
               textAlign: 'left'
             }}>
               <p style={{ marginBottom: '8px' }}>
-                <strong>👤 Login simples:</strong> Use um nickname para acesso rápido.
+                <strong>👤 Login persistente:</strong> Use seu nickname para acessar o sistema.
               </p>
               <p style={{ margin: 0 }}>
-                Se o nickname não existir, você será redirecionado para cadastro.
+                Se ainda não tem uma conta, vá para a aba "Cadastrar".
               </p>
             </div>
           </>
         )}
 
-        {/* Nickname Register Tab */}
+        {/* Cadastro Tab */}
         {activeTab === 'register' && (
           <>
             <div style={{
               marginBottom: '24px',
               textAlign: 'left'
             }}>
+              {/* Nome */}
               <label style={{
                 display: 'block',
                 marginBottom: '8px',
@@ -435,32 +483,82 @@ const Login: React.FC = () => {
                 fontWeight: 600,
                 color: '#333'
               }}>
-                <FaUserPlus style={{ marginRight: '8px' }} />
-                Escolha um Nickname
+                <FaIdCard style={{ marginRight: '8px' }} />
+                Nome Completo *
               </label>
               <input
                 type="text"
-                value={nickname}
-                onChange={(e) => {
-                  setNickname(e.target.value);
-                  setError('');
-                }}
-                placeholder="Escolha um nickname único (mínimo 2 caracteres)"
+                value={registerData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Digite seu nome completo"
                 style={{
                   width: '100%',
                   padding: '14px',
-                  border: `1px solid ${error ? '#FF6B6B' : '#e0e0e0'}`,
+                  border: `1px solid ${error && !registerData.name.trim() ? '#FF6B6B' : '#e0e0e0'}`,
                   borderRadius: '8px',
                   fontSize: '16px',
+                  marginBottom: '16px',
                   transition: 'all 0.2s',
                   boxSizing: 'border-box'
                 }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    handleNicknameRegister();
-                  }
+              />
+
+              {/* Nickname */}
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                color: '#333'
+              }}>
+                <FaUser style={{ marginRight: '8px' }} />
+                Nickname *
+              </label>
+              <input
+                type="text"
+                value={registerData.nickname}
+                onChange={(e) => handleInputChange('nickname', e.target.value)}
+                placeholder="Escolha um nickname único"
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  border: `1px solid ${error && !registerData.nickname.trim() ? '#FF6B6B' : '#e0e0e0'}`,
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  marginBottom: '16px',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
                 }}
               />
+
+              {/* Email (opcional) */}
+              <label style={{
+                display: 'block',
+                marginBottom: '8px',
+                fontSize: '14px',
+                fontWeight: 600,
+                color: '#333'
+              }}>
+                <FaEnvelope style={{ marginRight: '8px' }} />
+                Email (opcional)
+              </label>
+              <input
+                type="email"
+                value={registerData.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                placeholder="seu@email.com (opcional)"
+                style={{
+                  width: '100%',
+                  padding: '14px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  marginBottom: '16px',
+                  transition: 'all 0.2s',
+                  boxSizing: 'border-box'
+                }}
+              />
+              
               {error && (
                 <div style={{
                   marginTop: '8px',
@@ -474,11 +572,24 @@ const Login: React.FC = () => {
                   {error}
                 </div>
               )}
+              {success && (
+                <div style={{
+                  marginTop: '8px',
+                  padding: '8px 12px',
+                  backgroundColor: '#E5FFE5',
+                  border: '1px solid #06D6A0',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  color: '#06D6A0'
+                }}>
+                  {success}
+                </div>
+              )}
             </div>
 
             <button
-              onClick={handleNicknameRegister}
-              disabled={isNicknameLoading || !nickname.trim()}
+              onClick={handleRegister}
+              disabled={isLoadingAction || !registerData.name.trim() || !registerData.nickname.trim()}
               style={{
                 width: '100%',
                 padding: '16px',
@@ -494,25 +605,25 @@ const Login: React.FC = () => {
                 justifyContent: 'center',
                 gap: '12px',
                 transition: 'all 0.2s',
-                opacity: (isNicknameLoading || !nickname.trim()) ? 0.7 : 1
+                opacity: (isLoadingAction || !registerData.name.trim() || !registerData.nickname.trim()) ? 0.7 : 1
               }}
               onMouseEnter={(e) => {
-                if (!isNicknameLoading && nickname.trim()) {
+                if (!isLoadingAction && registerData.name.trim() && registerData.nickname.trim()) {
                   e.currentTarget.style.backgroundColor = '#05C592';
                 }
               }}
               onMouseLeave={(e) => {
-                if (!isNicknameLoading && nickname.trim()) {
+                if (!isLoadingAction && registerData.name.trim() && registerData.nickname.trim()) {
                   e.currentTarget.style.backgroundColor = '#06D6A0';
                 }
               }}
             >
-              {isNicknameLoading ? (
+              {isLoadingAction ? (
                 <FaSpinner className="spin" style={{ animation: 'spin 1s linear infinite' }} />
               ) : (
                 <FaUserPlus size={20} />
               )}
-              {isNicknameLoading ? 'Criando conta...' : 'Criar Conta com Nickname'}
+              {isLoadingAction ? 'Criando conta...' : 'Criar Conta'}
             </button>
 
             <div style={{
@@ -525,10 +636,10 @@ const Login: React.FC = () => {
               textAlign: 'left'
             }}>
               <p style={{ marginBottom: '8px' }}>
-                <strong>🚀 Cadastro rápido:</strong> Crie uma conta em segundos.
+                <strong>📝 Cadastro completo:</strong> Crie uma conta persistente no banco de dados.
               </p>
               <p style={{ margin: 0 }}>
-                Basta escolher um nickname único. Sem senhas, sem emails complicados.
+                Seus dados serão armazenados permanentemente. Email é opcional.
               </p>
             </div>
           </>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Task, User, Status, Priority, Project } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram } from 'react-icons/fa';
+import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle } from 'react-icons/fa';
 
 interface TaskCardProps {
   task: Task;
@@ -31,6 +31,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const getAssignedUser = () => users.find(user => user.id === task.assignedToId);
   const getStatus = () => statuses.find(status => status.id === task.statusId);
@@ -51,10 +52,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const handleToggleCompletion = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onToggleCompletion) {
+      setError(null); // Limpa erros anteriores
+      
       try {
         await onToggleCompletion(task.id);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to toggle task completion:', error);
+        
+        // Extrai mensagem de erro amigável
+        let errorMessage = 'Erro ao alterar status da tarefa.';
+        
+        if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        setError(errorMessage);
       }
     }
   };
@@ -65,10 +77,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
     
     if (window.confirm('Tem certeza que deseja excluir esta tarefa?')) {
       setIsDeleting(true);
+      setError(null); // Limpa erros anteriores
+      
       try {
         await onDeleteTask(task.id);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete task:', error);
+        
+        // Extrai mensagem de erro amigável
+        let errorMessage = 'Erro ao excluir tarefa.';
+        
+        if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        setError(errorMessage);
         setIsDeleting(false);
       }
     }
@@ -79,10 +102,32 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (!onUpdateTask) return;
     
     setIsUpdating(true);
+    setError(null); // Limpa erros anteriores
+    
     try {
       await onUpdateTask(task.id, { statusId: e.target.value });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update task status:', error);
+      
+      // Extrai mensagem de erro amigável
+      let errorMessage = 'Erro ao atualizar status da tarefa.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Tenta extrair detalhes da resposta da API
+      if (error.details && Array.isArray(error.details)) {
+        const validationErrors = error.details.map((detail: any) => 
+          detail.message || `${detail.path?.join('.')}: ${detail.code}`
+        ).join(', ');
+        
+        if (validationErrors) {
+          errorMessage = `Erros de validação: ${validationErrors}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -93,10 +138,32 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (!onUpdateTask) return;
     
     setIsUpdating(true);
+    setError(null); // Limpa erros anteriores
+    
     try {
       await onUpdateTask(task.id, { priorityId: e.target.value });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to update task priority:', error);
+      
+      // Extrai mensagem de erro amigável
+      let errorMessage = 'Erro ao atualizar prioridade da tarefa.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Tenta extrair detalhes da resposta da API
+      if (error.details && Array.isArray(error.details)) {
+        const validationErrors = error.details.map((detail: any) => 
+          detail.message || `${detail.path?.join('.')}: ${detail.code}`
+        ).join(', ');
+        
+        if (validationErrors) {
+          errorMessage = `Erros de validação: ${validationErrors}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsUpdating(false);
     }
@@ -126,6 +193,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
+        {/* Exibição de erro */}
+        {error && (
+          <div style={{
+            backgroundColor: '#FFE5E5',
+            border: '1px solid #FF6B6B',
+            color: '#D32F2F',
+            padding: '8px',
+            borderRadius: '4px',
+            marginBottom: '8px',
+            fontSize: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}>
+            <FaExclamationTriangle size={12} />
+            <span>{error}</span>
+          </div>
+        )}
+
         {/* Status indicator */}
         <div style={{
           position: 'absolute',
@@ -266,6 +352,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
+      {/* Exibição de erro */}
+      {error && (
+        <div style={{
+          backgroundColor: '#FFE5E5',
+          border: '1px solid #FF6B6B',
+          color: '#D32F2F',
+          padding: '10px',
+          borderRadius: '6px',
+          marginBottom: '12px',
+          fontSize: '13px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          <FaExclamationTriangle size={14} />
+          <span>{error}</span>
+        </div>
+      )}
+
       {/* Completion toggle */}
       <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
         <button

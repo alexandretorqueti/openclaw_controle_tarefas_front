@@ -74,32 +74,57 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       
-      // Check local storage for simple auth user
+      // Check local storage for user
       const savedUser = localStorage.getItem('tarefas_user');
       if (savedUser) {
         const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
-        setIsLoading(false);
-        return;
-      }
-
-      // Get backend URL using helper function
-      const backendUrl = getBackendUrl();
-      
-      const response = await fetch(`${backendUrl}/api/auth/check`, {
-        credentials: 'include'
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.isAuthenticated) {
-          setUser(data.user);
-          setIsAuthenticated(data.isAuthenticated);
+        
+        // Verificar se o usuário ainda existe no banco de dados
+        const backendUrl = getBackendUrl();
+        try {
+          const response = await fetch(`${backendUrl}/api/auth/check`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: parsedUser.id }),
+            credentials: 'include'
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.isAuthenticated) {
+              // Atualizar usuário com dados do banco
+              setUser(data.user);
+              setIsAuthenticated(true);
+              // Atualizar localStorage
+              localStorage.setItem('tarefas_user', JSON.stringify(data.user));
+            } else {
+              // Usuário não encontrado no banco, limpar localStorage
+              localStorage.removeItem('tarefas_user');
+              setUser(null);
+              setIsAuthenticated(false);
+            }
+          } else {
+            // Erro na verificação, manter usuário local
+            setUser(parsedUser);
+            setIsAuthenticated(true);
+          }
+        } catch (error) {
+          // Erro de conexão, manter usuário local
+          console.error('Erro ao verificar autenticação:', error);
+          setUser(parsedUser);
+          setIsAuthenticated(true);
         }
+      } else {
+        // Nenhum usuário no localStorage
+        setUser(null);
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.error('Error checking auth:', error);
+      setUser(null);
+      setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
     }

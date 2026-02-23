@@ -561,7 +561,17 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             <input
               type="datetime-local"
               value={editedTask.deadline ? new Date(editedTask.deadline).toISOString().slice(0, 16) : ''}
-              onChange={(e) => setEditedTask({ ...editedTask, deadline: e.target.value })}
+              onChange={(e) => {
+                // Quando o usuário seleciona uma data/hora, precisamos garantir o formato correto
+                const dateValue = e.target.value;
+                if (dateValue) {
+                  // Adiciona segundos e timezone para formato ISO 8601 completo
+                  const date = new Date(dateValue);
+                  setEditedTask({ ...editedTask, deadline: date.toISOString() });
+                } else {
+                  setEditedTask({ ...editedTask, deadline: '' });
+                }
+              }}
               style={{
                 width: '100%',
                 padding: '10px',
