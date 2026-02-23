@@ -3,6 +3,9 @@ import TaskList from './components/TaskList';
 import TaskDetail from './components/TaskDetail';
 import ProjectView from './components/ProjectView';
 import Login from './components/Login';
+import FloatingMenu from './components/FloatingMenu';
+import StatusManager from './components/StatusManager';
+import PriorityManager from './components/PriorityManager';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
@@ -126,6 +129,10 @@ const AppContent: React.FC = () => {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estados para os modais
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
 
   // Load initial data
   useEffect(() => {
@@ -146,6 +153,10 @@ const AppContent: React.FC = () => {
         apiService.getPriorities().catch(() => ({ priorities: [] }))
       ]);
 
+      console.log('🚀 Loaded users data:', usersData);
+      console.log('🚀 Users array:', usersData.users);
+      console.log('🚀 Users count:', usersData.users?.length || 0);
+      
       setProjects(projectsData.projects || []);
       setTasks(tasksData.tasks || []);
       setUsers(usersData.users || []);
@@ -164,6 +175,21 @@ const AppContent: React.FC = () => {
       setPriorities([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Função para recarregar apenas status e prioridades
+  const reloadStatusesAndPriorities = async () => {
+    try {
+      const [statusesData, prioritiesData] = await Promise.all([
+        apiService.getStatuses().catch(() => ({ statuses: [] })),
+        apiService.getPriorities().catch(() => ({ priorities: [] }))
+      ]);
+      
+      setStatuses(statusesData.statuses || []);
+      setPriorities(prioritiesData.priorities || []);
+    } catch (err) {
+      console.error('Failed to reload statuses/priorities:', err);
     }
   };
 
@@ -440,17 +466,10 @@ const AppContent: React.FC = () => {
             height: '64px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                backgroundColor: '#4ECDC4',
-                borderRadius: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <FaBars size={20} color="#fff" />
-              </div>
+              <FloatingMenu
+                onOpenStatus={() => setIsStatusModalOpen(true)}
+                onOpenPriority={() => setIsPriorityModalOpen(true)}
+              />
               <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#333' }}>
                 Sistema de Gestão
               </h1>
@@ -658,6 +677,19 @@ const AppContent: React.FC = () => {
             Backend: {getBackendUrl()} • Frontend: http://{window.location.hostname}:{window.location.port || (window.location.protocol === 'https:' ? '443' : '80')}
           </p>
         </div>
+
+        {/* Modais de Configuração */}
+        <StatusManager
+          isOpen={isStatusModalOpen}
+          onClose={() => setIsStatusModalOpen(false)}
+          onStatusUpdate={reloadStatusesAndPriorities}
+        />
+        
+        <PriorityManager
+          isOpen={isPriorityModalOpen}
+          onClose={() => setIsPriorityModalOpen(false)}
+          onPriorityUpdate={reloadStatusesAndPriorities}
+        />
 
         <style>{`
           @keyframes spin {

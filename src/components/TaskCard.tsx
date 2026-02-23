@@ -238,7 +238,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
   return (
     <div 
       className="task-card"
-      onClick={() => onTaskClick(task)}
+      onClick={(e) => {
+        // Only navigate to task details if we didn't click on an interactive element
+        const target = e.target as HTMLElement;
+        const isInteractive = target.tagName === 'SELECT' || target.tagName === 'BUTTON' || target.closest('select, button');
+        if (!isInteractive) {
+          onTaskClick(task);
+        }
+      }}
       style={{
         border: `1px solid ${isOverdue ? '#FF6B6B' : '#e0e0e0'}`,
         borderRadius: '12px',
