@@ -13,6 +13,7 @@ export interface Project {
   id: string;
   name: string;
   description: string;
+  regras?: string;
   createdById: string;
   createdAt: string;
   updatedAt: string;
@@ -56,6 +57,14 @@ export interface Task {
   isCompleted: boolean;
   createdAt: string;
   updatedAt: string;
+  
+  // Recurrence fields
+  isRecurring?: boolean;
+  recurrenceType?: 'daily' | 'weekly' | 'monthly' | null;
+  recurrenceTimes?: string[] | null;
+  recurrenceDays?: number[] | null;
+  lastExecutedAt?: string | null;
+  nextExecutionAt?: string | null;
   
   // Optional relations (from API includes)
   project?: {
@@ -171,7 +180,31 @@ export function convertToCamelCase<T>(obj: any): T {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-        newObj[camelKey] = convertToCamelCase(obj[key]);
+        const value = obj[key];
+        
+        // Special handling for JSON strings that should be arrays
+        if ((camelKey === 'recurrenceTimes' || camelKey === 'recurrenceDays') && 
+            typeof value === 'string') {
+          // Handle empty string, "null", or "[]" as null/empty array
+          const trimmedValue = value.trim();
+          if (trimmedValue === '' || trimmedValue === 'null') {
+            newObj[camelKey] = null;
+          } else if (trimmedValue === '[]') {
+            newObj[camelKey] = [];
+          } else if (trimmedValue.startsWith('[')) {
+            try {
+              newObj[camelKey] = JSON.parse(value);
+            } catch (error) {
+              console.warn(`Failed to parse ${camelKey} as JSON:`, value, error);
+              newObj[camelKey] = null; // Fallback to null instead of keeping invalid string
+            }
+          } else {
+            // If it's a string but not JSON array, treat as null
+            newObj[camelKey] = null;
+          }
+        } else {
+          newObj[camelKey] = convertToCamelCase(value);
+        }
       }
     }
     return newObj;
@@ -191,7 +224,14 @@ export function convertToSnakeCase<T>(obj: any): T {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
         const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-        newObj[snakeKey] = convertToSnakeCase(obj[key]);
+        const value = obj[key];
+        
+        // Special handling for arrays that should be JSON strings
+        if ((key === 'recurrenceTimes' || key === 'recurrenceDays') && Array.isArray(value)) {
+          newObj[snakeKey] = JSON.stringify(value);
+        } else {
+          newObj[snakeKey] = convertToSnakeCase(value);
+        }
       }
     }
     return newObj;
