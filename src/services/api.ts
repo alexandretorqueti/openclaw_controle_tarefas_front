@@ -279,6 +279,39 @@ class ApiService {
   async calculateNextExecution(id) {
     return this.request(`/recurrence/${id}/next-execution`);
   }
+
+  // Comment endpoints
+  async getCommentsByTask(taskId) {
+    return this.request(`/comments/task/${taskId}`);
+  }
+
+  async getComment(id) {
+    return this.request(`/comments/${id}`);
+  }
+
+  async createComment(data) {
+    return this.request('/comments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateComment(id, data) {
+    return this.request(`/comments/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteComment(id) {
+    return this.request(`/comments/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async getCommentReplies(commentId) {
+    return this.request(`/comments/${commentId}/replies`);
+  }
 }
 
 export default new ApiService();

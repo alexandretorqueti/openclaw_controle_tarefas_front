@@ -22,6 +22,7 @@ import {
   FaClock
 } from 'react-icons/fa';
 import RecurrenceConfig from './RecurrenceConfig';
+import CommentsSection from './CommentsSection';
 
 interface TaskDetailProps {
   task: Task;
@@ -29,6 +30,7 @@ interface TaskDetailProps {
   statuses: Status[];
   priorities: Priority[];
   projects: Project[];
+  currentUser: User | null;
   onBack: () => void;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
   onDeleteTask?: (id: string) => Promise<void>;
@@ -41,6 +43,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   statuses,
   priorities,
   projects,
+  currentUser,
   onBack,
   onUpdateTask,
   onDeleteTask,
@@ -889,24 +892,18 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         </div>
       </div>
 
-      {/* Placeholder for future features */}
+      {/* Comments Section */}
       <div style={{
         backgroundColor: '#fff',
-        padding: '20px',
+        padding: '0',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        marginBottom: '32px',
-        border: '2px dashed #ddd'
+        marginBottom: '32px'
       }}>
-        <div style={{ textAlign: 'center', color: '#666' }}>
-          <FaComment size={24} style={{ marginBottom: '12px' }} />
-          <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>
-            Comentários
-          </h3>
-          <p style={{ fontSize: '14px' }}>
-            Os comentários serão implementados na próxima versão.
-          </p>
-        </div>
+        <CommentsSection 
+          taskId={task.id} 
+          currentUser={currentUser}
+        />
       </div>
 
       <div style={{

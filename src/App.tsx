@@ -397,6 +397,7 @@ const AppContent: React.FC = () => {
             statuses={statuses}
             priorities={priorities}
             projects={projects}
+            currentUser={user}
             onBack={handleBackToList}
             onUpdateTask={handleUpdateTask}
             onDeleteTask={handleDeleteTask}
