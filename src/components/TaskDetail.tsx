@@ -104,6 +104,21 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         updateData.projectId = editedTask.projectId;
       }
       
+      // Campos de recorrência - precisam ser sempre enviados quando estão definidos
+      // porque o usuário pode estar ativando ou desativando a recorrência
+      if (editedTask.isRecurring !== undefined) {
+        updateData.isRecurring = editedTask.isRecurring;
+      }
+      if (editedTask.recurrenceType !== undefined) {
+        updateData.recurrenceType = editedTask.recurrenceType;
+      }
+      if (editedTask.recurrenceTimes !== undefined) {
+        updateData.recurrenceTimes = editedTask.recurrenceTimes;
+      }
+      if (editedTask.recurrenceDays !== undefined) {
+        updateData.recurrenceDays = editedTask.recurrenceDays;
+      }
+      
       // Só envia se houver algo para atualizar
       if (Object.keys(updateData).length > 0) {
         await onUpdateTask(task.id, updateData);
