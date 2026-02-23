@@ -16,8 +16,12 @@ import {
   FaEdit,
   FaTrash,
   FaSave,
-  FaTimes
+  FaTimes,
+  FaSync,
+  FaHistory,
+  FaClock
 } from 'react-icons/fa';
+import RecurrenceConfig from './RecurrenceConfig';
 
 interface TaskDetailProps {
   task: Task;
@@ -46,6 +50,20 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const [editedTask, setEditedTask] = useState<Partial<Task>>({ ...task });
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Log inicial para debug
+  React.useEffect(() => {
+    console.log('🔍 TaskDetail - task inicial:', task);
+    console.log('🔍 TaskDetail - assignedToId inicial:', task.assignedToId);
+    console.log('🔍 TaskDetail - editedTask inicial:', editedTask);
+  }, [task]);
+  
+  // Log quando editedTask muda
+  React.useEffect(() => {
+    console.log('🔄 TaskDetail - editedTask atualizado:', editedTask);
+    console.log('🔄 TaskDetail - assignedToId atualizado:', editedTask.assignedToId);
+  }, [editedTask]);
 
   const getAssignedUser = () => users.find(user => user.id === task.assignedToId);
   const getStatus = () => statuses.find(status => status.id === task.statusId);
@@ -68,11 +86,70 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     if (!onUpdateTask) return;
     
     setIsSaving(true);
+    setError(null); // Limpa erros anteriores
+    
     try {
-      await onUpdateTask(task.id, editedTask);
-      setIsEditing(false);
-    } catch (error) {
+      // Cria um objeto apenas com os campos que foram alterados
+      const updateData: Partial<Task> = {};
+      
+      // Compara cada campo com o valor original
+      if (editedTask.title !== undefined && editedTask.title !== task.title) {
+        updateData.title = editedTask.title;
+      }
+      if (editedTask.description !== undefined && editedTask.description !== task.description) {
+        updateData.description = editedTask.description;
+      }
+      if (editedTask.deadline !== undefined && editedTask.deadline !== task.deadline) {
+        updateData.deadline = editedTask.deadline;
+      }
+      if (editedTask.statusId !== undefined && editedTask.statusId !== task.statusId) {
+        updateData.statusId = editedTask.statusId;
+      }
+      if (editedTask.priorityId !== undefined && editedTask.priorityId !== task.priorityId) {
+        updateData.priorityId = editedTask.priorityId;
+      }
+      // SEMPRE envia assignedToId se estiver definido e não for undefined, mesmo que seja o mesmo valor
+      // Isso corrige o problema onde o usuário seleciona a mesma pessoa mas o frontend não envia
+      if (editedTask.assignedToId !== undefined && editedTask.assignedToId !== '') {
+        updateData.assignedToId = editedTask.assignedToId;
+      }
+      if (editedTask.projectId !== undefined && editedTask.projectId !== task.projectId) {
+        updateData.projectId = editedTask.projectId;
+      }
+      
+      console.log('📤 TaskDetail - updateData sendo enviado:', JSON.stringify(updateData, null, 2));
+      console.log('📤 TaskDetail - assignedToId value:', updateData.assignedToId);
+      
+      // Só envia se houver algo para atualizar
+      if (Object.keys(updateData).length > 0) {
+        await onUpdateTask(task.id, updateData);
+        setIsEditing(false);
+      } else {
+        console.log('📤 Nenhuma alteração detectada, cancelando salvamento');
+        setIsEditing(false);
+      }
+    } catch (error: any) {
       console.error('Failed to update task:', error);
+      
+      // Extrai mensagem de erro amigável
+      let errorMessage = 'Erro ao salvar tarefa.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Tenta extrair detalhes da resposta da API
+      if (error.details && Array.isArray(error.details)) {
+        const validationErrors = error.details.map((detail: any) => 
+          detail.message || `${detail.path?.join('.')}: ${detail.code}`
+        ).join(', ');
+        
+        if (validationErrors) {
+          errorMessage = `Erros de validação: ${validationErrors}`;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -83,11 +160,22 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     
     if (window.confirm('Tem certeza que deseja excluir esta tarefa? Esta ação não pode ser desfeita.')) {
       setIsDeleting(true);
+      setError(null); // Limpa erros anteriores
+      
       try {
         await onDeleteTask(task.id);
         onBack();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to delete task:', error);
+        
+        // Extrai mensagem de erro amigável
+        let errorMessage = 'Erro ao excluir tarefa.';
+        
+        if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        setError(errorMessage);
         setIsDeleting(false);
       }
     }
@@ -95,10 +183,21 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
   const handleToggleCompletion = async () => {
     if (onToggleCompletion) {
+      setError(null); // Limpa erros anteriores
+      
       try {
         await onToggleCompletion(task.id);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to toggle task completion:', error);
+        
+        // Extrai mensagem de erro amigável
+        let errorMessage = 'Erro ao alterar status da tarefa.';
+        
+        if (error.message) {
+          errorMessage = error.message;
+        }
+        
+        setError(errorMessage);
       }
     }
   };
@@ -106,7 +205,17 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const handleCancelEdit = () => {
     setEditedTask({ ...task });
     setIsEditing(false);
+    setError(null); // Limpa erros ao cancelar
   };
+
+  // Log quando entra no modo de edição
+  React.useEffect(() => {
+    if (isEditing) {
+      console.log('✏️ Entrou no modo de edição');
+      console.log('✏️ editedTask no início da edição:', editedTask);
+      console.log('✏️ assignedToId no início da edição:', editedTask.assignedToId);
+    }
+  }, [isEditing]);
 
   return (
     <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}>
@@ -133,6 +242,27 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           <FaArrowLeft size={14} />
           Voltar para lista
         </button>
+
+        {/* Exibição de erro */}
+        {error && (
+          <div style={{
+            backgroundColor: '#FFE5E5',
+            border: '1px solid #FF6B6B',
+            color: '#D32F2F',
+            padding: '16px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px'
+          }}>
+            <FaExclamationTriangle size={20} />
+            <div>
+              <strong style={{ display: 'block', marginBottom: '4px' }}>Erro</strong>
+              <span>{error}</span>
+            </div>
+          </div>
+        )}
 
         <div style={{
           backgroundColor: '#fff',
@@ -459,6 +589,94 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           )}
         </div>
 
+        {/* Recurrence Card */}
+        <div style={{
+          backgroundColor: '#fff',
+          padding: '20px',
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          border: task.isRecurring ? '1px solid #4ECDC4' : 'none'
+        }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FaSync size={14} />
+            Recorrência
+            {task.isRecurring && (
+              <span style={{ fontSize: '12px', backgroundColor: '#4ECDC4', color: 'white', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px' }}>
+                Ativa
+              </span>
+            )}
+          </h3>
+          
+          {isEditing ? (
+            <RecurrenceConfig
+              recurrenceType={editedTask.recurrenceType}
+              recurrenceTimes={editedTask.recurrenceTimes}
+              recurrenceDays={editedTask.recurrenceDays}
+              onChange={(config) => {
+                setEditedTask({
+                  ...editedTask,
+                  isRecurring: config.isRecurring,
+                  recurrenceType: config.recurrenceType,
+                  recurrenceTimes: config.recurrenceTimes,
+                  recurrenceDays: config.recurrenceDays
+                });
+              }}
+            />
+          ) : task.isRecurring ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FaSync size={14} color="#4ECDC4" />
+                <span style={{ fontWeight: 500 }}>
+                  {task.recurrenceType === 'daily' && 'Diária'}
+                  {task.recurrenceType === 'weekly' && 'Semanal'}
+                  {task.recurrenceType === 'monthly' && 'Mensal'}
+                </span>
+              </div>
+              
+              {task.recurrenceTimes && Array.isArray(task.recurrenceTimes) && task.recurrenceTimes.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaClock size={14} color="#666" />
+                  <span>Horários: {task.recurrenceTimes.join(', ')}</span>
+                </div>
+              )}
+              
+              {task.recurrenceType === 'weekly' && task.recurrenceDays && task.recurrenceDays.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaCalendarAlt size={14} color="#666" />
+                  <span>
+                    Dias: {task.recurrenceDays.map(d => {
+                      const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+                      return days[d];
+                    }).join(', ')}
+                  </span>
+                </div>
+              )}
+              
+              {task.lastExecutedAt && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaHistory size={14} color="#666" />
+                  <span>
+                    Última execução: {format(new Date(task.lastExecutedAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  </span>
+                </div>
+              )}
+              
+              {task.nextExecutionAt && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <FaCalendarAlt size={14} color="#4ECDC4" />
+                  <span style={{ fontWeight: 500 }}>
+                    Próxima execução: {format(new Date(task.nextExecutionAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div style={{ color: '#666', fontStyle: 'italic' }}>
+              Esta tarefa não é recorrente
+            </div>
+          )}
+        </div>
+
         {/* Assigned To Card */}
         <div style={{
           backgroundColor: '#fff',
@@ -472,7 +690,14 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           {isEditing ? (
             <select
               value={editedTask.assignedToId || ''}
-              onChange={(e) => setEditedTask({ ...editedTask, assignedToId: e.target.value })}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                console.log('🔄 Select onChange - assignedToId:', newValue);
+                console.log('🔄 Select onChange - editedTask antes:', editedTask);
+                // Se for string vazia, define como undefined
+                const assignedToId = newValue === '' ? undefined : newValue;
+                setEditedTask({ ...editedTask, assignedToId });
+              }}
               style={{
                 width: '100%',
                 padding: '10px',
@@ -481,6 +706,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 fontSize: '14px'
               }}
             >
+              <option value="">Selecione um usuário</option>
               {users.map(user => (
                 <option key={user.id} value={user.id}>
                   {user.name}
