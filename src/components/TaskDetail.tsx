@@ -52,19 +52,6 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Log inicial para debug
-  React.useEffect(() => {
-    console.log('🔍 TaskDetail - task inicial:', task);
-    console.log('🔍 TaskDetail - assignedToId inicial:', task.assignedToId);
-    console.log('🔍 TaskDetail - editedTask inicial:', editedTask);
-  }, [task]);
-  
-  // Log quando editedTask muda
-  React.useEffect(() => {
-    console.log('🔄 TaskDetail - editedTask atualizado:', editedTask);
-    console.log('🔄 TaskDetail - assignedToId atualizado:', editedTask.assignedToId);
-  }, [editedTask]);
-
   const getAssignedUser = () => users.find(user => user.id === task.assignedToId);
   const getStatus = () => statuses.find(status => status.id === task.statusId);
   const getPriority = () => priorities.find(priority => priority.id === task.priorityId);
@@ -117,15 +104,11 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         updateData.projectId = editedTask.projectId;
       }
       
-      console.log('📤 TaskDetail - updateData sendo enviado:', JSON.stringify(updateData, null, 2));
-      console.log('📤 TaskDetail - assignedToId value:', updateData.assignedToId);
-      
       // Só envia se houver algo para atualizar
       if (Object.keys(updateData).length > 0) {
         await onUpdateTask(task.id, updateData);
         setIsEditing(false);
       } else {
-        console.log('📤 Nenhuma alteração detectada, cancelando salvamento');
         setIsEditing(false);
       }
     } catch (error: any) {
@@ -692,8 +675,6 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               value={editedTask.assignedToId || ''}
               onChange={(e) => {
                 const newValue = e.target.value;
-                console.log('🔄 Select onChange - assignedToId:', newValue);
-                console.log('🔄 Select onChange - editedTask antes:', editedTask);
                 // Se for string vazia, define como undefined
                 const assignedToId = newValue === '' ? undefined : newValue;
                 setEditedTask({ ...editedTask, assignedToId });

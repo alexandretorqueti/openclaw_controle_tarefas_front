@@ -75,9 +75,6 @@ class ApiService {
     if (config.body && typeof config.body === 'string') {
       try {
         const parsedBody = JSON.parse(config.body);
-        console.log('📤 Request body (camelCase):', JSON.stringify(parsedBody, null, 2));
-        console.log('📤 Request body - assignedToId value:', parsedBody.assignedToId);
-        console.log('📤 Request body - assignedToId type:', typeof parsedBody.assignedToId);
         
         // Remove campos undefined/null para evitar problemas
         const cleanedBody = Object.fromEntries(
@@ -85,8 +82,6 @@ class ApiService {
         );
         
         const snakeCaseBody = convertToSnakeCase(cleanedBody);
-        console.log('📤 Request body (snake_case):', JSON.stringify(snakeCaseBody, null, 2));
-        console.log('📤 Request body - assigned_to_id value:', snakeCaseBody.assigned_to_id);
         config.body = JSON.stringify(snakeCaseBody);
       } catch (error) {
         // If body is not valid JSON, leave it as is
