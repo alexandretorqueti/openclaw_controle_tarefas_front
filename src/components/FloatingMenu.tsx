@@ -7,7 +7,7 @@ interface FloatingMenuProps {
   onOpenUser: () => void;
 }
 
-const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriority }) => {
+const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriority, onOpenUser }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
