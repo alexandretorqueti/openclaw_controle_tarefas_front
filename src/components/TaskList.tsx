@@ -78,8 +78,9 @@ const TaskList: React.FC<TaskListProps> = ({
     
     const matchesStatus = !selectedStatus || task.statusId === selectedStatus;
     const matchesPriority = !selectedPriority || task.priorityId === selectedPriority;
+    const notCompleted = !task.isCompleted; // Exclui tarefas concluídas
 
-    return matchesSearch && matchesStatus && matchesPriority;
+    return matchesSearch && matchesStatus && matchesPriority && notCompleted;
   });
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {

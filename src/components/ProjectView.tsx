@@ -48,6 +48,10 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     return tasks.filter(task => task.projectId === projectId);
   };
 
+  const getProjectActiveTasks = (projectId: string) => {
+    return tasks.filter(task => task.projectId === projectId && !task.isCompleted);
+  };
+
   const getProjectStats = (projectId: string) => {
     const projectTasks = getProjectTasks(projectId);
     const totalTasks = projectTasks.length;
@@ -152,7 +156,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   };
 
   if (selectedProject) {
-    const projectTasks = getProjectTasks(selectedProject.id);
+    const projectTasks = getProjectActiveTasks(selectedProject.id);
     const stats = getProjectStats(selectedProject.id);
 
     return (
