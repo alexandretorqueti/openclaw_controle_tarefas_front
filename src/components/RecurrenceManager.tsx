@@ -43,7 +43,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
     try {
       // For now, we'll load all tasks and filter recurring ones
       // In a real implementation, we'd have a dedicated endpoint
-      const tasks = await api.getTasks();
+      const tasks = await api.getTasks({ isCompleted: 'true' });
       const recurringTasks = tasks.filter((task: Task) => task.isRecurring);
       setAllRecurringTasks(recurringTasks);
     } catch (error) {
