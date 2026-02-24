@@ -1,9 +1,10 @@
 
-> task-manager-app@1.0.0 dev
+> task-manager-app@1.0.0 start
 > vite
 
+Re-optimizing dependencies because lockfile has changed
 
-  VITE v5.4.21  ready in 153 ms
+  VITE v5.4.21  ready in 205 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: http://192.168.1.70:3000/
