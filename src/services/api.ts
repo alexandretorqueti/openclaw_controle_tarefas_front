@@ -64,6 +64,22 @@ interface UpdatePriorityData {
   weight?: number;
 }
 
+interface UserData {
+  name: string;
+  email: string;
+  nickname?: string;
+  avatarUrl?: string;
+  role?: string;
+}
+
+interface UpdateUserData {
+  name?: string;
+  email?: string;
+  nickname?: string;
+  avatarUrl?: string;
+  role?: string;
+}
+
 interface CommentData {
   content: string;
   taskId: string;
@@ -328,6 +344,26 @@ class ApiService {
   // User endpoints
   async getUsers() {
     return this.request('/users');
+  }
+
+  async createUser(data: UserData) {
+    return this.request('/users', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateUser(id: string, data: UpdateUserData) {
+    return this.request(`/users/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteUser(id: string) {
+    return this.request(`/users/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   // Recurrence endpoints

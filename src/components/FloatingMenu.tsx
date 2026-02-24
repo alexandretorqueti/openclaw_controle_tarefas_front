@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { FaCog, FaListAlt, FaFlag, FaTimes, FaBars } from 'react-icons/fa';
+import { FaCog, FaListAlt, FaFlag, FaTimes, FaBars, FaUser } from 'react-icons/fa';
 
 interface FloatingMenuProps {
   onOpenStatus: () => void;
   onOpenPriority: () => void;
+  onOpenUser: () => void;
 }
 
 const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriority }) => {
@@ -226,6 +227,73 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 width: '8px',
                 height: '8px',
                 backgroundColor: '#FFB74D',
+                borderRadius: '50%'
+              }} />
+            </button>
+
+            {/* Separador */}
+            <div style={{
+              height: '1px',
+              backgroundColor: '#f0f0f0',
+              margin: '4px 16px'
+            }} />
+
+            {/* Opção USUÁRIOS */}
+            <button
+              onClick={() => {
+                onOpenUser();
+                setIsOpen(false);
+              }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                textAlign: 'left'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f0f9ff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <div style={{
+                width: '36px',
+                height: '36px',
+                backgroundColor: '#F3E5F5',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <FaUser size={18} color="#9D4EDD" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#333',
+                  marginBottom: '2px'
+                }}>
+                  Usuários
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#666'
+                }}>
+                  Gerencie os usuários do sistema
+                </div>
+              </div>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                backgroundColor: '#9D4EDD',
                 borderRadius: '50%'
               }} />
             </button>
