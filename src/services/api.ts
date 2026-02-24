@@ -1,5 +1,76 @@
 import { convertToCamelCase, convertToSnakeCase } from '../types';
 
+// Type definitions for API parameters
+interface ProjectData {
+  name: string;
+  description: string;
+  regras?: string;
+}
+
+interface UpdateProjectData {
+  name?: string;
+  description?: string;
+  regras?: string;
+}
+
+interface TaskData {
+  title: string;
+  description: string;
+  projectId: string;
+  statusId: string;
+  priorityId: string;
+  assignedToId: string;
+  deadline: string;
+  parentTaskId?: string | null;
+  position?: number;
+}
+
+interface UpdateTaskData {
+  title?: string;
+  description?: string;
+  statusId?: string;
+  priorityId?: string;
+  assignedToId?: string;
+  deadline?: string;
+  position?: number;
+  isCompleted?: boolean;
+}
+
+interface UpdateTaskPositionData {
+  position: number;
+}
+
+interface StatusData {
+  name: string;
+  colorCode?: string;
+  isFinalState?: boolean;
+  order?: number;
+}
+
+interface UpdateStatusData {
+  name?: string;
+  colorCode?: string;
+  isFinalState?: boolean;
+  order?: number;
+}
+
+interface PriorityData {
+  name: string;
+  weight?: number;
+}
+
+interface UpdatePriorityData {
+  name?: string;
+  weight?: number;
+}
+
+interface CommentData {
+  content: string;
+  taskId: string;
+  userId: string;
+  parentCommentId?: string | null;
+}
+
 // Use relative URL or detect environment
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
@@ -116,82 +187,82 @@ class ApiService {
     return this.request('/projects');
   }
 
-  async getProject(id) {
+  async getProject(id: string) {
     return this.request(`/projects/${id}`);
   }
 
-  async createProject(data) {
+  async createProject(data: ProjectData) {
     return this.request('/projects', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateProject(id, data) {
+  async updateProject(id: string, data: UpdateProjectData) {
     return this.request(`/projects/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteProject(id) {
+  async deleteProject(id: string) {
     return this.request(`/projects/${id}`, {
       method: 'DELETE',
     });
   }
 
-  async getProjectStatistics(id) {
+  async getProjectStatistics(id: string) {
     return this.request(`/projects/${id}/statistics`);
   }
 
   // Task endpoints
-  async getTasks(filters = {}) {
+  async getTasks(filters: Record<string, any> = {}) {
     const queryParams = new URLSearchParams(filters).toString();
     const endpoint = queryParams ? `/tasks?${queryParams}` : '/tasks';
     return this.request(endpoint);
   }
 
-  async getTask(id) {
+  async getTask(id: string) {
     return this.request(`/tasks/${id}`);
   }
 
-  async createTask(data) {
+  async createTask(data: TaskData) {
     return this.request('/tasks', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateTask(id, data) {
+  async updateTask(id: string, data: UpdateTaskData) {
     return this.request(`/tasks/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteTask(id) {
+  async deleteTask(id: string) {
     return this.request(`/tasks/${id}`, {
       method: 'DELETE',
     });
   }
 
-  async toggleTaskCompletion(id) {
+  async toggleTaskCompletion(id: string) {
     return this.request(`/tasks/${id}/toggle-completion`, {
       method: 'PATCH',
     });
   }
 
-  async updateTaskPosition(id, position) {
+  async updateTaskPosition(id: string, position: number) {
     return this.request(`/tasks/${id}/position`, {
       method: 'PATCH',
       body: JSON.stringify({ position }),
     });
   }
 
-  async getTasksByProject(projectId, filters = {}) {
+  async getTasksByProject(projectId: string, filters: Record<string, any> = {}) {
     const queryParams = new URLSearchParams(filters).toString();
-    const endpoint = queryParams 
-      ? `/tasks/project/${projectId}?${queryParams}` 
+    const endpoint = queryParams
+      ? `/tasks/project/${projectId}?${queryParams}`
       : `/tasks/project/${projectId}`;
     return this.request(endpoint);
   }
@@ -201,25 +272,25 @@ class ApiService {
     return this.request('/statuses');
   }
 
-  async getStatus(id) {
+  async getStatus(id: string) {
     return this.request(`/statuses/${id}`);
   }
 
-  async createStatus(statusData) {
+  async createStatus(statusData: StatusData) {
     return this.request('/statuses', {
       method: 'POST',
       body: JSON.stringify(statusData),
     });
   }
 
-  async updateStatus(id, statusData) {
+  async updateStatus(id: string, statusData: UpdateStatusData) {
     return this.request(`/statuses/${id}`, {
       method: 'PUT',
       body: JSON.stringify(statusData),
     });
   }
 
-  async deleteStatus(id) {
+  async deleteStatus(id: string) {
     return this.request(`/statuses/${id}`, {
       method: 'DELETE',
     });
@@ -230,25 +301,25 @@ class ApiService {
     return this.request('/priorities');
   }
 
-  async getPriority(id) {
+  async getPriority(id: string) {
     return this.request(`/priorities/${id}`);
   }
 
-  async createPriority(priorityData) {
+  async createPriority(priorityData: PriorityData) {
     return this.request('/priorities', {
       method: 'POST',
       body: JSON.stringify(priorityData),
     });
   }
 
-  async updatePriority(id, priorityData) {
+  async updatePriority(id: string, priorityData: UpdatePriorityData) {
     return this.request(`/priorities/${id}`, {
       method: 'PUT',
       body: JSON.stringify(priorityData),
     });
   }
 
-  async deletePriority(id) {
+  async deletePriority(id: string) {
     return this.request(`/priorities/${id}`, {
       method: 'DELETE',
     });
