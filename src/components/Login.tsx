@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { FaGoogle, FaTasks, FaSpinner, FaUser, FaUserPlus, FaSignInAlt, FaEnvelope, FaIdCard } from 'react-icons/fa';
 
@@ -54,6 +54,16 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeTab, setActiveTab] = useState<'google' | 'login' | 'register'>('google');
+  const [rememberLogin, setRememberLogin] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('saved_nickname');
+    if (saved) {
+      setLoginNickname(saved);
+      setRememberLogin(true);
+      setActiveTab('login');
+    }
+  }, []);
 
   const handleLogin = async () => {
     if (!loginNickname.trim() || loginNickname.length < 2) {
@@ -79,6 +89,13 @@ const Login: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // Save or clear login preference
+        if (rememberLogin) {
+          localStorage.setItem('saved_nickname', loginNickname.trim());
+        } else {
+          localStorage.removeItem('saved_nickname');
+        }
+
         // Persist user in localStorage
         localStorage.setItem('tarefas_user', JSON.stringify(data.user));
         window.location.reload();
@@ -408,6 +425,37 @@ const Login: React.FC = () => {
                   {success}
                 </div>
               )}
+            </div>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '16px',
+              paddingLeft: '4px'
+            }}>
+              <input
+                type="checkbox"
+                id="rememberLogin"
+                checked={rememberLogin}
+                onChange={(e) => setRememberLogin(e.target.checked)}
+                style={{
+                  marginRight: '8px',
+                  width: '16px',
+                  height: '16px',
+                  cursor: 'pointer'
+                }}
+              />
+              <label 
+                htmlFor="rememberLogin"
+                style={{
+                  fontSize: '14px',
+                  color: '#666',
+                  cursor: 'pointer',
+                  userSelect: 'none'
+                }}
+              >
+                Lembrar Login
+              </label>
             </div>
 
             <button
