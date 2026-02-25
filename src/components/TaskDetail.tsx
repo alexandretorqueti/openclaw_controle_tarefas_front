@@ -839,13 +839,36 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <FaProjectDiagram size={20} color="#4ECDC4" />
-              <div>
+              <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
                   {project?.name || 'Projeto não encontrado'}
                 </div>
                 {project && (
                   <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
                     {project.description}
+                  </div>
+                )}
+                {project?.regras && (
+                  <div style={{ 
+                    backgroundColor: '#f8f9fa', 
+                    padding: '12px', 
+                    borderRadius: '8px',
+                    marginTop: '12px',
+                    borderLeft: '4px solid #4ECDC4'
+                  }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '6px' }}>
+                      📋 Regras do Projeto
+                    </h4>
+                    <pre style={{ 
+                      fontSize: '12px', 
+                      color: '#666', 
+                      lineHeight: 1.4, 
+                      whiteSpace: 'pre-wrap',
+                      fontFamily: 'inherit',
+                      margin: 0
+                    }}>
+                      {project.regras}
+                    </pre>
                   </div>
                 )}
               </div>

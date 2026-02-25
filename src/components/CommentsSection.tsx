@@ -16,6 +16,9 @@ import {
   FaChevronUp
 } from 'react-icons/fa';
 
+// TESTE DE REGRAS E COMENTÁRIOS: Este componente recebe as regras do projeto e os comentários
+// para verificar se estão sendo enviados corretamente para a IA. Alteração realizada em 25/02/2026.
+
 interface CommentsSectionProps {
   taskId: string;
   currentUser: User | null;

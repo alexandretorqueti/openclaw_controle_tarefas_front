@@ -26,6 +26,12 @@ export interface Project {
     overdueTasks: number;
     progress: number;
   };
+  // Novos campos para configuração de repositórios
+  frontendPath?: string;
+  frontendPort?: number;
+  backendPath?: string;
+  backendPort?: number;
+  repositoryUrl?: string;
 }
 
 export interface Status {

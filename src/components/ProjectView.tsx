@@ -35,7 +35,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     name: '',
     description: '',
     regras: '',
-    status: true
+    status: true,
+    frontendPath: '',
+    frontendPort: null,
+    backendPath: '',
+    backendPort: null,
+    repositoryUrl: ''
   });
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -110,7 +115,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         name: '',
         description: '',
         regras: '',
-        status: true
+        status: true,
+        frontendPath: '',
+        frontendPort: null,
+        backendPath: '',
+        backendPort: null,
+        repositoryUrl: ''
       });
       setIsCreatingProject(false);
       setCreateError(null);
@@ -633,6 +643,116 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 <option value="false">Inativo</option>
               </select>
             </div>
+
+            {/* Novos campos para configuração de repositórios (opcional na criação) */}
+            <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', marginTop: '10px' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 600, color: '#666', marginBottom: '12px' }}>
+                Configuração de Repositórios (Opcional)
+              </h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '6px' }}>
+                    Caminho do Frontend
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.frontendPath || ''}
+                    onChange={(e) => setNewProjectData({ ...newProjectData, frontendPath: e.target.value })}
+                    placeholder="/caminho/frontend"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '6px' }}>
+                    Porta do Frontend
+                  </label>
+                  <input
+                    type="number"
+                    value={newProjectData.frontendPort || ''}
+                    onChange={(e) => setNewProjectData({ ...newProjectData, frontendPort: e.target.value ? parseInt(e.target.value) : null })}
+                    placeholder="3000"
+                    min="1"
+                    max="65535"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '6px' }}>
+                    Caminho do Backend
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.backendPath || ''}
+                    onChange={(e) => setNewProjectData({ ...newProjectData, backendPath: e.target.value })}
+                    placeholder="/caminho/backend"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '6px' }}>
+                    Porta do Backend
+                  </label>
+                  <input
+                    type="number"
+                    value={newProjectData.backendPort || ''}
+                    onChange={(e) => setNewProjectData({ ...newProjectData, backendPort: e.target.value ? parseInt(e.target.value) : null })}
+                    placeholder="3001"
+                    min="1"
+                    max="65535"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '6px' }}>
+                  URL do Repositório
+                </label>
+                <input
+                  type="url"
+                  value={newProjectData.repositoryUrl || ''}
+                  onChange={(e) => setNewProjectData({ ...newProjectData, repositoryUrl: e.target.value })}
+                  placeholder="https://github.com/usuario/projeto"
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '13px'
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Mensagem de erro */}
@@ -1086,6 +1206,119 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                   <option value="false">Inativo</option>
                 </select>
               </div>
+
+              {/* Novos campos para configuração de repositórios */}
+              <div style={{ borderTop: '1px solid #eee', paddingTop: '20px', marginTop: '10px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
+                  Configuração de Repositórios
+                </h3>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                      Caminho do Frontend
+                    </label>
+                    <input
+                      type="text"
+                      value={editProjectData.frontendPath !== undefined ? editProjectData.frontendPath : (editingProject.frontendPath || '')}
+                      onChange={(e) => setEditProjectData({ ...editProjectData, frontendPath: e.target.value })}
+                      placeholder="/caminho/absoluto/frontend"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                      Porta do Frontend
+                    </label>
+                    <input
+                      type="number"
+                      value={editProjectData.frontendPort !== undefined ? editProjectData.frontendPort : (editingProject.frontendPort || '')}
+                      onChange={(e) => setEditProjectData({ ...editProjectData, frontendPort: e.target.value ? parseInt(e.target.value) : null })}
+                      placeholder="3000"
+                      min="1"
+                      max="65535"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                      Caminho do Backend
+                    </label>
+                    <input
+                      type="text"
+                      value={editProjectData.backendPath !== undefined ? editProjectData.backendPath : (editingProject.backendPath || '')}
+                      onChange={(e) => setEditProjectData({ ...editProjectData, backendPath: e.target.value })}
+                      placeholder="/caminho/absoluto/backend"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                      Porta do Backend
+                    </label>
+                    <input
+                      type="number"
+                      value={editProjectData.backendPort !== undefined ? editProjectData.backendPort : (editingProject.backendPort || '')}
+                      onChange={(e) => setEditProjectData({ ...editProjectData, backendPort: e.target.value ? parseInt(e.target.value) : null })}
+                      placeholder="3001"
+                      min="1"
+                      max="65535"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                    URL do Repositório
+                  </label>
+                  <input
+                    type="url"
+                    value={editProjectData.repositoryUrl !== undefined ? editProjectData.repositoryUrl : (editingProject.repositoryUrl || '')}
+                    onChange={(e) => setEditProjectData({ ...editProjectData, repositoryUrl: e.target.value })}
+                    placeholder="https://github.com/usuario/projeto"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #ddd',
+                      borderRadius: '8px',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    URL do repositório Git (GitHub, GitLab, etc.)
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Update error message */}
@@ -1132,7 +1365,13 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     name: editProjectData.name || editingProject.name,
                     description: editProjectData.description || editingProject.description,
                     regras: editProjectData.regras !== undefined ? editProjectData.regras : editingProject.regras,
-                    status: editProjectData.status !== undefined ? editProjectData.status : editingProject.status
+                    status: editProjectData.status !== undefined ? editProjectData.status : editingProject.status,
+                    // Novos campos
+                    frontendPath: editProjectData.frontendPath !== undefined ? editProjectData.frontendPath : editingProject.frontendPath,
+                    frontendPort: editProjectData.frontendPort !== undefined ? editProjectData.frontendPort : editingProject.frontendPort,
+                    backendPath: editProjectData.backendPath !== undefined ? editProjectData.backendPath : editingProject.backendPath,
+                    backendPort: editProjectData.backendPort !== undefined ? editProjectData.backendPort : editingProject.backendPort,
+                    repositoryUrl: editProjectData.repositoryUrl !== undefined ? editProjectData.repositoryUrl : editingProject.repositoryUrl
                   };
 
                   // Validation
