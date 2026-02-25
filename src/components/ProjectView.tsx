@@ -36,6 +36,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     description: '',
     regras: '',
     status: true,
+    ativo: true,
     frontendPath: '',
     frontendPort: null,
     backendPath: '',
@@ -48,13 +49,18 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   const [editProjectData, setEditProjectData] = useState<Partial<Project>>({});
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
+  const [showCompletedTasks, setShowCompletedTasks] = useState(false);
 
   const getProjectTasks = (projectId: string) => {
     return tasks.filter(task => task.projectId === projectId);
   };
 
   const getProjectActiveTasks = (projectId: string) => {
-    return tasks.filter(task => task.projectId === projectId && !task.isCompleted);
+    if (showCompletedTasks) {
+      return tasks.filter(task => task.projectId === projectId && task.isCompleted);
+    } else {
+      return tasks.filter(task => task.projectId === projectId && !task.isCompleted);
+    }
   };
 
   const getProjectStats = (projectId: string) => {
@@ -210,14 +216,14 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     {selectedProject.name}
                   </h1>
                   <span style={{
-                    backgroundColor: selectedProject.status ? '#06D6A0' : '#FF6B6B',
+                    backgroundColor: selectedProject.ativo ? '#06D6A0' : '#FF6B6B',
                     color: '#fff',
                     padding: '4px 12px',
                     borderRadius: '16px',
                     fontSize: '12px',
                     fontWeight: 500
                   }}>
-                    {selectedProject.status ? 'Ativo' : 'Inativo'}
+                    {selectedProject.ativo ? 'Ativo' : 'Inativo'}
                   </span>
                 </div>
                 
@@ -398,10 +404,19 @@ const ProjectView: React.FC<ProjectViewProps> = ({
               marginBottom: '24px' 
             }}>
               <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#333' }}>
-                Tarefas do Projeto ({projectTasks.length})
+                {showCompletedTasks ? 'Tarefas Completas' : 'Tarefas do Projeto'} ({projectTasks.length})
               </h2>
               
-              <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#333' }}>
+                  <input
+                    type="checkbox"
+                    checked={showCompletedTasks}
+                    onChange={(e) => setShowCompletedTasks(e.target.checked)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  Ver tarefas completas
+                </label>
                 <button
                   onClick={() => setViewMode('grid')}
                   style={{
@@ -626,11 +641,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
             <div>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                Status
+                Ativo
               </label>
               <select
-                value={newProjectData.status ? 'true' : 'false'}
-                onChange={(e) => setNewProjectData({ ...newProjectData, status: e.target.value === 'true' })}
+                value={newProjectData.ativo ? 'true' : 'false'}
+                onChange={(e) => setNewProjectData({ ...newProjectData, ativo: e.target.value === 'true' })}
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -1189,11 +1204,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  Status
+                  Ativo
                 </label>
                 <select
-                  value={editProjectData.status !== undefined ? editProjectData.status.toString() : editingProject.status.toString()}
-                  onChange={(e) => setEditProjectData({ ...editProjectData, status: e.target.value === 'true' })}
+                  value={editProjectData.ativo !== undefined ? editProjectData.ativo.toString() : editingProject.ativo.toString()}
+                  onChange={(e) => setEditProjectData({ ...editProjectData, ativo: e.target.value === 'true' })}
                   style={{
                     width: '100%',
                     padding: '12px',
