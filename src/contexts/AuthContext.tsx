@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           
           if (response.ok) {
             const data = await response.json();
-            if (data.isAuthenticated) {
+            if (data.isAuthenticated && data.user) {
               // Atualizar usuário com dados do banco
               setUser(data.user);
               setIsAuthenticated(true);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTimes, FaPlus, FaEdit, FaTrash, FaSave, FaPalette, FaListOl, FaCheckCircle, FaBan, FaListAlt } from 'react-icons/fa';
+import { FaTimes, FaPlus, FaEdit, FaTrash, FaSave, FaPalette, FaListOl, FaCheckCircle, FaBan, FaListAlt, FaRobot } from 'react-icons/fa';
 import apiService from '../services/api';
 import { Status } from '../types';
 
@@ -22,7 +22,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
     colorCode: '#4ECDC4',
     order: 0,
     isFinalState: false,
-    allowAI: false
+    visibleToAi: true
   });
 
   // Cores pré-definidas para facilitar a seleção
@@ -89,12 +89,20 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
     try {
       setError(null);
       
+      const payload = {
+        name: formData.name,
+        color_code: formData.colorCode,
+        order: formData.order,
+        is_final_state: formData.isFinalState,
+        visible_to_ai: formData.visibleToAi
+      };
+
       if (editingId) {
         // Atualizar status existente
-        await apiService.updateStatus(editingId, formData);
+        await apiService.updateStatus(editingId, payload);
       } else {
         // Criar novo status
-        await apiService.createStatus(formData);
+        await apiService.createStatus(payload);
       }
       
       // Recarregar lista
@@ -120,7 +128,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
       colorCode: status.colorCode,
       order: status.order || 0,
       isFinalState: status.isFinalState,
-      allowAI: status.allowAI || false
+      visibleToAi: status.visibleToAi ?? true
     });
     setEditingId(status.id);
     setIsEditing(true);
@@ -150,7 +158,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
       colorCode: '#4ECDC4',
       order: statuses.length > 0 ? Math.max(...statuses.map(s => s.order || 0)) + 1 : 0,
       isFinalState: false,
-      allowAI: false
+      visibleToAi: true
     });
     setEditingId(null);
     setIsEditing(false);
@@ -357,25 +365,36 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         display: 'flex',
                         alignItems: 'center',
                         gap: '16px',
-                        transition: 'all 0.2s'
+                        transition: 'all 0.2s',
+                        background: `linear-gradient(90deg, ${status.colorCode}10 0%, #fff 30%)`
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = '#4ECDC4';
-                        e.currentTarget.style.boxShadow = '0 4px 12px rgba(78, 205, 196, 0.1)';
+                        e.currentTarget.style.borderColor = status.colorCode;
+                        e.currentTarget.style.boxShadow = `0 4px 12px ${status.colorCode}30`;
+                        e.currentTarget.style.transform = 'translateY(-2px)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.borderColor = '#e0e0e0';
                         e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >
                       <div style={{
-                        width: '24px',
-                        height: '24px',
+                        width: '48px',
+                        height: '48px',
                         backgroundColor: status.colorCode,
-                        borderRadius: '6px',
+                        borderRadius: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#fff',
+                        fontSize: '18px',
+                        fontWeight: 'bold',
                         border: '2px solid #fff',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                      }} />
+                      }}>
+                        {status.order}
+                      </div>
                       
                       <div style={{ flex: 1 }}>
                         <div style={{
@@ -406,10 +425,10 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                               Final
                             </span>
                           )}
-                          {status.allowAI && (
+                          {status.visibleToAi && (
                             <span style={{
                               fontSize: '12px',
-                              backgroundColor: '#9D4EDD',
+                              backgroundColor: '#4ECDC4',
                               color: '#fff',
                               padding: '2px 8px',
                               borderRadius: '4px',
@@ -417,7 +436,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                               alignItems: 'center',
                               gap: '4px'
                             }}>
-                              <FaListAlt size={10} />
+                              <FaRobot size={10} />
                               IA
                             </span>
                           )}
@@ -658,13 +677,6 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                     }}
                     required
                   />
-                  <div style={{
-                    fontSize: '12px',
-                    color: '#666',
-                    marginTop: '4px'
-                  }}>
-                    Define a ordem de exibição
-                  </div>
                 </div>
 
                 {/* Estado Final */}
@@ -692,7 +704,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         padding: '12px',
                         backgroundColor: formData.isFinalState ? '#06D6A0' : '#f8f9fa',
                         color: formData.isFinalState ? '#fff' : '#333',
-                        border: 'none',
+                        border: formData.isFinalState ? 'none' : '1px solid #ddd',
                         borderRadius: '8px',
                         cursor: 'pointer',
                         display: 'flex',
@@ -713,7 +725,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         padding: '12px',
                         backgroundColor: !formData.isFinalState ? '#FF6B6B' : '#f8f9fa',
                         color: !formData.isFinalState ? '#fff' : '#333',
-                        border: 'none',
+                        border: !formData.isFinalState ? 'none' : '1px solid #ddd',
                         borderRadius: '8px',
                         cursor: 'pointer',
                         display: 'flex',
@@ -727,17 +739,10 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       Não
                     </button>
                   </div>
-                  <div style={{
-                    fontSize: '12px',
-                    color: '#666',
-                    marginTop: '4px'
-                  }}>
-                    Status final não permite mais alterações
-                  </div>
                 </div>
               </div>
 
-              {/* Acessível pela IA */}
+              {/* Visível pela IA */}
               <div style={{ marginBottom: '20px' }}>
                 <label style={{
                   display: 'block',
@@ -746,7 +751,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                   color: '#333',
                   marginBottom: '8px'
                 }}>
-                  Acessível pela IA
+                  Visível pela IA
                 </label>
                 <div style={{
                   display: 'flex',
@@ -756,13 +761,13 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                 }}>
                   <button
                     type="button"
-                    onClick={() => handleInputChange('allowAI', true)}
+                    onClick={() => handleInputChange('visibleToAi', true)}
                     style={{
                       flex: 1,
                       padding: '12px',
-                      backgroundColor: formData.allowAI ? '#9D4EDD' : '#f8f9fa',
-                      color: formData.allowAI ? '#fff' : '#333',
-                      border: 'none',
+                      backgroundColor: formData.visibleToAi ? '#4ECDC4' : '#f8f9fa',
+                      color: formData.visibleToAi ? '#fff' : '#333',
+                      border: formData.visibleToAi ? 'none' : '1px solid #ddd',
                       borderRadius: '8px',
                       cursor: 'pointer',
                       display: 'flex',
@@ -772,18 +777,18 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       transition: 'all 0.2s'
                     }}
                   >
-                    <FaListAlt size={16} />
+                    <FaRobot size={16} />
                     Sim
                   </button>
                   <button
                     type="button"
-                    onClick={() => handleInputChange('allowAI', false)}
+                    onClick={() => handleInputChange('visibleToAi', false)}
                     style={{
                       flex: 1,
                       padding: '12px',
-                      backgroundColor: !formData.allowAI ? '#6C757D' : '#f8f9fa',
-                      color: !formData.allowAI ? '#fff' : '#333',
-                      border: 'none',
+                      backgroundColor: !formData.visibleToAi ? '#6C757D' : '#f8f9fa',
+                      color: !formData.visibleToAi ? '#fff' : '#333',
+                      border: !formData.visibleToAi ? 'none' : '1px solid #ddd',
                       borderRadius: '8px',
                       cursor: 'pointer',
                       display: 'flex',
@@ -796,13 +801,6 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                     <FaBan size={16} />
                     Não
                   </button>
-                </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: '#666',
-                  marginTop: '4px'
-                }}>
-                  Define se tarefas com este status podem ser processadas pela IA
                 </div>
               </div>
 
@@ -871,14 +869,6 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       gap: '10px',
                       transition: 'all 0.2s'
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#e9ecef';
-                      e.currentTarget.style.borderColor = '#666';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8f9fa';
-                      e.currentTarget.style.borderColor = '#ddd';
-                    }}
                   >
                     <FaTimes size={18} />
                     Cancelar
@@ -886,37 +876,6 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                 )}
               </div>
             </form>
-
-            {/* Informações */}
-            <div style={{
-              marginTop: '32px',
-              padding: '16px',
-              backgroundColor: '#fff',
-              borderRadius: '8px',
-              border: '1px solid #e0e0e0'
-            }}>
-              <h4 style={{
-                fontSize: '14px',
-                fontWeight: 600,
-                color: '#333',
-                marginBottom: '8px'
-              }}>
-                💡 Dicas sobre Status
-              </h4>
-              <ul style={{
-                fontSize: '12px',
-                color: '#666',
-                margin: 0,
-                paddingLeft: '20px',
-                lineHeight: 1.6
-              }}>
-                <li>Use cores diferentes para facilitar a identificação</li>
-                <li>A ordem define a sequência no fluxo de trabalho</li>
-                <li>Status finais marcam tarefas como concluídas</li>
-                <li>Evite excluir status em uso por tarefas</li>
-                <li>Mantenha uma sequência lógica (ex: Pendente → Em Andamento → Concluído)</li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>

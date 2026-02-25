@@ -3,7 +3,6 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  nickname?: string;
   avatarUrl?: string;
   role: 'Admin' | 'Viewer' | 'Editor';
   createdAt?: string;
@@ -34,7 +33,7 @@ export interface Status {
   name: string;
   colorCode: string;
   isFinalState: boolean;
-  allowAI: boolean;
+  visibleToAi: boolean;
   order?: number;
 }
 
@@ -159,6 +158,7 @@ export type LegacyProject = Project & {
 export type LegacyStatus = Status & {
   color_code: string;
   is_final_state: boolean;
+  visible_to_ai: boolean;
 };
 
 export type LegacyTask = Task & {
@@ -186,23 +186,12 @@ export function convertToCamelCase<T>(obj: any): T {
         
         // Special handling for JSON strings that should be arrays
         if ((camelKey === 'recurrenceTimes' || camelKey === 'recurrenceDays') && 
-            typeof value === 'string') {
-          // Handle empty string, "null", or "[]" as null/empty array
-          const trimmedValue = value.trim();
-          if (trimmedValue === '' || trimmedValue === 'null') {
-            newObj[camelKey] = null;
-          } else if (trimmedValue === '[]') {
-            newObj[camelKey] = [];
-          } else if (trimmedValue.startsWith('[')) {
-            try {
-              newObj[camelKey] = JSON.parse(value);
-            } catch (error) {
-              console.warn(`Failed to parse ${camelKey} as JSON:`, value, error);
-              newObj[camelKey] = null; // Fallback to null instead of keeping invalid string
-            }
-          } else {
-            // If it's a string but not JSON array, treat as null
-            newObj[camelKey] = null;
+            typeof value === 'string' && value.trim().startsWith('[')) {
+          try {
+            newObj[camelKey] = JSON.parse(value);
+          } catch (error) {
+            console.warn(`Failed to parse ${camelKey} as JSON:`, value, error);
+            newObj[camelKey] = value;
           }
         } else {
           newObj[camelKey] = convertToCamelCase(value);

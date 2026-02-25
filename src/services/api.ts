@@ -165,9 +165,9 @@ class ApiService {
       try {
         const parsedBody = JSON.parse(config.body);
         
-        // Remove campos undefined/null para evitar problemas
+        // Remove campos undefined para evitar problemas, mantendo booleanos (false)
         const cleanedBody = Object.fromEntries(
-          Object.entries(parsedBody).filter(([_, value]) => value !== undefined && value !== null)
+          Object.entries(parsedBody).filter(([_, value]) => value !== undefined)
         );
         
         const snakeCaseBody = convertToSnakeCase(cleanedBody);

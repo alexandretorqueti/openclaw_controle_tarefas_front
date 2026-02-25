@@ -1,0 +1,20 @@
+
+> task-manager-app@1.0.0 dev
+> vite
+
+
+  VITE v5.4.21  ready in 123 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://192.168.1.70:3000/
+10:34:20 [vite] hmr update /src/components/StatusManager.tsx
+10:39:37 [vite] hmr update /src/App.tsx, /src/components/RecurrenceManager.tsx, /src/components/PriorityManager.tsx, /src/components/StatusManager.tsx, /src/components/UserManager.tsx, /src/components/NextTaskManager.tsx, /src/components/CommentsSection.tsx
+10:41:27 [vite] hmr update /src/App.tsx, /src/components/RecurrenceManager.tsx, /src/components/PriorityManager.tsx, /src/components/StatusManager.tsx, /src/components/UserManager.tsx, /src/components/NextTaskManager.tsx, /src/components/CommentsSection.tsx
+10:42:41 [vite] hmr update /src/App.tsx, /src/components/RecurrenceManager.tsx, /src/components/PriorityManager.tsx, /src/components/StatusManager.tsx, /src/components/UserManager.tsx, /src/components/NextTaskManager.tsx, /src/components/CommentsSection.tsx
+12:34:46 [vite] hmr update /src/components/StatusManager.tsx
+16:49:10 [vite] hmr update /src/contexts/AuthContext.tsx
+16:49:10 [vite] hmr invalidate /src/contexts/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+16:49:10 [vite] hmr update /src/App.tsx, /src/components/Login.tsx
+16:49:34 [vite] hmr update /src/contexts/AuthContext.tsx
+16:49:34 [vite] hmr invalidate /src/contexts/AuthContext.tsx Could not Fast Refresh ("useAuth" export is incompatible). Learn more at https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react#consistent-components-exports
+16:49:34 [vite] hmr update /src/App.tsx, /src/components/Login.tsx

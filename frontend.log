@@ -1,15 +1,10 @@
 
-> task-manager-app@1.0.0 start
+> task-manager-app@1.0.0 dev
 > vite
 
 
-  VITE v5.4.21  ready in 125 ms
+  VITE v5.4.21  ready in 151 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: http://192.168.1.70:3000/
-20:57:58 [vite] hmr update /src/App.tsx, /src/components/RecurrenceManager.tsx, /src/components/PriorityManager.tsx, /src/components/UserManager.tsx, /src/components/StatusManager.tsx, /src/components/CommentsSection.tsx
-20:58:01 [vite] hmr update /src/components/StatusManager.tsx
-20:58:04 [vite] hmr update /src/components/StatusManager.tsx
-20:58:08 [vite] hmr update /src/components/StatusManager.tsx
-20:58:20 [vite] hmr update /src/components/StatusManager.tsx
-20:58:25 [vite] hmr update /src/components/StatusManager.tsx
+17:41:22 [vite] hmr update /src/components/UserManager.tsx

@@ -502,6 +502,21 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
             }}>
               {isEditing ? 'Editar Usuário' : 'Novo Usuário'}
             </h3>
+            {isEditing && editingId && (
+              <div style={{
+                fontSize: '14px',
+                color: '#666',
+                marginBottom: '20px',
+                padding: '12px 16px',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px solid #e0e0e0',
+                fontFamily: 'monospace',
+                wordBreak: 'break-all'
+              }}>
+                <strong>ID do usuário:</strong> {editingId}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
               {/* Nome do Usuário */}
