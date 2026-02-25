@@ -7,6 +7,7 @@ import FloatingMenu from './components/FloatingMenu';
 import StatusManager from './components/StatusManager';
 import PriorityManager from './components/PriorityManager';
 import UserManager from './components/UserManager';
+import NextTaskManager from './components/NextTaskManager';
 import RecurrenceManager from './components/RecurrenceManager';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
@@ -136,6 +137,7 @@ const AppContent: React.FC = () => {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isNextTaskModalOpen, setIsNextTaskModalOpen] = useState(false);
 
   // Load initial data
   useEffect(() => {
@@ -481,6 +483,7 @@ const AppContent: React.FC = () => {
                 onOpenStatus={() => setIsStatusModalOpen(true)}
                 onOpenPriority={() => setIsPriorityModalOpen(true)}
                 onOpenUser={() => setIsUserModalOpen(true)}
+                onOpenNextTask={() => setIsNextTaskModalOpen(true)}
               />
               <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#333' }}>
                 Sistema de Gestão
@@ -731,6 +734,11 @@ const AppContent: React.FC = () => {
           isOpen={isUserModalOpen}
           onClose={() => setIsUserModalOpen(false)}
           onUserUpdate={loadInitialData}
+        />
+        
+        <NextTaskManager
+          isOpen={isNextTaskModalOpen}
+          onClose={() => setIsNextTaskModalOpen(false)}
         />
 
         <style>{`

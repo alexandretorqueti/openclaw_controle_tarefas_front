@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { FaCog, FaListAlt, FaFlag, FaTimes, FaBars, FaUser } from 'react-icons/fa';
+import { FaCog, FaListAlt, FaFlag, FaTimes, FaBars, FaUser, FaTasks } from 'react-icons/fa';
 
 interface FloatingMenuProps {
   onOpenStatus: () => void;
   onOpenPriority: () => void;
   onOpenUser: () => void;
+  onOpenNextTask: () => void;
 }
 
-const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriority, onOpenUser }) => {
+const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriority, onOpenUser, onOpenNextTask }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -97,7 +98,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 color: '#666',
                 margin: '4px 0 0 0'
               }}>
-                Gerencie status e prioridades
+                Gerencie status, prioridades e usuários
               </p>
             </div>
           </div>
@@ -294,6 +295,73 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 width: '8px',
                 height: '8px',
                 backgroundColor: '#9D4EDD',
+                borderRadius: '50%'
+              }} />
+            </button>
+
+            {/* Separador */}
+            <div style={{
+              height: '1px',
+              backgroundColor: '#f0f0f0',
+              margin: '4px 16px'
+            }} />
+
+            {/* Opção PRÓXIMA TAREFA */}
+            <button
+              onClick={() => {
+                onOpenNextTask();
+                setIsOpen(false);
+              }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s',
+                textAlign: 'left'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#f0f9ff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
+            >
+              <div style={{
+                width: '36px',
+                height: '36px',
+                backgroundColor: '#E8F5E9',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <FaTasks size={18} color="#4CAF50" />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#333',
+                  marginBottom: '2px'
+                }}>
+                  Próxima Tarefa
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#666'
+                }}>
+                  Consulte a próxima tarefa de um usuário
+                </div>
+              </div>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                backgroundColor: '#4CAF50',
                 borderRadius: '50%'
               }} />
             </button>

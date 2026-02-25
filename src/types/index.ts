@@ -34,6 +34,7 @@ export interface Status {
   name: string;
   colorCode: string;
   isFinalState: boolean;
+  allowAI: boolean;
   order?: number;
 }
 

@@ -21,7 +21,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
     name: '',
     colorCode: '#4ECDC4',
     order: 0,
-    isFinalState: false
+    isFinalState: false,
+    allowAI: false
   });
 
   // Cores pré-definidas para facilitar a seleção
@@ -118,7 +119,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
       name: status.name,
       colorCode: status.colorCode,
       order: status.order || 0,
-      isFinalState: status.isFinalState
+      isFinalState: status.isFinalState,
+      allowAI: status.allowAI || false
     });
     setEditingId(status.id);
     setIsEditing(true);
@@ -147,7 +149,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
       name: '',
       colorCode: '#4ECDC4',
       order: statuses.length > 0 ? Math.max(...statuses.map(s => s.order || 0)) + 1 : 0,
-      isFinalState: false
+      isFinalState: false,
+      allowAI: false
     });
     setEditingId(null);
     setIsEditing(false);
@@ -401,6 +404,21 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                             }}>
                               <FaCheckCircle size={10} />
                               Final
+                            </span>
+                          )}
+                          {status.allowAI && (
+                            <span style={{
+                              fontSize: '12px',
+                              backgroundColor: '#9D4EDD',
+                              color: '#fff',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '4px'
+                            }}>
+                              <FaListAlt size={10} />
+                              IA
                             </span>
                           )}
                         </div>
@@ -716,6 +734,75 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                   }}>
                     Status final não permite mais alterações
                   </div>
+                </div>
+              </div>
+
+              {/* Acessível pela IA */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
+                  Acessível pela IA
+                </label>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  marginTop: '8px'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => handleInputChange('allowAI', true)}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      backgroundColor: formData.allowAI ? '#9D4EDD' : '#f8f9fa',
+                      color: formData.allowAI ? '#fff' : '#333',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <FaListAlt size={16} />
+                    Sim
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleInputChange('allowAI', false)}
+                    style={{
+                      flex: 1,
+                      padding: '12px',
+                      backgroundColor: !formData.allowAI ? '#6C757D' : '#f8f9fa',
+                      color: !formData.allowAI ? '#fff' : '#333',
+                      border: 'none',
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <FaBan size={16} />
+                    Não
+                  </button>
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: '#666',
+                  marginTop: '4px'
+                }}>
+                  Define se tarefas com este status podem ser processadas pela IA
                 </div>
               </div>
 

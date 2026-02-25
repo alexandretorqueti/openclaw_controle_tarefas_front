@@ -366,6 +366,11 @@ class ApiService {
     });
   }
 
+  // Next task by nickname endpoint
+  async getNextTaskByNickname(nickname: string) {
+    return this.request(`/users/nickname/${nickname}/next-task`);
+  }
+
   // Recurrence endpoints
   async getRecurringTasksDue() {
     return this.request('/recurrence/due');
