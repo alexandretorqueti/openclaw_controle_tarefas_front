@@ -242,6 +242,7 @@ const AppContent: React.FC = () => {
       const data = {
         ...projectData,
         status: true,
+        ativo: true,
         createdById: user?.id || ''
       };
 

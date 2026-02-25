@@ -5,12 +5,16 @@ interface ProjectData {
   name: string;
   description: string;
   regras?: string;
+  status?: boolean;
+  ativo?: boolean;
 }
 
 interface UpdateProjectData {
   name?: string;
   description?: string;
   regras?: string;
+  status?: boolean;
+  ativo?: boolean;
 }
 
 interface TaskData {

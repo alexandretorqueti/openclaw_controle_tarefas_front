@@ -18,6 +18,7 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   status: boolean;
+  ativo: boolean;
   createdBy?: User;
   tasks?: Task[];
   statistics?: {
