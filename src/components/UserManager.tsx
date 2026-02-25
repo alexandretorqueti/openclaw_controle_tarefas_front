@@ -492,7 +492,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: '#f8f9fa'
+            backgroundColor: '#f8f9fa',
+            overflowY: 'auto'
           }}>
             <h3 style={{
               fontSize: '18px',
