@@ -64,6 +64,14 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   };
 
   const getProjectStats = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    
+    // Se o projeto já tem estatísticas da API, use-as
+    if (project?.statistics) {
+      return project.statistics;
+    }
+    
+    // Fallback: calcular localmente se não houver estatísticas da API
     const projectTasks = getProjectTasks(projectId);
     const totalTasks = projectTasks.length;
     const completedTasks = projectTasks.filter(t => t.isCompleted).length;
@@ -521,7 +529,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
             {projects.length} Projetos
           </h2>
           <p style={{ fontSize: '14px', color: '#666' }}>
-            {tasks.length} tarefas distribuídas entre os projetos
+            {projects.reduce((total, project) => total + (project.statistics?.totalTasks || 0), 0)} tarefas • 
+            {projects.reduce((total, project) => total + (project.statistics?.completedTasks || 0), 0)} concluídas
           </p>
         </div>
 
@@ -854,7 +863,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
               {/* Action buttons */}
               <div style={{
                 position: 'absolute',
-                top: '12px',
+                top: '50px',
                 right: '12px',
                 display: 'flex',
                 gap: '8px',
@@ -933,7 +942,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                   <FaFolder size={24} color="#1976d2" />
                 </div>
 
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, position: 'relative' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
                       {project.name}
@@ -944,7 +953,9 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                       padding: '4px 12px',
                       borderRadius: '16px',
                       fontSize: '12px',
-                      fontWeight: 500
+                      fontWeight: 500,
+                      zIndex: 5,
+                      position: 'relative'
                     }}>
                       {project.status ? 'Ativo' : 'Inativo'}
                     </span>

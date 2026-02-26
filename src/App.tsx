@@ -10,6 +10,8 @@ import UserManager from './components/UserManager';
 import NextTaskManager from './components/NextTaskManager';
 import RecurrenceManager from './components/RecurrenceManager';
 import LogsViewer from './components/LogsViewer';
+import UserDropdownMenu from './components/UserDropdownMenu';
+import UserProfileEdit from './components/UserProfileEdit';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
@@ -144,6 +146,7 @@ const AppContent: React.FC = () => {
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isNextTaskModalOpen, setIsNextTaskModalOpen] = useState(false);
+  const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
   // Load initial data
   useEffect(() => {
@@ -425,6 +428,7 @@ const AppContent: React.FC = () => {
         return (
           <TaskDetail
             task={selectedTask!}
+            tasks={tasks}
             users={users}
             statuses={statuses}
             priorities={priorities}
@@ -623,58 +627,10 @@ const AppContent: React.FC = () => {
               </button>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                overflow: 'hidden',
-                backgroundColor: '#e3f2fd'
-              }}>
-                <img
-                  src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=1'}
-                  alt={user?.name || 'Usuário'}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                  {user?.name || 'Usuário'}
-                </span>
-                <span style={{ fontSize: '12px', color: '#666' }}>
-                  {user?.role || 'Usuário'}
-                </span>
-              </div>
-              <button
-                onClick={logout}
-                style={{
-                  padding: '8px 12px',
-                  backgroundColor: 'transparent',
-                  color: '#666',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8f9fa';
-                  e.currentTarget.style.color = '#FF6B6B';
-                  e.currentTarget.style.borderColor = '#FF6B6B';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = '#666';
-                  e.currentTarget.style.borderColor = '#ddd';
-                }}
-              >
-                <FaSignOutAlt size={12} />
-                Sair
-              </button>
-            </div>
+            <UserDropdownMenu
+              onLogout={logout}
+              onEditProfile={() => setIsProfileEditModalOpen(true)}
+            />
           </div>
         </div>
 
@@ -798,6 +754,12 @@ const AppContent: React.FC = () => {
         <NextTaskManager
           isOpen={isNextTaskModalOpen}
           onClose={() => setIsNextTaskModalOpen(false)}
+        />
+
+        <UserProfileEdit
+          isOpen={isProfileEditModalOpen}
+          onClose={() => setIsProfileEditModalOpen(false)}
+          onProfileUpdate={loadInitialData}
         />
 
         <style>{`

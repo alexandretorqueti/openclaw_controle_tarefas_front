@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTasks, FaUser, FaCalendarAlt, FaFlag, FaProjectDiagram, FaSpinner, FaExclamationTriangle, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
+import { FaTasks, FaUser, FaCalendarAlt, FaFlag, FaProjectDiagram, FaSpinner, FaTimes, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 import apiService from '../services/api';
 import { User, Task } from '../types';
 
@@ -177,7 +177,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               e.currentTarget.style.borderColor = '#ddd';
             }}
           >
-            <FaExclamationTriangle size={18} color="#666" />
+            <FaTimes size={18} color="#666" />
           </button>
         </div>
 

@@ -65,6 +65,7 @@ export interface Task {
   isCompleted: boolean;
   createdAt: string;
   updatedAt: string;
+  model?: string | null;
   
   // Recurrence fields
   isRecurring?: boolean;

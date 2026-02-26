@@ -626,30 +626,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
             </button>
           )}
           
-          {onToggleCompletion && (
-            <button
-              onClick={handleToggleCompletion}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: task.isCompleted ? '#FFD166' : '#06D6A0',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '12px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = task.isCompleted ? '#e5bc5c' : '#05c090'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = task.isCompleted ? '#FFD166' : '#06D6A0'}
-            >
-              <FaCheck size={12} />
-              {task.isCompleted ? 'Reabrir' : 'Concluir'}
-            </button>
-          )}
-          
           <button
             onClick={(e) => {
               e.stopPropagation();

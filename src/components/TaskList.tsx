@@ -45,6 +45,7 @@ const TaskList: React.FC<TaskListProps> = ({
   // Estado local para compatibilidade, caso a prop não seja fornecida
   const [localShowCompleted, setLocalShowCompleted] = useState(false);
   const showCompleted = onToggleShowCompleted ? propShowCompleted : localShowCompleted;
+  const [models, setModels] = useState<string[]>([]);
 
   const handleToggleShowCompleted = (checked: boolean) => {
     if (onToggleShowCompleted) {
@@ -61,7 +62,9 @@ const TaskList: React.FC<TaskListProps> = ({
     statusId: statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '',
     priorityId: priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '',
     assignedToId: users.length > 0 ? users[0]?.id || '' : '',
-    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias a partir de agora
+    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
+    model: '',
+    parentTaskId: null
   });
 
   // Update defaults when data loads
@@ -87,6 +90,57 @@ const TaskList: React.FC<TaskListProps> = ({
       }));
     }
   }, [selectedProject]);
+
+  // Load models from openclaw.json
+  React.useEffect(() => {
+    const loadModels = async () => {
+      try {
+        const response = await fetch('/api/models');
+        if (response.ok) {
+          const data = await response.json();
+          setModels(data.models || []);
+        } else {
+          console.error('Failed to load models:', response.status);
+          // Fallback: try to load from a hardcoded list or local file
+          const fallbackModels = [
+            'ollama/mistral-small',
+            'ollama/glm-4.7-flash:q8_0',
+            'ollama/glm-4.7-flash:bf16',
+            'ollama/mixtral:latest',
+            'ollama/deepseek-v2.5',
+            'ollama/llama3.3',
+            'ollama/llama3.1:405b',
+            'ollama/llama3.1',
+            'ollama/nomic-embed-text:latest',
+            'ollama/deepseek-r1:70b',
+            'ollama/qwen2.5-coder:32b',
+            'ollama/qwen3-coder-next:latest',
+            'ollama/qwen3:4b',
+            'ollama/qwen2.5-coder:14b',
+            'ollama/llama3.1:70b',
+            'ollama/qwen2.5:72b',
+            'ollama/nemotron:latest',
+            'ollama/mxbai-embed-large:latest',
+            'chatllm/route-llm',
+            'google-antigravity/gemini-3-pro',
+            'google-antigravity/gemini-3-flash',
+            'google-antigravity/gemini-2.5-pro',
+            'google-antigravity/gemini-2.5-flash',
+            'google-antigravity/gemini-2.5-flash-lite',
+            'google-antigravity/gemini-2.0-flash',
+            'google-antigravity/gemini-2.0-flash-lite',
+            'deepseek/deepseek-chat',
+            'deepseek/deepseek-reasoner'
+          ];
+          setModels(fallbackModels);
+        }
+      } catch (error) {
+        console.error('Error loading models:', error);
+      }
+    };
+
+    loadModels();
+  }, []);
 
   const shouldFilterByCompletion = !onToggleShowCompleted;
   const filteredTasks = tasks.filter(task => {
@@ -132,10 +186,11 @@ const TaskList: React.FC<TaskListProps> = ({
     console.log('🔍 Title exists:', !!newTaskData.title);
     console.log('🔍 ProjectId exists:', !!newTaskData.projectId);
     console.log('🔍 Deadline exists:', !!newTaskData.deadline);
+    console.log('🔍 Model exists:', !!newTaskData.model);
     
-    if (!onCreateTask || !newTaskData.title || !newTaskData.projectId || !newTaskData.deadline) {
+    if (!onCreateTask || !newTaskData.title || !newTaskData.projectId || !newTaskData.deadline || !newTaskData.model) {
       console.error('❌ Missing required data for task creation');
-      setError('Preencha o título da tarefa e o prazo.');
+      setError('Preencha o título da tarefa, o prazo e selecione um modelo.');
       return;
     }
 
@@ -167,7 +222,8 @@ const TaskList: React.FC<TaskListProps> = ({
         statusId: defaultStatus,
         priorityId: defaultPriority,
         assignedToId: defaultUser,
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 dias a partir de agora
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
+        model: ''
       });
       setIsCreatingTask(false);
     } catch (error: any) {
@@ -251,20 +307,19 @@ const TaskList: React.FC<TaskListProps> = ({
         marginBottom: '24px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
       }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '20px', alignItems: 'flex-start' }}>
           {/* Barra de Pesquisa */}
           <div style={{ flex: '1', minWidth: '300px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
+              <FaSearch size={14} color="#666" />
+              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                Pesquisar
+              </label>
+            </div>
             <div style={{ position: 'relative' }}>
-              <FaSearch style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#666'
-              }} />
               <input
                 type="text"
-                placeholder="Pesquisar tarefas..."
+                placeholder="Digite para pesquisar tarefas..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
@@ -274,15 +329,25 @@ const TaskList: React.FC<TaskListProps> = ({
                   borderRadius: '8px',
                   fontSize: '14px',
                   outline: 'none',
-                  transition: 'border-color 0.2s'
+                  transition: 'border-color 0.2s',
+                  height: '44px',
+                  boxSizing: 'border-box'
                 }}
               />
+              <FaSearch style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#666',
+                pointerEvents: 'none'
+              }} />
             </div>
           </div>
 
           {/* Filtro de Status */}
           <div style={{ minWidth: '200px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
               <FaFilter size={14} color="#666" />
               <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
                 Status
@@ -298,7 +363,9 @@ const TaskList: React.FC<TaskListProps> = ({
                 borderRadius: '8px',
                 fontSize: '14px',
                 backgroundColor: '#fff',
-                outline: 'none'
+                outline: 'none',
+                height: '44px',
+                boxSizing: 'border-box'
               }}
             >
               <option value="">Todos os status</option>
@@ -312,7 +379,7 @@ const TaskList: React.FC<TaskListProps> = ({
 
           {/* Filtro de Prioridade */}
           <div style={{ minWidth: '200px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
               <FaFlag size={14} color="#666" />
               <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
                 Prioridade
@@ -328,7 +395,9 @@ const TaskList: React.FC<TaskListProps> = ({
                 borderRadius: '8px',
                 fontSize: '14px',
                 backgroundColor: '#fff',
-                outline: 'none'
+                outline: 'none',
+                height: '44px',
+                boxSizing: 'border-box'
               }}
             >
               <option value="">Todas as prioridades</option>
@@ -341,27 +410,64 @@ const TaskList: React.FC<TaskListProps> = ({
           </div>
 
           {/* Mostrar Tarefas Completas */}
-          <div style={{ minWidth: '200px', display: 'flex', alignItems: 'flex-end' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+          <div style={{ minWidth: '200px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
+              <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* Espaço reservado para ícone alinhado */}
+              </div>
+              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                Filtro
+              </label>
+            </div>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '10px',
+              height: '44px',
+              padding: '0 12px',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              backgroundColor: '#fff',
+              boxSizing: 'border-box'
+            }}>
               <input
                 type="checkbox"
                 id="showCompleted"
                 checked={showCompleted}
                 onChange={(e) => handleToggleShowCompleted(e.target.checked)}
-                style={{ transform: 'scale(1.2)', cursor: 'pointer' }}
+                style={{ 
+                  transform: 'scale(1.2)', 
+                  cursor: 'pointer',
+                  margin: 0
+                }}
               />
-              <label htmlFor="showCompleted" style={{ fontSize: '14px', fontWeight: 500, color: '#333', cursor: 'pointer' }}>
-                Mostrar tarefas completas
+              <label htmlFor="showCompleted" style={{ 
+                fontSize: '14px', 
+                color: '#333', 
+                cursor: 'pointer',
+                flex: 1,
+                margin: 0
+              }}>
+                Mostrar completas
               </label>
             </div>
           </div>
 
           {/* Botão Nova Tarefa */}
-          <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+          <div style={{ minWidth: '200px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
+              <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* Espaço reservado para ícone alinhado */}
+              </div>
+              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                Ações
+              </label>
+            </div>
             <button
               onClick={() => setIsCreatingTask(!isCreatingTask)}
               style={{
-                padding: '12px 24px',
+                width: '100%',
+                padding: '12px 16px',
                 backgroundColor: '#4ECDC4',
                 color: '#fff',
                 border: 'none',
@@ -370,10 +476,12 @@ const TaskList: React.FC<TaskListProps> = ({
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '8px',
                 fontWeight: 500,
                 transition: 'background-color 0.2s',
-                height: '44px'
+                height: '44px',
+                boxSizing: 'border-box'
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
@@ -561,6 +669,39 @@ const TaskList: React.FC<TaskListProps> = ({
 
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Modelo *
+                </label>
+                <select
+                  value={newTaskData.model || ''}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, model: e.target.value })}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#fff'
+                  }}
+                >
+                  <option value="">Selecione um modelo</option>
+                  {models.length > 0 ? (
+                    models.map((model, index) => (
+                      <option key={index} value={model}>
+                        {model}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">Carregando modelos...</option>
+                  )}
+                </select>
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  Modelo de IA para processamento da tarefa
+                </p>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
                   Prazo
                 </label>
                 <input
@@ -585,6 +726,42 @@ const TaskList: React.FC<TaskListProps> = ({
                 />
                 <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
                   Data e hora limite para conclusão
+                </p>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                  Depende de (opcional)
+                </label>
+                <select
+                  value={newTaskData.parentTaskId || ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setNewTaskData({ 
+                      ...newTaskData, 
+                      parentTaskId: value === '' ? null : value 
+                    });
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  <option value="">Nenhuma (tarefa independente)</option>
+                  {tasks
+                    .filter(task => !task.isCompleted && task.projectId === newTaskData.projectId)
+                    .map(task => (
+                      <option key={task.id} value={task.id}>
+                        {task.title} {task.isCompleted ? '(Concluída)' : ''}
+                      </option>
+                    ))
+                  }
+                </select>
+                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  Selecione uma tarefa da qual esta tarefa depende
                 </p>
               </div>
 
@@ -626,19 +803,19 @@ const TaskList: React.FC<TaskListProps> = ({
               </button>
               <button
                 onClick={handleCreateTask}
-                disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.deadline}
+                disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.deadline || !newTaskData.model}
                 style={{
                   padding: '10px 20px',
-                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline) ? '#4ECDC4' : '#ccc',
+                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.model) ? '#4ECDC4' : '#ccc',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline) ? 'pointer' : 'not-allowed'
+                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.model) ? 'pointer' : 'not-allowed'
                 }}
               >
                 Criar Tarefa
-                {(!newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId) && ' (carregando...)'}
+                {(!newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.model) && ' (carregando...)'}
               </button>
             </div>
           </div>

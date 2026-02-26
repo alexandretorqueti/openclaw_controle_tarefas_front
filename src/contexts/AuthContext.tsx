@@ -49,6 +49,7 @@ interface AuthContextType {
   login: () => void;
   logout: () => Promise<void>;
   checkAuth: () => Promise<void>;
+  updateUser: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -164,6 +165,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem('tarefas_user', JSON.stringify(updatedUser));
+  };
+
   useEffect(() => {
     checkAuth();
   }, []);
@@ -189,7 +195,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     logout,
-    checkAuth
+    checkAuth,
+    updateUser
   };
 
   return (
