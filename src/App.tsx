@@ -150,13 +150,13 @@ const AppContent: React.FC = () => {
   }, []);
 
   // Carrega tarefas com base no projeto selecionado e filtros atuais
-  const loadTasks = async (projectId?: string | null) => {
+  const loadTasks = async (projectId?: string | null, filters = taskFilters) => {
     try {
       let tasksData;
       if (projectId) {
-        tasksData = await apiService.getTasksByProject(projectId, taskFilters);
+        tasksData = await apiService.getTasksByProject(projectId, filters);
       } else {
-        tasksData = await apiService.getTasks(taskFilters);
+        tasksData = await apiService.getTasks(filters);
       }
       setTasks(tasksData.tasks || []);
     } catch (err) {
@@ -169,7 +169,7 @@ const AppContent: React.FC = () => {
   const updateTaskFilters = async (newFilters: { isCompleted?: boolean }) => {
     setTaskFilters(newFilters);
     // Recarrega as tarefas com os novos filtros
-    await loadTasks(selectedProject?.id);
+    await loadTasks(selectedProject?.id, newFilters);
   };
 
   const loadInitialData = async () => {
@@ -451,6 +451,8 @@ const AppContent: React.FC = () => {
             onUpdateTask={handleUpdateTask}
             onDeleteTask={handleDeleteTask}
             onToggleCompletion={handleToggleTaskCompletion}
+            showCompleted={taskFilters.isCompleted === true}
+            onToggleShowCompleted={(show) => updateTaskFilters({ isCompleted: show })}
           />
         );
       

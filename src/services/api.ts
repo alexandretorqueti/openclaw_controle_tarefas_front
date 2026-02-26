@@ -280,10 +280,12 @@ class ApiService {
   }
 
   async getTasksByProject(projectId: string, filters: Record<string, any> = {}) {
+    console.log('🔍 getTasksByProject filters:', filters);
     const queryParams = new URLSearchParams(filters).toString();
     const endpoint = queryParams
       ? `/tasks/project/${projectId}?${queryParams}`
       : `/tasks/project/${projectId}`;
+    console.log('🔍 getTasksByProject endpoint:', endpoint);
     return this.request(endpoint);
   }
 
