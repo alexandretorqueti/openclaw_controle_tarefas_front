@@ -430,6 +430,11 @@ class ApiService {
   async getCommentReplies(commentId) {
     return this.request(`/comments/${commentId}/replies`);
   }
+
+  // Logs endpoints
+  async getMonitorLogs() {
+    return this.request('/logs/monitor');
+  }
 }
 
 export default new ApiService();

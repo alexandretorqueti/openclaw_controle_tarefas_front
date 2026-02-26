@@ -9,10 +9,11 @@ import PriorityManager from './components/PriorityManager';
 import UserManager from './components/UserManager';
 import NextTaskManager from './components/NextTaskManager';
 import RecurrenceManager from './components/RecurrenceManager';
+import LogsViewer from './components/LogsViewer';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
-import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync } from 'react-icons/fa';
+import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync, FaTerminal } from 'react-icons/fa';
 
 // Tarefa de teste para IA - Processamento concluído em 2026-02-25 18:35 GMT-3
 
@@ -20,10 +21,10 @@ import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaS
 const getBackendUrl = (): string => {
   const hostname = window.location.hostname;
   const port = window.location.port;
-  
+
   // Determine backend port based on frontend port
   let backendPort = 3001; // Default to development
-  
+
   if (port === '8090' || port === '8091') {
     // Production environment
     backendPort = 8091;
@@ -40,9 +41,9 @@ const getBackendUrl = (): string => {
       backendPort = 8091;
     }
   }
-  
+
   console.log(`🌐 App Component: Frontend ${hostname}:${port} → Backend port ${backendPort}`);
-  
+
   // Build backend URL
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     return `http://localhost:${backendPort}`;
@@ -77,7 +78,7 @@ class ErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ 
+        <div style={{
           padding: '40px',
           textAlign: 'center',
           fontFamily: 'Arial, sans-serif',
@@ -85,8 +86,8 @@ class ErrorBoundary extends Component<
         }}>
           <h1 style={{ color: '#FF6B6B' }}>⚠️ Erro no Componente</h1>
           <p>Ocorreu um erro ao renderizar este componente.</p>
-          <p style={{ 
-            backgroundColor: '#f8f9fa', 
+          <p style={{
+            backgroundColor: '#f8f9fa',
             padding: '15px',
             borderRadius: '8px',
             marginTop: '20px',
@@ -95,7 +96,7 @@ class ErrorBoundary extends Component<
           }}>
             {this.state.error?.message || 'Erro desconhecido'}
           </p>
-          <button 
+          <button
             onClick={() => this.setState({ hasError: false, error: null })}
             style={{
               marginTop: '20px',
@@ -117,7 +118,7 @@ class ErrorBoundary extends Component<
   }
 }
 
-type ViewMode = 'tasks' | 'projects' | 'task-detail';
+type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs';
 
 // Main app content that requires authentication
 const AppContent: React.FC = () => {
@@ -125,19 +126,19 @@ const AppContent: React.FC = () => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('projects');
-  
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [priorities, setPriorities] = useState<Priority[]>([]);
-  
+
   // Filtros para tarefas
   const [taskFilters, setTaskFilters] = useState<{ isCompleted?: boolean }>({});
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Estados para os modais
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
@@ -189,7 +190,7 @@ const AppContent: React.FC = () => {
       console.log('🚀 Loaded users data:', usersData);
       console.log('🚀 Users array:', usersData.users);
       console.log('🚀 Users count:', usersData.users?.length || 0);
-      
+
       setProjects(projectsData.projects || []);
       setTasks(tasksData.tasks || []);
       setUsers(usersData.users || []);
@@ -199,7 +200,7 @@ const AppContent: React.FC = () => {
     } catch (err) {
       console.error('Failed to load data:', err);
       setError('Falha ao carregar dados. Tente novamente.');
-      
+
       // Clear all data on error
       setProjects([]);
       setTasks([]);
@@ -218,7 +219,7 @@ const AppContent: React.FC = () => {
         apiService.getStatuses().catch(() => ({ statuses: [] })),
         apiService.getPriorities().catch(() => ({ priorities: [] }))
       ]);
-      
+
       setStatuses(statusesData.statuses || []);
       setPriorities(prioritiesData.priorities || []);
     } catch (err) {
@@ -239,7 +240,7 @@ const AppContent: React.FC = () => {
   const handleProjectSelect = async (project: Project) => {
     setSelectedProject(project);
     setViewMode('tasks');
-    
+
     try {
       // Load tasks for this project with current filters
       await loadTasks(project.id);
@@ -251,7 +252,7 @@ const AppContent: React.FC = () => {
   const handleBackToProjects = async () => {
     setSelectedProject(null);
     setViewMode('projects');
-    
+
     try {
       // Load all tasks with current filters
       await loadTasks();
@@ -294,7 +295,7 @@ const AppContent: React.FC = () => {
     try {
       await apiService.deleteProject(id);
       setProjects(prev => prev.filter(p => p.id !== id));
-      
+
       // If we're viewing this project, go back to projects list
       if (selectedProject?.id === id) {
         handleBackToProjects();
@@ -326,12 +327,12 @@ const AppContent: React.FC = () => {
     try {
       const response = await apiService.updateTask(id, taskData);
       setTasks(prev => prev.map(t => t.id === id ? response.task : t));
-      
+
       // Update selected task if it's the one being edited
       if (selectedTask?.id === id) {
         setSelectedTask(response.task);
       }
-      
+
       return response.task;
     } catch (err) {
       console.error('Failed to update task:', err);
@@ -343,7 +344,7 @@ const AppContent: React.FC = () => {
     try {
       await apiService.deleteTask(id);
       setTasks(prev => prev.filter(t => t.id !== id));
-      
+
       // If we're viewing this task, go back to list
       if (selectedTask?.id === id) {
         handleBackToList();
@@ -358,7 +359,7 @@ const AppContent: React.FC = () => {
     try {
       const response = await apiService.toggleTaskCompletion(id);
       setTasks(prev => prev.map(t => t.id === id ? response.task : t));
-      
+
       if (selectedTask?.id === id) {
         setSelectedTask(response.task);
       }
@@ -435,7 +436,7 @@ const AppContent: React.FC = () => {
             onToggleCompletion={handleToggleTaskCompletion}
           />
         );
-      
+
       case 'tasks':
         return (
           <TaskList
@@ -455,14 +456,19 @@ const AppContent: React.FC = () => {
             onToggleShowCompleted={(show) => updateTaskFilters({ isCompleted: show })}
           />
         );
-      
+
       case 'recurrence':
         return (
           <RecurrenceManager
             onTaskSelect={handleTaskSelect}
           />
         );
-      
+
+      case 'logs':
+        return (
+          <LogsViewer />
+        );
+
       case 'projects':
       default:
         return (
@@ -484,8 +490,8 @@ const AppContent: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div style={{ 
-        minHeight: '100vh', 
+      <div style={{
+        minHeight: '100vh',
         backgroundColor: '#f5f5f5',
         fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
       }}>
@@ -520,6 +526,30 @@ const AppContent: React.FC = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('logs');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: viewMode === 'logs' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'logs' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <FaTerminal size={14} />
+                Logs do Sistema
+              </button>
+              
               <button
                 onClick={() => {
                   setSelectedProject(null);
@@ -567,7 +597,7 @@ const AppContent: React.FC = () => {
                 <FaFolder size={14} />
                 Projetos
               </button>
-              
+
               <button
                 onClick={() => {
                   setSelectedProject(null);
@@ -601,8 +631,8 @@ const AppContent: React.FC = () => {
                 overflow: 'hidden',
                 backgroundColor: '#e3f2fd'
               }}>
-                <img 
-                  src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=1'} 
+                <img
+                  src={user?.avatarUrl || 'https://i.pravatar.cc/150?img=1'}
                   alt={user?.name || 'Usuário'}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
@@ -687,7 +717,7 @@ const AppContent: React.FC = () => {
                 <FaHome size={12} />
                 Projetos
               </button>
-              
+
               {selectedProject && (
                 <>
                   <span style={{ color: '#999' }}>/</span>
@@ -708,7 +738,7 @@ const AppContent: React.FC = () => {
                   </button>
                 </>
               )}
-              
+
               {selectedTask && (
                 <>
                   <span style={{ color: '#999' }}>/</span>
@@ -723,7 +753,7 @@ const AppContent: React.FC = () => {
 
         {/* Main Content */}
         {renderContent()}
-        
+
         {/* Footer */}
         <div style={{
           padding: '20px',
@@ -735,7 +765,7 @@ const AppContent: React.FC = () => {
           backgroundColor: '#fff'
         }}>
           <p>
-            Sistema de Gestão de Tarefas • API REST com Node.js e PostgreSQL • 
+            Sistema de Gestão de Tarefas • API REST com Node.js e PostgreSQL •
             Frontend com React e TypeScript
           </p>
           <p style={{ fontSize: '12px', marginTop: '8px' }}>
@@ -752,19 +782,19 @@ const AppContent: React.FC = () => {
           onClose={() => setIsStatusModalOpen(false)}
           onStatusUpdate={reloadStatusesAndPriorities}
         />
-        
+
         <PriorityManager
           isOpen={isPriorityModalOpen}
           onClose={() => setIsPriorityModalOpen(false)}
           onPriorityUpdate={reloadStatusesAndPriorities}
         />
-        
+
         <UserManager
           isOpen={isUserModalOpen}
           onClose={() => setIsUserModalOpen(false)}
           onUserUpdate={loadInitialData}
         />
-        
+
         <NextTaskManager
           isOpen={isNextTaskModalOpen}
           onClose={() => setIsNextTaskModalOpen(false)}
@@ -775,7 +805,7 @@ const AppContent: React.FC = () => {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
-          
+
           .spin {
             animation: spin 1s linear infinite;
           }
