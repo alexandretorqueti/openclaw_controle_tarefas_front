@@ -16,6 +16,8 @@ interface TaskListProps {
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
   onDeleteTask?: (id: string) => Promise<void>;
   onToggleCompletion?: (id: string) => Promise<void>;
+  showCompleted?: boolean;
+  onToggleShowCompleted?: (show: boolean) => void;
 }
 
 const TaskList: React.FC<TaskListProps> = ({ 
@@ -30,7 +32,9 @@ const TaskList: React.FC<TaskListProps> = ({
   onCreateTask,
   onUpdateTask,
   onDeleteTask,
-  onToggleCompletion
+  onToggleCompletion,
+  showCompleted: propShowCompleted = false,
+  onToggleShowCompleted
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
@@ -38,6 +42,18 @@ const TaskList: React.FC<TaskListProps> = ({
   const [sortBy, setSortBy] = useState<'deadline' | 'priority' | 'title'>('deadline');
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Estado local para compatibilidade, caso a prop não seja fornecida
+  const [localShowCompleted, setLocalShowCompleted] = useState(false);
+  const showCompleted = onToggleShowCompleted ? propShowCompleted : localShowCompleted;
+
+  const handleToggleShowCompleted = (checked: boolean) => {
+    if (onToggleShowCompleted) {
+      onToggleShowCompleted(checked);
+    } else {
+      setLocalShowCompleted(checked);
+    }
+  };
+
   const [newTaskData, setNewTaskData] = useState<Partial<Task>>({
     title: '',
     description: '',
@@ -72,15 +88,16 @@ const TaskList: React.FC<TaskListProps> = ({
     }
   }, [selectedProject]);
 
+  const shouldFilterByCompletion = !onToggleShowCompleted;
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          task.description.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = !selectedStatus || task.statusId === selectedStatus;
     const matchesPriority = !selectedPriority || task.priorityId === selectedPriority;
-    const notCompleted = !task.isCompleted; // Exclui tarefas concluídas
+    const matchesCompletion = shouldFilterByCompletion ? (showCompleted ? true : !task.isCompleted) : true;
 
-    return matchesSearch && matchesStatus && matchesPriority && notCompleted;
+    return matchesSearch && matchesStatus && matchesPriority && matchesCompletion;
   });
 
   const sortedTasks = [...filteredTasks].sort((a, b) => {
@@ -321,6 +338,22 @@ const TaskList: React.FC<TaskListProps> = ({
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Mostrar Tarefas Completas */}
+          <div style={{ minWidth: '200px', display: 'flex', alignItems: 'flex-end' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <input
+                type="checkbox"
+                id="showCompleted"
+                checked={showCompleted}
+                onChange={(e) => handleToggleShowCompleted(e.target.checked)}
+                style={{ transform: 'scale(1.2)', cursor: 'pointer' }}
+              />
+              <label htmlFor="showCompleted" style={{ fontSize: '14px', fontWeight: 500, color: '#333', cursor: 'pointer' }}>
+                Mostrar tarefas completas
+              </label>
+            </div>
           </div>
 
           {/* Botão Nova Tarefa */}

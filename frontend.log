@@ -3,11 +3,7 @@
 > vite
 
 
-  VITE v5.4.21  ready in 174 ms
+  VITE v5.4.21  ready in 114 ms
 
   ➜  Local:   http://localhost:3000/
   ➜  Network: http://192.168.1.70:3000/
-18:33:13 [vite] hmr update /src/components/FloatingMenu.tsx
-18:33:38 [vite] hmr update /src/App.tsx
-18:33:40 [vite] hmr update /src/components/FloatingMenu.tsx
-18:35:40 [vite] hmr update /src/components/FloatingMenu.tsx

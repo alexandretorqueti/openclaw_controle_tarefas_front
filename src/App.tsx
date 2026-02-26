@@ -132,6 +132,9 @@ const AppContent: React.FC = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [priorities, setPriorities] = useState<Priority[]>([]);
   
+  // Filtros para tarefas
+  const [taskFilters, setTaskFilters] = useState<{ isCompleted?: boolean }>({});
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -146,6 +149,29 @@ const AppContent: React.FC = () => {
     loadInitialData();
   }, []);
 
+  // Carrega tarefas com base no projeto selecionado e filtros atuais
+  const loadTasks = async (projectId?: string | null) => {
+    try {
+      let tasksData;
+      if (projectId) {
+        tasksData = await apiService.getTasksByProject(projectId, taskFilters);
+      } else {
+        tasksData = await apiService.getTasks(taskFilters);
+      }
+      setTasks(tasksData.tasks || []);
+    } catch (err) {
+      console.error('Failed to load tasks:', err);
+      setTasks([]);
+    }
+  };
+
+  // Atualiza filtros de tarefas e recarrega a lista
+  const updateTaskFilters = async (newFilters: { isCompleted?: boolean }) => {
+    setTaskFilters(newFilters);
+    // Recarrega as tarefas com os novos filtros
+    await loadTasks(selectedProject?.id);
+  };
+
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -154,7 +180,7 @@ const AppContent: React.FC = () => {
       // Load all data from API
       const [projectsData, tasksData, usersData, statusesData, prioritiesData] = await Promise.all([
         apiService.getProjects().catch(() => ({ projects: [] })),
-        apiService.getTasks().catch(() => ({ tasks: [] })),
+        apiService.getTasks(taskFilters).catch(() => ({ tasks: [] })),
         apiService.getUsers().catch(() => ({ users: [] })),
         apiService.getStatuses().catch(() => ({ statuses: [] })),
         apiService.getPriorities().catch(() => ({ priorities: [] }))
@@ -215,9 +241,8 @@ const AppContent: React.FC = () => {
     setViewMode('tasks');
     
     try {
-      // Load tasks for this project
-      const response = await apiService.getTasksByProject(project.id);
-      setTasks(response.tasks || []);
+      // Load tasks for this project with current filters
+      await loadTasks(project.id);
     } catch (err) {
       console.error('Failed to load project tasks:', err);
     }
@@ -228,9 +253,8 @@ const AppContent: React.FC = () => {
     setViewMode('projects');
     
     try {
-      // Load all tasks
-      const response = await apiService.getTasks();
-      setTasks(response.tasks || []);
+      // Load all tasks with current filters
+      await loadTasks();
     } catch (err) {
       console.error('Failed to load all tasks:', err);
     }
