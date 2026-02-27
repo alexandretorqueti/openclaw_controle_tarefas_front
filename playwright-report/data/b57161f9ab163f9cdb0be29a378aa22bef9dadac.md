@@ -20,9 +20,9 @@
         - img [ref=e23]
         - text: Todas as Tarefas
     - generic [ref=e26] [cursor=pointer]:
-      - img "Alexandre Torqueti" [ref=e28]
+      - img "Test User 1772149807139 Editado" [ref=e28]
       - generic [ref=e29]:
-        - generic [ref=e30]: Alexandre Torqueti
+        - generic [ref=e30]: Test User 1772149807139 Editado
         - generic [ref=e31]: Viewer
       - img [ref=e32]
   - generic [ref=e34]:
@@ -32,7 +32,7 @@
     - generic [ref=e38]:
       - generic [ref=e39]:
         - heading "1 Projetos" [level=2] [ref=e40]
-        - paragraph [ref=e41]: 15 tarefas •11 concluídas
+        - paragraph [ref=e41]: 19 tarefas •18 concluídas
       - button "Novo Projeto" [ref=e42] [cursor=pointer]:
         - img [ref=e43]
         - text: Novo Projeto
@@ -51,22 +51,22 @@
           - paragraph [ref=e62]: Sistema completo para gerenciamento de tarefas com frontend e backend separados
       - generic [ref=e63]:
         - generic [ref=e64]:
-          - generic [ref=e65]: "15"
+          - generic [ref=e65]: "19"
           - generic [ref=e66]: Tarefas
         - generic [ref=e67]:
-          - generic [ref=e68]: "11"
+          - generic [ref=e68]: "18"
           - generic [ref=e69]: Concluídas
       - generic [ref=e71]:
         - generic [ref=e72]: Progresso
-        - generic [ref=e73]: 73%
+        - generic [ref=e73]: 95%
       - generic [ref=e76]:
         - generic [ref=e77]:
           - text: "Criado por:"
-          - strong [ref=e78]: Alexandre Torqueti
+          - strong [ref=e78]: Test User 1772149807139 Editado
         - generic [ref=e79]: 25/02/2026
   - generic [ref=e80]:
     - paragraph [ref=e81]: Sistema de Gestão de Tarefas • API REST com Node.js e PostgreSQL • Frontend com React e TypeScript
-    - paragraph [ref=e82]: 4 tarefas • 9 usuários • 1 projetos
+    - paragraph [ref=e82]: 1 tarefas • 7 usuários • 1 projetos
     - paragraph [ref=e83]: "Backend: http://localhost:3001 • Frontend: http://localhost:3000"
   - generic [ref=e85]:
     - generic [ref=e86]:
@@ -81,19 +81,21 @@
       - generic [ref=e98]:
         - generic [ref=e99]:
           - heading "Usuários Cadastrados" [level=3] [ref=e100]
-          - generic [ref=e101]: 9 usuários
+          - generic [ref=e101]: 7 usuários
         - generic [ref=e102]:
           - generic [ref=e103]:
-            - img "Alexandre Torqueti" [ref=e105]
+            - img "Test User 1772149630599 Editado" [ref=e105]
             - generic [ref=e106]:
               - generic [ref=e107]:
-                - generic [ref=e108]: Alexandre Torqueti
-                - generic [ref=e109]: Visualizador
+                - generic [ref=e108]: Test User 1772149630599 Editado
+                - generic [ref=e109]: Administrador
               - generic [ref=e110]:
-                - img [ref=e112]
+                - generic [ref=e111]:
+                  - img [ref=e112]
+                  - text: Jarbas@temp.dev
                 - generic [ref=e114]:
                   - img [ref=e115]
-                  - text: "Apelido: alexandre"
+                  - text: "Apelido: Jarbas"
               - generic [ref=e118]:
                 - img [ref=e119]
                 - text: "Criado em: 25/02/2026"
@@ -105,21 +107,21 @@
                 - img [ref=e126]
                 - text: Excluir
           - generic [ref=e128]:
-            - img "Jarbas" [ref=e130]
+            - img "Test User 1772149701561" [ref=e130]
             - generic [ref=e131]:
               - generic [ref=e132]:
-                - generic [ref=e133]: Jarbas
-                - generic [ref=e134]: Administrador
+                - generic [ref=e133]: Test User 1772149701561
+                - generic [ref=e134]: Visualizador
               - generic [ref=e135]:
                 - generic [ref=e136]:
                   - img [ref=e137]
-                  - text: Jarbas@temp.dev
+                  - text: test1772149701561@example.com
                 - generic [ref=e139]:
                   - img [ref=e140]
-                  - text: "Apelido: Jarbas"
+                  - text: "Apelido: testuser1772149701561"
               - generic [ref=e143]:
                 - img [ref=e144]
-                - text: "Criado em: 25/02/2026"
+                - text: "Criado em: 26/02/2026"
             - generic [ref=e146]:
               - button "Editar" [ref=e147] [cursor=pointer]:
                 - img [ref=e148]
@@ -128,21 +130,21 @@
                 - img [ref=e151]
                 - text: Excluir
           - generic [ref=e153]:
-            - img "Test Edit 1772137926190" [ref=e155]
+            - img "Test User 1772149701561 Editado" [ref=e155]
             - generic [ref=e156]:
               - generic [ref=e157]:
-                - generic [ref=e158]: Test Edit 1772137926190
+                - generic [ref=e158]: Test User 1772149701561 Editado
                 - generic [ref=e159]: Visualizador
               - generic [ref=e160]:
                 - generic [ref=e161]:
                   - img [ref=e162]
-                  - text: testedit1772137926190@example.com
+                  - text: test@example.com
                 - generic [ref=e164]:
                   - img [ref=e165]
-                  - text: "Apelido: testedit1772137926190"
+                  - text: "Apelido: test"
               - generic [ref=e168]:
                 - img [ref=e169]
-                - text: "Criado em: 26/02/2026"
+                - text: "Criado em: 25/02/2026"
             - generic [ref=e171]:
               - button "Editar" [ref=e172] [cursor=pointer]:
                 - img [ref=e173]
@@ -151,21 +153,21 @@
                 - img [ref=e176]
                 - text: Excluir
           - generic [ref=e178]:
-            - img "Test User" [ref=e180]
+            - img "Test User 1772149807139" [ref=e180]
             - generic [ref=e181]:
               - generic [ref=e182]:
-                - generic [ref=e183]: Test User
-                - generic [ref=e184]: Visualizador
+                - generic [ref=e183]: Test User 1772149807139
+                - generic [ref=e184]: Editor
               - generic [ref=e185]:
                 - generic [ref=e186]:
                   - img [ref=e187]
-                  - text: test@example.com
+                  - text: test1772149807139@example.com
                 - generic [ref=e189]:
                   - img [ref=e190]
-                  - text: "Apelido: test"
+                  - text: "Apelido: testuser1772149807139"
               - generic [ref=e193]:
                 - img [ref=e194]
-                - text: "Criado em: 25/02/2026"
+                - text: "Criado em: 26/02/2026"
             - generic [ref=e196]:
               - button "Editar" [ref=e197] [cursor=pointer]:
                 - img [ref=e198]
@@ -174,21 +176,21 @@
                 - img [ref=e201]
                 - text: Excluir
           - generic [ref=e203]:
-            - img "Test User 1772137524013" [ref=e205]
+            - img "Test User 1772149807139 Editado" [ref=e205]
             - generic [ref=e206]:
               - generic [ref=e207]:
-                - generic [ref=e208]: Test User 1772137524013
-                - generic [ref=e209]: Editor
+                - generic [ref=e208]: Test User 1772149807139 Editado
+                - generic [ref=e209]: Visualizador
               - generic [ref=e210]:
                 - generic [ref=e211]:
                   - img [ref=e212]
-                  - text: test1772137524013@example.com
+                  - text: alexandre.globaltecnologia@gmail.com
                 - generic [ref=e214]:
                   - img [ref=e215]
-                  - text: "Apelido: testuser1772137524013"
+                  - text: "Apelido: alexandre"
               - generic [ref=e218]:
                 - img [ref=e219]
-                - text: "Criado em: 26/02/2026"
+                - text: "Criado em: 25/02/2026"
             - generic [ref=e221]:
               - button "Editar" [ref=e222] [cursor=pointer]:
                 - img [ref=e223]
@@ -197,18 +199,18 @@
                 - img [ref=e226]
                 - text: Excluir
           - generic [ref=e228]:
-            - img "Test User 1772137784488" [ref=e230]
+            - img "Test User 1772149865717" [ref=e230]
             - generic [ref=e231]:
               - generic [ref=e232]:
-                - generic [ref=e233]: Test User 1772137784488
+                - generic [ref=e233]: Test User 1772149865717
                 - generic [ref=e234]: Visualizador
               - generic [ref=e235]:
                 - generic [ref=e236]:
                   - img [ref=e237]
-                  - text: test1772137784488@example.com
+                  - text: test1772149865717@example.com
                 - generic [ref=e239]:
                   - img [ref=e240]
-                  - text: "Apelido: testuser1772137784488"
+                  - text: "Apelido: testuser1772149865717"
               - generic [ref=e243]:
                 - img [ref=e244]
                 - text: "Criado em: 26/02/2026"
@@ -220,18 +222,18 @@
                 - img [ref=e251]
                 - text: Excluir
           - generic [ref=e253]:
-            - img "Test User 1772137826737" [ref=e255]
+            - img "Test User 1772149865717 Editado" [ref=e255]
             - generic [ref=e256]:
               - generic [ref=e257]:
-                - generic [ref=e258]: Test User 1772137826737
+                - generic [ref=e258]: Test User 1772149865717 Editado
                 - generic [ref=e259]: Visualizador
               - generic [ref=e260]:
                 - generic [ref=e261]:
                   - img [ref=e262]
-                  - text: test1772137826737@example.com
+                  - text: test1772149630599@example.com
                 - generic [ref=e264]:
                   - img [ref=e265]
-                  - text: "Apelido: testuser1772137826737"
+                  - text: "Apelido: testuser1772149630599"
               - generic [ref=e268]:
                 - img [ref=e269]
                 - text: "Criado em: 26/02/2026"
@@ -242,111 +244,58 @@
               - button "Excluir" [ref=e275] [cursor=pointer]:
                 - img [ref=e276]
                 - text: Excluir
-          - generic [ref=e278]:
-            - img "Test User 1772137879720" [ref=e280]
-            - generic [ref=e281]:
-              - generic [ref=e282]:
-                - generic [ref=e283]: Test User 1772137879720
-                - generic [ref=e284]: Visualizador
-              - generic [ref=e285]:
-                - generic [ref=e286]:
-                  - img [ref=e287]
-                  - text: test1772137879720@example.com
-                - generic [ref=e289]:
-                  - img [ref=e290]
-                  - text: "Apelido: testuser1772137879720"
-              - generic [ref=e293]:
-                - img [ref=e294]
-                - text: "Criado em: 26/02/2026"
-            - generic [ref=e296]:
-              - button "Editar" [ref=e297] [cursor=pointer]:
-                - img [ref=e298]
-                - text: Editar
-              - button "Excluir" [ref=e300] [cursor=pointer]:
-                - img [ref=e301]
-                - text: Excluir
-          - generic [ref=e303]:
-            - img "Test User 1772137984410" [ref=e305]
-            - generic [ref=e306]:
-              - generic [ref=e307]:
-                - generic [ref=e308]: Test User 1772137984410
-                - generic [ref=e309]: Visualizador
-              - generic [ref=e310]:
-                - generic [ref=e311]:
-                  - img [ref=e312]
-                  - text: test1772137984410@example.com
+      - generic [ref=e278]:
+        - heading "Novo Usuário" [level=3] [ref=e279]
+        - generic [ref=e280]:
+          - generic [ref=e281]:
+            - generic [ref=e282]: Nome Completo *
+            - generic [ref=e283]:
+              - img [ref=e284]
+              - 'textbox "Ex: João da Silva" [ref=e286]'
+          - generic [ref=e287]:
+            - generic [ref=e288]: Email *
+            - generic [ref=e289]:
+              - img [ref=e290]
+              - 'textbox "Ex: joao@empresa.com" [ref=e292]'
+          - generic [ref=e293]:
+            - generic [ref=e294]: Apelido (Opcional)
+            - generic [ref=e295]:
+              - img [ref=e296]
+              - 'textbox "Ex: joaosilva (será gerado a partir do email se não informado)" [ref=e298]': testuser1772149630599
+            - generic [ref=e299]: Deixe em branco para gerar automaticamente a partir do email
+          - generic [ref=e300]:
+            - generic [ref=e301]: URL do Avatar (Opcional)
+            - generic [ref=e302]:
+              - img [ref=e303]
+              - 'textbox "Ex: https://example.com/avatar.jpg" [ref=e305]'
+            - generic [ref=e306]: Deixe em branco para usar avatar padrão
+          - generic [ref=e307]:
+            - generic [ref=e308]: Permissão de Acesso
+            - generic [ref=e309]:
+              - button "Administrador Acesso total ao sistema" [ref=e310] [cursor=pointer]:
+                - img [ref=e312]
                 - generic [ref=e314]:
-                  - img [ref=e315]
-                  - text: "Apelido: testuser1772137984410"
-              - generic [ref=e318]:
+                  - generic [ref=e315]: Administrador
+                  - generic [ref=e316]: Acesso total ao sistema
+              - button "Editor Pode criar e editar tarefas" [ref=e317] [cursor=pointer]:
                 - img [ref=e319]
-                - text: "Criado em: 26/02/2026"
-            - generic [ref=e321]:
-              - button "Editar" [ref=e322] [cursor=pointer]:
-                - img [ref=e323]
-                - text: Editar
-              - button "Excluir" [ref=e325] [cursor=pointer]:
+                - generic [ref=e321]:
+                  - generic [ref=e322]: Editor
+                  - generic [ref=e323]: Pode criar e editar tarefas
+              - button "Visualizador Somente leitura" [ref=e324] [cursor=pointer]:
                 - img [ref=e326]
-                - text: Excluir
-      - generic [ref=e328]:
-        - heading "Editar Usuário" [level=3] [ref=e329]
-        - generic [ref=e330]:
-          - strong [ref=e331]: "ID do usuário:"
-          - text: 5fe303cc-19be-4d03-abe6-91a63414005f
-        - generic [ref=e332]:
-          - generic [ref=e333]:
-            - generic [ref=e334]: Nome Completo *
-            - generic [ref=e335]:
-              - img [ref=e336]
-              - 'textbox "Ex: João da Silva" [ref=e338]': Test User 1772137984410 Editado
-          - generic [ref=e339]:
-            - generic [ref=e340]: Email *
-            - generic [ref=e341]:
-              - img [ref=e342]
-              - 'textbox "Ex: joao@empresa.com" [active] [ref=e344]'
-          - generic [ref=e345]:
-            - generic [ref=e346]: Apelido (Opcional)
-            - generic [ref=e347]:
-              - img [ref=e348]
-              - 'textbox "Ex: joaosilva (será gerado a partir do email se não informado)" [ref=e350]': alexandre
-            - generic [ref=e351]: Deixe em branco para gerar automaticamente a partir do email
-          - generic [ref=e352]:
-            - generic [ref=e353]: URL do Avatar (Opcional)
-            - generic [ref=e354]:
-              - img [ref=e355]
-              - 'textbox "Ex: https://example.com/avatar.jpg" [ref=e357]'
-            - generic [ref=e358]: Deixe em branco para usar avatar padrão
-          - generic [ref=e359]:
-            - generic [ref=e360]: Permissão de Acesso
-            - generic [ref=e361]:
-              - button "Administrador Acesso total ao sistema" [ref=e362] [cursor=pointer]:
-                - img [ref=e364]
-                - generic [ref=e366]:
-                  - generic [ref=e367]: Administrador
-                  - generic [ref=e368]: Acesso total ao sistema
-              - button "Editor Pode criar e editar tarefas" [ref=e369] [cursor=pointer]:
-                - img [ref=e371]
-                - generic [ref=e373]:
-                  - generic [ref=e374]: Editor
-                  - generic [ref=e375]: Pode criar e editar tarefas
-              - button "Visualizador Somente leitura" [ref=e376] [cursor=pointer]:
-                - img [ref=e378]
-                - generic [ref=e380]:
-                  - generic [ref=e381]: Visualizador
-                  - generic [ref=e382]: Somente leitura
-          - generic [ref=e385]:
-            - button "Atualizar Usuário" [ref=e386] [cursor=pointer]:
-              - img [ref=e387]
-              - text: Atualizar Usuário
-            - button "Cancelar" [ref=e389] [cursor=pointer]:
-              - img [ref=e390]
-              - text: Cancelar
-        - generic [ref=e392]:
-          - heading "💡 Dicas sobre Usuários" [level=4] [ref=e393]
-          - list [ref=e394]:
-            - listitem [ref=e395]: Administradores têm acesso total ao sistema
-            - listitem [ref=e396]: Editores podem criar e editar tarefas
-            - listitem [ref=e397]: Visualizadores podem apenas visualizar tarefas
-            - listitem [ref=e398]: Use avatares para facilitar a identificação
-            - listitem [ref=e399]: Evite excluir usuários associados a projetos ou tarefas
+                - generic [ref=e328]:
+                  - generic [ref=e329]: Visualizador
+                  - generic [ref=e330]: Somente leitura
+          - button "Criar Usuário" [active] [ref=e334] [cursor=pointer]:
+            - img [ref=e335]
+            - text: Criar Usuário
+        - generic [ref=e337]:
+          - heading "💡 Dicas sobre Usuários" [level=4] [ref=e338]
+          - list [ref=e339]:
+            - listitem [ref=e340]: Administradores têm acesso total ao sistema
+            - listitem [ref=e341]: Editores podem criar e editar tarefas
+            - listitem [ref=e342]: Visualizadores podem apenas visualizar tarefas
+            - listitem [ref=e343]: Use avatares para facilitar a identificação
+            - listitem [ref=e344]: Evite excluir usuários associados a projetos ou tarefas
 ```

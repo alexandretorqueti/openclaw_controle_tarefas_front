@@ -188,6 +188,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       // Só envia se houver algo para atualizar
       if (Object.keys(updateData).length > 0) {
         await onUpdateTask(task.id, updateData);
+        
+        // Save the model to localStorage if it was changed
+        if (updateData.model !== undefined && updateData.model !== null) {
+          localStorage.setItem('lastUsedModel', updateData.model);
+        }
+        
         setIsEditing(false);
       } else {
         setIsEditing(false);
@@ -854,7 +860,6 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 backgroundColor: '#fff'
               }}
             >
-              <option value="">Selecione um modelo</option>
               {models.length > 0 ? (
                 models.map((model, index) => (
                   <option key={index} value={model}>

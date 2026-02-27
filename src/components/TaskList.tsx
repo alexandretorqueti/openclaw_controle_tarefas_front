@@ -63,7 +63,7 @@ const TaskList: React.FC<TaskListProps> = ({
     priorityId: priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '',
     assignedToId: users.length > 0 ? users[0]?.id || '' : '',
     deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
-    model: '',
+    model: typeof window !== 'undefined' ? localStorage.getItem('lastUsedModel') || '' : '',
     parentTaskId: null
   });
 
@@ -142,6 +142,17 @@ const TaskList: React.FC<TaskListProps> = ({
     loadModels();
   }, []);
 
+  // Load last used model from localStorage
+  React.useEffect(() => {
+    const lastModel = localStorage.getItem('lastUsedModel');
+    if (lastModel) {
+      setNewTaskData(prev => ({
+        ...prev,
+        model: lastModel
+      }));
+    }
+  }, []);
+
   const shouldFilterByCompletion = !onToggleShowCompleted;
   const filteredTasks = tasks.filter(task => {
     const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -210,6 +221,11 @@ const TaskList: React.FC<TaskListProps> = ({
       
       await onCreateTask(taskData);
       
+      // Save the selected model to localStorage
+      if (newTaskData.model) {
+        localStorage.setItem('lastUsedModel', newTaskData.model);
+      }
+      
       // Reset form with current values (not empty strings)
       const defaultStatus = statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '';
       const defaultPriority = priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '';
@@ -223,7 +239,7 @@ const TaskList: React.FC<TaskListProps> = ({
         priorityId: defaultPriority,
         assignedToId: defaultUser,
         deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
-        model: ''
+        model: newTaskData.model || '' // Keep the same model for next task
       });
       setIsCreatingTask(false);
     } catch (error: any) {
@@ -684,7 +700,6 @@ const TaskList: React.FC<TaskListProps> = ({
                     backgroundColor: '#fff'
                   }}
                 >
-                  <option value="">Selecione um modelo</option>
                   {models.length > 0 ? (
                     models.map((model, index) => (
                       <option key={index} value={model}>
