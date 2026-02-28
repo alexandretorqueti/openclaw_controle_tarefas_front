@@ -435,6 +435,12 @@ class ApiService {
   async getMonitorLogs() {
     return this.request('/logs/monitor');
   }
+
+  async getErrorLogs(filters: Record<string, any> = {}) {
+    const queryParams = new URLSearchParams(filters).toString();
+    const endpoint = queryParams ? `/logs/errors?${queryParams}` : '/logs/errors';
+    return this.request(endpoint);
+  }
 }
 
 export default new ApiService();

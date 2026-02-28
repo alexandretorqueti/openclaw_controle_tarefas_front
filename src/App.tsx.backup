@@ -10,13 +10,12 @@ import UserManager from './components/UserManager';
 import NextTaskManager from './components/NextTaskManager';
 import RecurrenceManager from './components/RecurrenceManager';
 import LogsViewer from './components/LogsViewer';
-import LogErros from './components/LogErros';
 import UserDropdownMenu from './components/UserDropdownMenu';
 import UserProfileEdit from './components/UserProfileEdit';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
-import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync, FaTerminal, FaExclamationTriangle } from 'react-icons/fa';
+import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync, FaTerminal } from 'react-icons/fa';
 
 // Tarefa de teste para IA - Processamento concluído em 2026-02-25 18:35 GMT-3
 
@@ -121,7 +120,7 @@ class ErrorBoundary extends Component<
   }
 }
 
-type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs';
+type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs';
 
 // Main app content that requires authentication
 const AppContent: React.FC = () => {
@@ -263,10 +262,6 @@ const AppContent: React.FC = () => {
     } catch (err) {
       console.error('Failed to load all tasks:', err);
     }
-  };
-
-  const handleBackFromErrorLogs = () => {
-    setViewMode('projects');
   };
 
   const handleCreateProject = async (projectData: Partial<Project>) => {
@@ -478,11 +473,6 @@ const AppContent: React.FC = () => {
           <LogsViewer />
         );
 
-      case 'error-logs':
-        return (
-          <LogErros onBack={handleBackFromErrorLogs} />
-        );
-
       case 'projects':
       default:
         return (
@@ -544,30 +534,6 @@ const AppContent: React.FC = () => {
                 onClick={() => {
                   setSelectedProject(null);
                   setSelectedTask(null);
-                  setViewMode('error-logs');
-                }}
-                style={{
-                  padding: '10px 16px',
-                  backgroundColor: viewMode === 'error-logs' ? '#4ECDC4' : '#f8f9fa',
-                  color: viewMode === 'error-logs' ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <FaExclamationTriangle size={14} />
-                Logs de Erros
-              </button>
-              
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
                   setViewMode('logs');
                 }}
                 style={{
@@ -585,7 +551,7 @@ const AppContent: React.FC = () => {
                 }}
               >
                 <FaTerminal size={14} />
-                Logs do Jarbas
+                Logs do Sistema
               </button>
               
               <button

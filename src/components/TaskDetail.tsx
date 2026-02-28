@@ -1102,6 +1102,18 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             </div>
           </div>
           <div>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da última execução</div>
+            <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+              {task.lastExecutedAt ? format(new Date(task.lastExecutedAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : 'Nunca executada'}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da próxima execução</div>
+            <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+              {task.nextExecutionAt ? format(new Date(task.nextExecutionAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : 'Não agendada'}
+            </div>
+          </div>
+          <div>
             <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Posição</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
               {task.position}
