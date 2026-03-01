@@ -441,6 +441,10 @@ class ApiService {
     const endpoint = queryParams ? `/logs/errors?${queryParams}` : '/logs/errors';
     return this.request(endpoint);
   }
+
+  async getErrorDetails(logId: string) {
+    return this.request(`/logs/errors/${logId}/details`);
+  }
 }
 
 export default new ApiService();
