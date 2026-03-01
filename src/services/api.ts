@@ -284,7 +284,7 @@ class ApiService {
     const queryParams = new URLSearchParams(filters).toString();
     const endpoint = queryParams
       ? `/tasks/project/${projectId}?${queryParams}`
-      : `/tasks/project/${projectId}`;
+      : `/tasks/project/${projectId}?isCompleted=false`; // Default to show only incomplete tasks
     console.log('🔍 getTasksByProject endpoint:', endpoint);
     return this.request(endpoint);
   }
@@ -426,6 +426,28 @@ class ApiService {
       method: 'DELETE',
     });
   }
+  // Task History endpoints
+  async getTaskHistoryByTask(taskId) {
+    return this.request(`/task-history/task/${taskId}`);
+  }
+
+  async getTaskHistory(id) {
+    return this.request(`/task-history/${id}`);
+  }
+
+  async createTaskHistory(data) {
+    return this.request('/task-history', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteTaskHistory(id) {
+    return this.request(`/task-history/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
 
   async getCommentReplies(commentId) {
     return this.request(`/comments/${commentId}/replies`);

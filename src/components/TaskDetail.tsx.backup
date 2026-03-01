@@ -26,6 +26,7 @@ import CommentsSection from './CommentsSection';
 
 interface TaskDetailProps {
   task: Task;
+  tasks: Task[];
   users: User[];
   statuses: Status[];
   priorities: Priority[];
@@ -39,6 +40,7 @@ interface TaskDetailProps {
 
 const TaskDetail: React.FC<TaskDetailProps> = ({
   task,
+  tasks,
   users,
   statuses,
   priorities,
@@ -162,6 +164,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         updateData.model = editedTask.model;
       }
       
+      // Campo parentTaskId - precisa ser sempre enviado quando está definido
+      // porque o usuário pode estar alterando a dependência
+      if (editedTask.parentTaskId !== undefined) {
+        updateData.parentTaskId = editedTask.parentTaskId;
+      }
+      
       // Campos de recorrência - precisam ser sempre enviados quando estão definidos
       // porque o usuário pode estar ativando ou desativando a recorrência
       if (editedTask.isRecurring !== undefined) {
@@ -180,6 +188,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       // Só envia se houver algo para atualizar
       if (Object.keys(updateData).length > 0) {
         await onUpdateTask(task.id, updateData);
+        
+        // Save the model to localStorage if it was changed
+        if (updateData.model !== undefined && updateData.model !== null) {
+          localStorage.setItem('lastUsedModel', updateData.model);
+        }
+        
         setIsEditing(false);
       } else {
         setIsEditing(false);
@@ -846,7 +860,6 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 backgroundColor: '#fff'
               }}
             >
-              <option value="">Selecione um modelo</option>
               {models.length > 0 ? (
                 models.map((model, index) => (
                   <option key={index} value={model}>
@@ -876,6 +889,68 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 </div>
                 <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
                   Modelo de IA para processamento
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Parent Task Card */}
+        <div style={{
+          backgroundColor: '#fff',
+          padding: '20px',
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+        }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
+            Depende de
+          </h3>
+          {isEditing ? (
+            <select
+              value={editedTask.parentTaskId || ''}
+              onChange={(e) => {
+                const newValue = e.target.value;
+                // Se for string vazia, define como null
+                const parentTaskId = newValue === '' ? null : newValue;
+                setEditedTask({ ...editedTask, parentTaskId });
+              }}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px'
+              }}
+            >
+              <option value="">Nenhuma (tarefa independente)</option>
+              {tasks
+                .filter(t => !t.isCompleted && t.projectId === task.projectId && t.id !== task.id)
+                .map(t => (
+                  <option key={t.id} value={t.id}>
+                    {t.title}
+                  </option>
+                ))
+              }
+            </select>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                borderRadius: '50%',
+                backgroundColor: '#f0f9f8',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#4ECDC4' }}>↗</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
+                  {task.parentTask?.title || 'Nenhuma'}
+                </div>
+                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  {task.parentTaskId ? `ID: ${task.parentTaskId}` : 'Tarefa independente'}
                 </div>
               </div>
             </div>
@@ -1024,6 +1099,18 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Atualizado em</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
               {format(new Date(task.updatedAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da última execução</div>
+            <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+              {task.lastExecutedAt ? format(new Date(task.lastExecutedAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : 'Nunca executada'}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da próxima execução</div>
+            <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+              {task.nextExecutionAt ? format(new Date(task.nextExecutionAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : 'Não agendada'}
             </div>
           </div>
           <div>

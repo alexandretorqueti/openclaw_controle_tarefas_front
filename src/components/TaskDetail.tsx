@@ -23,6 +23,7 @@ import {
 } from 'react-icons/fa';
 import RecurrenceConfig from './RecurrenceConfig';
 import CommentsSection from './CommentsSection';
+import TaskHistorySection from './TaskHistorySection';
 
 interface TaskDetailProps {
   task: Task;
@@ -1121,6 +1122,21 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Task History Section */}
+      <div style={{
+        backgroundColor: '#fff',
+        padding: '0',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+        marginBottom: '32px'
+      }}>
+        <TaskHistorySection 
+          taskId={task.id} 
+          currentUser={currentUser}
+        />
+      </div>
+
 
       {/* Comments Section */}
       <div style={{
