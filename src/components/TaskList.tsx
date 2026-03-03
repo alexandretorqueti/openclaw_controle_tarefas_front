@@ -21,7 +21,7 @@ interface TaskListProps {
   onToggleShowCompleted?: (show: boolean) => void;
 }
 
-const TaskList: React.FC<TaskListProps> = ({ 
+const TaskList: React.FC<TaskListProps> = ({
   tasks, 
   users, 
   statuses, 
@@ -47,7 +47,23 @@ const TaskList: React.FC<TaskListProps> = ({
   const [localShowCompleted, setLocalShowCompleted] = useState(false);
   const showCompleted = onToggleShowCompleted ? propShowCompleted : localShowCompleted;
   const [models, setModels] = useState<string[]>([]);
+  // Back to top functionality
+  const [showBackToTop, setShowBackToTop] = useState(false);
 
+  // Handle scroll to show/hide back to top button
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+ 
   const handleToggleShowCompleted = (checked: boolean) => {
     if (onToggleShowCompleted) {
       onToggleShowCompleted(checked);
@@ -923,6 +939,9 @@ const TaskList: React.FC<TaskListProps> = ({
         )}
       </div>
       {/* Back to Top Button */}
+      
+    
+      {/* Back to Top Button */}
       {showBackToTop && (
         <button
           onClick={scrollToTop}
@@ -959,10 +978,9 @@ const TaskList: React.FC<TaskListProps> = ({
           <FaArrowUp />
         </button>
       )}
-    </div>
+</div>
   );
+};
 
-
-export default TaskList;
 
 export default TaskList;

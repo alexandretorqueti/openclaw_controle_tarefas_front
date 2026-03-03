@@ -76,6 +76,22 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const isOverdue = !task.isCompleted && deadlineDate < new Date();
   const formattedDeadline = format(deadlineDate, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR });
   const formattedCreatedAt = format(new Date(task.createdAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR });
+  // Back to top functionality
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Handle scroll to show/hide back to top button
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Load models from openclaw.json
   React.useEffect(() => {
@@ -1133,6 +1149,9 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         </div>
       </div>
       {/* Back to Top Button */}
+      
+    
+      {/* Back to Top Button */}
       {showBackToTop && (
         <button
           onClick={scrollToTop}
@@ -1169,10 +1188,9 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           <FaArrowUp />
         </button>
       )}
-    </div>
+</div>
   );
+};
 
-
-export default TaskDetail;
 
 export default TaskDetail;
