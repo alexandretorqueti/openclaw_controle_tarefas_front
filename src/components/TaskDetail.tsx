@@ -21,7 +21,7 @@ import {
   FaSync,
   FaHistory,
   FaClock
-} from 'react-icons/fa';
+, FaArrowUp} from 'react-icons/fa';
 import RecurrenceConfig from './RecurrenceConfig';
 import CommentsSection from './CommentsSection';
 import TaskHistorySection from './TaskHistorySection';
@@ -1132,8 +1132,47 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           </p>
         </div>
       </div>
+      {/* Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          style={{
+            position: 'fixed',
+            bottom: '30px',
+            right: '30px',
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            backgroundColor: '#4ECDC4',
+            color: '#fff',
+            border: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '20px',
+            zIndex: 1000,
+            transition: 'all 0.3s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = '#3db8af';
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = '#4ECDC4';
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+          }}
+        >
+          <FaArrowUp />
+        </button>
+      )}
     </div>
   );
-};
+
+
+export default TaskDetail;
 
 export default TaskDetail;
