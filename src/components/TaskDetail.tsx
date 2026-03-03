@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import api from '../services/api';
 import { Task, User, Status, Priority, Project } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -80,50 +81,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   React.useEffect(() => {
     const loadModels = async () => {
       try {
-        const response = await fetch('/api/models');
-        if (response.ok) {
-          const data = await response.json();
-          setModels(data.models || []);
-        } else {
-          console.error('Failed to load models:', response.status);
-          // Fallback to a hardcoded list if there's an error
-          const fallbackModels = [
-            'ollama/mistral-small',
-            'ollama/glm-4.7-flash:q8_0',
-            'ollama/glm-4.7-flash:bf16',
-            'ollama/mixtral:latest',
-            'ollama/deepseek-v2.5',
-            'ollama/llama3.3',
-            'ollama/llama3.1:405b',
-            'ollama/llama3.1',
-            'ollama/nomic-embed-text:latest',
-            'ollama/deepseek-r1:70b',
-            'ollama/qwen2.5-coder:32b',
-            'ollama/qwen3-coder-next:latest',
-            'ollama/qwen3:4b',
-            'ollama/qwen2.5-coder:14b',
-            'ollama/llama3.1:70b',
-            'ollama/qwen2.5:72b',
-            'ollama/nemotron:latest',
-            'ollama/mxbai-embed-large:latest',
-            'chatllm/route-llm',
-            'google-antigravity/gemini-3-pro',
-            'google-antigravity/gemini-3-flash',
-            'google-antigravity/gemini-2.5-pro',
-            'google-antigravity/gemini-2.5-flash',
-            'google-antigravity/gemini-2.5-flash-lite',
-            'google-antigravity/gemini-2.0-flash',
-            'google-antigravity/gemini-2.0-flash-lite',
-            'deepseek/deepseek-chat',
-            'deepseek/deepseek-reasoner'
-          ];
-          setModels(fallbackModels);
-        }
+        const data = await api.request('/models');
+        setModels(data.models || []);
       } catch (error) {
         console.error('Error loading models:', error);
       }
     };
-
     loadModels();
   }, []);
 
