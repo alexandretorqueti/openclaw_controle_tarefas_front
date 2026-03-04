@@ -9,6 +9,7 @@ interface TaskCardProps {
   users: User[];
   statuses: Status[];
   priorities: Priority[];
+  models?: string[];
   projects: Project[];
   onTaskClick: (task: Task) => void;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
@@ -21,7 +22,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   task, 
   users, 
   statuses, 
-  priorities, 
+  priorities,
+  models = [], 
   projects,
   onTaskClick,
   onUpdateTask,
@@ -207,7 +209,44 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
   };
 
-  if (compact) {
+    const handleModelChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    e.stopPropagation();
+    if (!onUpdateTask) return;
+    
+    setIsUpdating(true);
+    setError(null); // Limpa erros anteriores
+    
+    try {
+      const newValue = e.target.value === '' ? null : e.target.value;
+      await onUpdateTask(task.id, { model: newValue });
+    } catch (error: any) {
+      console.error('Failed to update task model:', error);
+      
+      // Extrai mensagem de erro amigável
+      let errorMessage = 'Erro ao atualizar modelo da tarefa.';
+      
+      if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Tenta extrair detalhes da resposta da API
+      if (error.details && Array.isArray(error.details)) {
+        const validationErrors = error.details.map((detail: any) => 
+          detail.message || `${detail.path?.join('.')}: ${detail.code}`
+        ).join(', ');
+        
+        if (validationErrors) {
+          errorMessage = `Erros de validação: ${validationErrors}`;
+        }
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+if (compact) {
     return (
       <div 
         className="task-card-compact"

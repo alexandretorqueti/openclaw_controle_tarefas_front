@@ -933,6 +933,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 onUpdateTask={onUpdateTask}
                 onDeleteTask={onDeleteTask}
                 onToggleCompletion={onToggleCompletion}
+                models={models}
               />
             ))}
           </div>

@@ -25,6 +25,7 @@ import {
 import RecurrenceConfig from './RecurrenceConfig';
 import CommentsSection from './CommentsSection';
 import TaskHistorySection from './TaskHistorySection';
+import TaskExecutionLog from './TaskExecutionLog';
 
 interface TaskDetailProps {
   task: Task;
@@ -54,6 +55,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   onToggleCompletion
 }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState("comments");
   const [editedTask, setEditedTask] = useState<Partial<Task>>({ ...task });
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -1102,34 +1104,112 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         </div>
       </div>
 
-      {/* Task History Section */}
+      
+      {/* Tabs for Comments, History, and Execution Logs */}
       <div style={{
         backgroundColor: '#fff',
-        padding: '0',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        marginBottom: '32px'
+        marginBottom: '32px',
+        overflow: 'hidden'
       }}>
-        <TaskHistorySection 
-          taskId={task.id} 
-          currentUser={currentUser}
-        />
-      </div>
+        {/* Tab Navigation */}
+        <div style={{
+          display: 'flex',
+          borderBottom: '1px solid #e9ecef',
+          backgroundColor: '#f8f9fa'
+        }}>
+          <button
+            onClick={() => setActiveTab('comments')}
+            style={{
+              flex: 1,
+              padding: '16px 24px',
+              backgroundColor: activeTab === 'comments' ? '#fff' : 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'comments' ? '3px solid #4ECDC4' : '3px solid transparent',
+              color: activeTab === 'comments' ? '#333' : '#666',
+              fontWeight: activeTab === 'comments' ? 600 : 500,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <FaComment size={14} />
+            Comentários
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            style={{
+              flex: 1,
+              padding: '16px 24px',
+              backgroundColor: activeTab === 'history' ? '#fff' : 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'history' ? '3px solid #4ECDC4' : '3px solid transparent',
+              color: activeTab === 'history' ? '#333' : '#666',
+              fontWeight: activeTab === 'history' ? 600 : 500,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <FaHistory size={14} />
+            Histórico
+          </button>
+          <button
+            onClick={() => setActiveTab('execution')}
+            style={{
+              flex: 1,
+              padding: '16px 24px',
+              backgroundColor: activeTab === 'execution' ? '#fff' : 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'execution' ? '3px solid #4ECDC4' : '3px solid transparent',
+              color: activeTab === 'execution' ? '#333' : '#666',
+              fontWeight: activeTab === 'execution' ? 600 : 500,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <FaClock size={14} />
+            Log de Execução
+          </button>
+        </div>
 
-
-      {/* Comments Section */}
-      <div style={{
-        backgroundColor: '#fff',
-        padding: '0',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        marginBottom: '32px'
-      }}>
-        <CommentsSection 
-          taskId={task.id} 
-          currentUser={currentUser}
-        />
+        {/* Tab Content */}
+        <div style={{ padding: '0' }}>
+          {activeTab === 'comments' && (
+            <CommentsSection 
+              taskId={task.id} 
+              currentUser={currentUser}
+            />
+          )}
+          {activeTab === 'history' && (
+            <TaskHistorySection 
+              taskId={task.id} 
+              currentUser={currentUser}
+            />
+          )}
+          {activeTab === 'execution' && (
+            <TaskExecutionLog 
+              taskId={task.id} 
+              currentUser={currentUser}
+            />
+          )}
+        </div>
       </div>
+    
 
       <div style={{
         backgroundColor: '#fff',
@@ -1148,10 +1228,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           </p>
         </div>
       </div>
-      {/* Back to Top Button */}
-      
+
     
-      {/* Back to Top Button */}
+    
+        {/* Back to Top Button */}
       {showBackToTop && (
         <button
           onClick={scrollToTop}
@@ -1188,7 +1268,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           <FaArrowUp />
         </button>
       )}
-</div>
+    </div>
   );
 };
 

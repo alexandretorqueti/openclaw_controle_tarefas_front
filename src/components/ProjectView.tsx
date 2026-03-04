@@ -38,10 +38,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     status: true,
     ativo: true,
     frontendPath: '',
-    frontendPort: null,
+    pastaBase: '',
+    frontendPort: 0,
     backendPath: '',
-    backendPort: null,
-    repositoryUrl: ''
+    backendPort: 0,
+    repositoryUrl: '',
   });
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -131,10 +132,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         regras: '',
         status: true,
         frontendPath: '',
+    pastaBase: '',
         frontendPort: null,
         backendPath: '',
         backendPort: null,
-        repositoryUrl: ''
+        repositoryUrl: '',
+    pastaBase: ''
       });
       setIsCreatingProject(false);
       setCreateError(null);
@@ -1344,6 +1347,28 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     URL do repositório Git (GitHub, GitLab, etc.)
                   </div>
                 </div>
+
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                    Pasta Base
+                  </label>
+                  <input
+                    type="text"
+                    value={editProjectData.pastaBase !== undefined ? editProjectData.pastaBase : (editingProject.pastaBase || '')}
+                    onChange={(e) => setEditProjectData({ ...editProjectData, pastaBase: e.target.value })}
+                    placeholder="/caminho/absoluto/pasta-base"
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #ddd',
+                      borderRadius: '8px',
+                      fontSize: '14px'
+                    }}
+                  />
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    Caminho absoluto da pasta base do projeto (opcional)
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1397,7 +1422,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     frontendPort: editProjectData.frontendPort !== undefined ? editProjectData.frontendPort : editingProject.frontendPort,
                     backendPath: editProjectData.backendPath !== undefined ? editProjectData.backendPath : editingProject.backendPath,
                     backendPort: editProjectData.backendPort !== undefined ? editProjectData.backendPort : editingProject.backendPort,
-                    repositoryUrl: editProjectData.repositoryUrl !== undefined ? editProjectData.repositoryUrl : editingProject.repositoryUrl
+                    repositoryUrl: editProjectData.repositoryUrl !== undefined ? editProjectData.repositoryUrl : editingProject.repositoryUrl,
+                    pastaBase: editProjectData.pastaBase !== undefined ? editProjectData.pastaBase : editingProject.pastaBase
                   };
 
                   // Validation

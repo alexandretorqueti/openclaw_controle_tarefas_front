@@ -216,29 +216,31 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
           </div>
 
           {/* Comment actions */}
-          {isOwner && !isReply && (
+          {!isReply && currentUser && (
             <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => {
-                  setEditingCommentId(comment.id);
-                  setEditingContent(comment.content);
-                }}
-                style={{
-                  padding: '6px 10px',
-                  backgroundColor: '#f8f9fa',
-                  color: '#333',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                <FaEdit size={12} />
-                Editar
-              </button>
+              {isOwner && (
+                <button
+                  onClick={() => {
+                    setEditingCommentId(comment.id);
+                    setEditingContent(comment.content);
+                  }}
+                  style={{
+                    padding: '6px 10px',
+                    backgroundColor: '#f8f9fa',
+                    color: '#333',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  <FaEdit size={12} />
+                  Editar
+                </button>
+              )}
               <button
                 onClick={() => handleDeleteComment(comment.id)}
                 style={{

@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Project, Task, User, Status, Priority } from '../types';
 import TaskCard from './TaskCard';
-import apiService from '../services/api';
 import { FaFolder, FaTasks, FaUsers, FaCalendarAlt, FaPlus, FaEdit, FaTrash, FaArrowLeft } from 'react-icons/fa';
 
 interface ProjectViewProps {
@@ -39,10 +38,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     status: true,
     ativo: true,
     frontendPath: '',
+    pastaBase: '',
     frontendPort: null,
     backendPath: '',
     backendPort: null,
-    repositoryUrl: ''
+    repositoryUrl: '',
+    pastaBase: ''
   });
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -51,83 +52,6 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
   const [showCompletedTasks, setShowCompletedTasks] = useState(false);
-  const [projectStats, setProjectStats] = useState<Record<string, { totalTasks: number; completedTasks: number; overdueTasks: number; progress: number }>>({});
-  const [selectedProjectStats, setSelectedProjectStats] = useState<{ totalTasks: number; completedTasks: number; overdueTasks: number; progress: number } | null>(null);
-  const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({});
-
-  // Carrega estatísticas quando um projeto é selecionado
-  useEffect(() => {
-    if (selectedProject) {
-      const loadStats = async () => {
-        try {
-          const stats = await apiService.getProjectStatistics(selectedProject.id);
-          setSelectedProjectStats({
-            totalTasks: stats.totalTasks || 0,
-            completedTasks: stats.completedTasks || 0,
-            overdueTasks: stats.overdueTasks || 0,
-            progress: stats.progress || 0
-          });
-        } catch (error) {
-          console.error('Failed to load project statistics:', error);
-          // Fallback: calcular localmente
-          const projectTasks = getProjectTasks(selectedProject.id);
-          const totalTasks = projectTasks.length;
-          const completedTasks = projectTasks.filter(t => t.isCompleted).length;
-          const overdueTasks = projectTasks.filter(t => 
-            !t.isCompleted && new Date(t.deadline) < new Date()
-          ).length;
-          const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-          setSelectedProjectStats({ totalTasks, completedTasks, overdueTasks, progress });
-        }
-      };
-      loadStats();
-    } else {
-      setSelectedProjectStats(null);
-    }
-  }, [selectedProject]);
-
-  // Pré-carrega estatísticas para todos os projetos na lista
-  useEffect(() => {
-    const loadAllProjectsStats = async () => {
-      for (const project of projects) {
-        if (!projectStats[project.id] && !loadingStats[project.id]) {
-          setLoadingStats(prev => ({ ...prev, [project.id]: true }));
-          try {
-            const stats = await apiService.getProjectStatistics(project.id);
-            setProjectStats(prev => ({
-              ...prev,
-              [project.id]: {
-                totalTasks: stats.totalTasks || 0,
-                completedTasks: stats.completedTasks || 0,
-                overdueTasks: stats.overdueTasks || 0,
-                progress: stats.progress || 0
-              }
-            }));
-          } catch (error) {
-            console.error(`Failed to load statistics for project ${project.id}:`, error);
-            // Fallback: calcular localmente
-            const projectTasks = getProjectTasks(project.id);
-            const totalTasks = projectTasks.length;
-            const completedTasks = projectTasks.filter(t => t.isCompleted).length;
-            const overdueTasks = projectTasks.filter(t => 
-              !t.isCompleted && new Date(t.deadline) < new Date()
-            ).length;
-            const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-            setProjectStats(prev => ({
-              ...prev,
-              [project.id]: { totalTasks, completedTasks, overdueTasks, progress }
-            }));
-          } finally {
-            setLoadingStats(prev => ({ ...prev, [project.id]: false }));
-          }
-        }
-      }
-    };
-
-    if (projects.length > 0) {
-      loadAllProjectsStats();
-    }
-  }, [projects]);
 
   const getProjectTasks = (projectId: string) => {
     return tasks.filter(task => task.projectId === projectId);
@@ -141,6 +65,27 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     }
   };
 
+  const getProjectStats = (projectId: string) => {
+    const project = projects.find(p => p.id === projectId);
+    
+    // Se o projeto já tem estatísticas da API, use-as
+    if (project?.statistics) {
+      return project.statistics;
+    }
+    
+    // Fallback: calcular localmente se não houver estatísticas da API
+    const projectTasks = getProjectTasks(projectId);
+    const totalTasks = projectTasks.length;
+    const completedTasks = projectTasks.filter(t => t.isCompleted).length;
+    const overdueTasks = projectTasks.filter(t => 
+      !t.isCompleted && new Date(t.deadline) < new Date()
+    ).length;
+    const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    
+    return { totalTasks, completedTasks, overdueTasks, progress };
+  };
+
+  const getProjectOwner = (userId: string) => {
     const user = users.find(u => u.id === userId);
     return user ? user.name : 'Desconhecido';
   };
@@ -188,10 +133,12 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         regras: '',
         status: true,
         frontendPath: '',
+    pastaBase: '',
         frontendPort: null,
         backendPath: '',
         backendPort: null,
-        repositoryUrl: ''
+        repositoryUrl: '',
+    pastaBase: ''
       });
       setIsCreatingProject(false);
       setCreateError(null);
@@ -238,8 +185,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
 
   if (selectedProject) {
     const projectTasks = getProjectActiveTasks(selectedProject.id);
-    // Usa as estatísticas carregadas da API ou fallback
-    const stats = selectedProjectStats || { totalTasks: 0, completedTasks: 0, overdueTasks: 0, progress: 0 };
+    const stats = getProjectStats(selectedProject.id);
 
     return (
       <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -587,7 +533,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
             {projects.length} Projetos
           </h2>
           <p style={{ fontSize: '14px', color: '#666' }}>
-            {tasks.length} tarefas distribuídas entre os projetos
+            {projects.reduce((total, project) => total + (project.statistics?.totalTasks || 0), 0)} tarefas • 
+            {projects.reduce((total, project) => total + (project.statistics?.completedTasks || 0), 0)} concluídas
           </p>
         </div>
 
@@ -891,17 +838,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         gap: '24px'
       }}>
         {projects.map(project => {
-          // Usa estatísticas do cache ou calcula localmente se não estiverem carregadas
-          const stats = projectStats[project.id] || (() => {
-            const projectTasks = getProjectTasks(project.id);
-            const totalTasks = projectTasks.length;
-            const completedTasks = projectTasks.filter(t => t.isCompleted).length;
-            const overdueTasks = projectTasks.filter(t => 
-              !t.isCompleted && new Date(t.deadline) < new Date()
-            ).length;
-            const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-            return { totalTasks, completedTasks, overdueTasks, progress };
-          })();
+          const stats = getProjectStats(project.id);
           const progress = stats.progress;
 
           return (
@@ -930,7 +867,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
               {/* Action buttons */}
               <div style={{
                 position: 'absolute',
-                top: '12px',
+                top: '50px',
                 right: '12px',
                 display: 'flex',
                 gap: '8px',
@@ -1009,7 +946,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                   <FaFolder size={24} color="#1976d2" />
                 </div>
 
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, position: 'relative' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
                       {project.name}
@@ -1020,7 +957,9 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                       padding: '4px 12px',
                       borderRadius: '16px',
                       fontSize: '12px',
-                      fontWeight: 500
+                      fontWeight: 500,
+                      zIndex: 5,
+                      position: 'relative'
                     }}>
                       {project.status ? 'Ativo' : 'Inativo'}
                     </span>

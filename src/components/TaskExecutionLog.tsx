@@ -499,4 +499,209 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
   }
 
   return (
-    <div style={{ padding: '24px
+    <div style={{ padding: '24px' }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <FaHistory size={18} />
+        Log de Execução da Tarefa ({filteredLogs.length})
+      </h3>
+
+      {/* Error message */}
+      {error && (
+        <div style={{
+          backgroundColor: '#FFE5E5',
+          border: '1px solid #FF6B6B',
+          color: '#D32F2F',
+          padding: '16px',
+          borderRadius: '8px',
+          marginBottom: '20px'
+        }}>
+          {error}
+        </div>
+      )}
+
+      {/* Filters */}
+      <div style={{
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+        marginBottom: '24px'
+      }}>
+        <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FaFilter size={14} />
+          Filtros
+        </h4>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
+          {/* Level filter */}
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+              Nível
+            </label>
+            <select
+              value={filters.level}
+              onChange={(e) => setFilters({ ...filters, level: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                backgroundColor: '#fff'
+              }}
+            >
+              <option value="all">Todos os níveis</option>
+              <option value="ERROR">Erro</option>
+              <option value="WARN">Aviso</option>
+              <option value="INFO">Informação</option>
+              <option value="DEBUG">Debug</option>
+            </select>
+          </div>
+
+          {/* Date range filters */}
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+              Data inicial
+            </label>
+            <input
+              type="date"
+              value={filters.startDate}
+              onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+              Data final
+            </label>
+            <input
+              type="date"
+              value={filters.endDate}
+              onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px'
+              }}
+            />
+          </div>
+
+          {/* Search filter */}
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+              Buscar
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                value={filters.search}
+                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                placeholder="Buscar em mensagens, erros, IDs..."
+                style={{
+                  width: '100%',
+                  padding: '10px 10px 10px 36px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  fontSize: '14px'
+                }}
+              />
+              <FaSearch size={14} style={{
+                position: 'absolute',
+                left: '12px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                color: '#666'
+              }} />
+            </div>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontSize: '12px', color: '#666' }}>
+            Mostrando {filteredLogs.length} de {logs.length} logs
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button
+              onClick={() => setFilters({ level: 'all', startDate: '', endDate: '', search: '' })}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#f8f9fa',
+                color: '#333',
+                border: '1px solid #ddd',
+                borderRadius: '6px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              Limpar filtros
+            </button>
+            <button
+              onClick={loadExecutionLogs}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: '#4ECDC4',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <FaRedo size={14} />
+              Atualizar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Logs list */}
+      {filteredLogs.length === 0 ? (
+        <div style={{
+          backgroundColor: '#f8f9fa',
+          padding: '40px',
+          borderRadius: '8px',
+          textAlign: 'center',
+          color: '#666'
+        }}>
+          <FaHistory size={32} style={{ marginBottom: '12px', opacity: 0.5 }} />
+          <div style={{ fontSize: '16px', marginBottom: '8px' }}>Nenhum log de execução encontrado</div>
+          <div style={{ fontSize: '14px' }}>
+            {logs.length === 0 
+              ? 'Ainda não há logs de execução para esta tarefa.'
+              : 'Nenhum log corresponde aos filtros aplicados.'}
+          </div>
+        </div>
+      ) : (
+        <div>
+          {filteredLogs.map(log => renderLogItem(log))}
+        </div>
+      )}
+
+      {/* CSS for spinner animation */}
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default TaskExecutionLog;

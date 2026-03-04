@@ -33,6 +33,7 @@ export interface Project {
   backendPath?: string;
   backendPort?: number;
   repositoryUrl?: string;
+  pastaBase?: string; // Campo pasta base (não obrigatório)
 }
 
 export interface Status {
