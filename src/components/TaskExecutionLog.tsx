@@ -71,13 +71,23 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       setLoading(true);
       setError(null);
       
-      // Get all logs and filter by task ID
+      // Get logs filtered by task ID
+      // We look for logs where:
+      // 1. Endpoint contains task ID
+      // 2. Message contains task ID
+      // 3. Endpoint is TaskExecutionService and message contains task ID
       const response = await api.getAllLogs({
-        endpoint: `/api/tasks/${taskId}`,
         limit: 100
       });
       
-      setLogs(response.logs || []);
+      // Filter logs that are related to this task
+      const filteredLogs = (response.logs || []).filter(log => 
+        log.endpoint?.includes(taskId) || 
+        log.message?.includes(taskId) ||
+        (log.endpoint === 'TaskExecutionService' && log.message?.includes(taskId))
+      );
+      
+      setLogs(filteredLogs);
     } catch (error: any) {
       console.error('Failed to load execution logs:', error);
       setError('Erro ao carregar logs de execução. Tente novamente.');

@@ -467,6 +467,12 @@ class ApiService {
   async getErrorDetails(logId: string) {
     return this.request(`/logs/errors/${logId}/details`);
   }
+
+  async getAllLogs(filters: Record<string, any> = {}) {
+    const queryParams = new URLSearchParams(filters).toString();
+    const endpoint = queryParams ? `/logs?${queryParams}` : '/logs';
+    return this.request(endpoint);
+  }
 }
 
 export default new ApiService();
