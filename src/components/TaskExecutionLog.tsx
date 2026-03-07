@@ -218,7 +218,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
             <div>
               <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Tempo de Resposta</div>
               <div style={{ fontSize: '13px', fontWeight: 500, color: '#333' }}>
-                {log.responseTime}ms
+                {formatDuration(log.responseTime)}
               </div>
             </div>
           </div>
@@ -507,6 +507,21 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       </div>
     );
   }
+
+
+  const formatDuration = (durationMs: number) => {
+    if (durationMs < 1000) {
+      return `${durationMs} ms`;
+    } else if (durationMs < 60000) {
+      const seconds = (durationMs / 1000).toFixed(0);
+      return `${seconds} s`;
+    } else {
+      const minutes = (durationMs / 60000).toFixed(0);
+      // mm min e ss segundos
+      const seconds = ((durationMs % 60000) / 1000).toFixed(0);
+      return `${minutes} min e ` +  `${seconds} seg`;  
+    }
+  };
 
   return (
     <div style={{ padding: '24px' }}>
