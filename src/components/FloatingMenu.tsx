@@ -7,9 +7,10 @@ interface FloatingMenuProps {
   onOpenUser: () => void;
   onOpenNextTask: () => void;
   onOpenIATest: () => void;
+  onOpenProjectType: () => void;
 }
 
-const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriority, onOpenUser, onOpenNextTask, onOpenIATest }) => {
+const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriority, onOpenUser, onOpenNextTask, onOpenIATest, onOpenProjectType }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -366,6 +367,74 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 borderRadius: '50%'
               }} />
             </button>
+
+          {/* Separador */}
+          <div style={{
+            height: '1px',
+            backgroundColor: '#f0f0f0',
+            margin: '4px 16px'
+          }} />
+
+          {/* Opção TIPOS DE PROJETO */}
+          <button
+            onClick={() => {
+              onOpenProjectType();
+              setIsOpen(false);
+            }}
+            style={{
+              width: '100%',
+              padding: '14px 16px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              textAlign: 'left'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#f0f9ff';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }}
+          >
+            <div style={{
+              width: '36px',
+              height: '36px',
+              backgroundColor: '#F3E5F5',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <FaRobot size={18} color="#9D4EDD" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: 600,
+                color: '#333',
+                marginBottom: '2px'
+              }}>
+                Tipos de Projeto
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: '#666'
+              }}>
+                Gerencie personas e regras por domínio
+              </div>
+            </div>
+            <div style={{
+              width: '8px',
+              height: '8px',
+              backgroundColor: '#9D4EDD',
+              borderRadius: '50%'
+            }} />
+          </button>
+
           </div>
 
           {/* Rodapé do menu */}

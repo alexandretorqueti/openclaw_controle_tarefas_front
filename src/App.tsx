@@ -7,6 +7,7 @@ import FloatingMenu from './components/FloatingMenu';
 import StatusManager from './components/StatusManager';
 import PriorityManager from './components/PriorityManager';
 import UserManager from './components/UserManager';
+import ProjectTypeManager from './components/ProjectTypeManager';
 import NextTaskManager from './components/NextTaskManager';
 import RecurrenceManager from './components/RecurrenceManager';
 import LogsViewer from './components/LogsViewer';
@@ -146,6 +147,7 @@ const AppContent: React.FC = () => {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const [isProjectTypeModalOpen, setIsProjectTypeModalOpen] = useState(false);
   const [isNextTaskModalOpen, setIsNextTaskModalOpen] = useState(false);
   const [isProfileEditModalOpen, setIsProfileEditModalOpen] = useState(false);
 
@@ -533,6 +535,7 @@ const AppContent: React.FC = () => {
                 onOpenPriority={() => setIsPriorityModalOpen(true)}
                 onOpenUser={() => setIsUserModalOpen(true)}
                 onOpenNextTask={() => setIsNextTaskModalOpen(true)}
+                onOpenProjectType={() => setIsProjectTypeModalOpen(true)}
               />
               <h1 style={{ fontSize: '16px', fontWeight: 600, color: '#333', letterSpacing: '-0.3px' }}>
                 Sistema de Gestão
@@ -788,6 +791,12 @@ const AppContent: React.FC = () => {
           isOpen={isUserModalOpen}
           onClose={() => setIsUserModalOpen(false)}
           onUserUpdate={loadInitialData}
+        />
+
+        <ProjectTypeManager
+          isOpen={isProjectTypeModalOpen}
+          onClose={() => setIsProjectTypeModalOpen(false)}
+          onProjectTypeUpdate={loadInitialData}
         />
 
         <NextTaskManager

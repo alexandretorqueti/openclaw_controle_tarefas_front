@@ -20,6 +20,8 @@ export interface Project {
   status: boolean;
   ativo: boolean;
   createdBy?: User;
+  projectTypeId?: string;
+  projectType?: ProjectType;
   tasks?: Task[];
   statistics?: {
     totalTasks: number;
@@ -34,6 +36,16 @@ export interface Project {
   backendPort?: number;
   repositoryUrl?: string;
   pastaBase?: string; // Campo pasta base (não obrigatório)
+}
+
+export interface ProjectType {
+  id: string;
+  name: string;
+  personaPrompt: string;
+  baseRules: string;
+  createdAt: string;
+  updatedAt: string;
+  projects?: Project[];
 }
 
 export interface Status {

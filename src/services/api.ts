@@ -68,6 +68,18 @@ interface UpdatePriorityData {
   weight?: number;
 }
 
+interface ProjectTypeData {
+  name: string;
+  personaPrompt: string;
+  baseRules: string;
+}
+
+interface UpdateProjectTypeData {
+  name?: string;
+  personaPrompt?: string;
+  baseRules?: string;
+}
+
 interface UserData {
   name: string;
   email: string;
@@ -396,6 +408,35 @@ class ApiService {
 
   async calculateNextExecution(id) {
     return this.request(`/recurrence/${id}/next-execution`);
+  }
+
+  // ProjectType endpoints
+  async getProjectTypes() {
+    return this.request('/project-types');
+  }
+
+  async getProjectType(id: string) {
+    return this.request(`/project-types/${id}`);
+  }
+
+  async createProjectType(projectTypeData: ProjectTypeData) {
+    return this.request('/project-types', {
+      method: 'POST',
+      body: JSON.stringify(projectTypeData),
+    });
+  }
+
+  async updateProjectType(id: string, projectTypeData: UpdateProjectTypeData) {
+    return this.request(`/project-types/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(projectTypeData),
+    });
+  }
+
+  async deleteProjectType(id: string) {
+    return this.request(`/project-types/${id}`, {
+      method: 'DELETE',
+    });
   }
 
   // Comment endpoints

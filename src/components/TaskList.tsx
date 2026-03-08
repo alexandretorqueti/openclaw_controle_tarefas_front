@@ -496,9 +496,9 @@ const TaskList: React.FC<TaskListProps> = ({
             marginTop: '20px',
             border: '1px solid #e0e0e0'
           }}>
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '24px', color: '#8B0000' }}>Criar Nova Tarefa</h2>
-            </h3>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '24px', color: '#8B0000', margin: 0 }}>Criar Nova Tarefa</h2>
+            </div>
             
             {/* Exibição de erro */}
             {error && (
