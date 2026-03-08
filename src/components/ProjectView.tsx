@@ -44,6 +44,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
     backendPath: '',
     backendPort: 0,
     repositoryUrl: '',
+    frontendBuildCmd: '',
+    backendBuildCmd: '',
   });
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
@@ -133,12 +135,13 @@ const ProjectView: React.FC<ProjectViewProps> = ({
         regras: '',
         status: true,
         frontendPath: '',
-    pastaBase: '',
+        pastaBase: '',
         frontendPort: null,
         backendPath: '',
         backendPort: null,
         repositoryUrl: '',
-    pastaBase: ''
+        frontendBuildCmd: '',
+        backendBuildCmd: '',
       });
       setIsCreatingProject(false);
       setCreateError(null);
@@ -780,6 +783,46 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                   }}
                 />
               </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginTop: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '6px' }}>
+                    Comando Build Frontend
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.frontendBuildCmd || ''}
+                    onChange={(e) => setNewProjectData({ ...newProjectData, frontendBuildCmd: e.target.value })}
+                    placeholder="npm run build"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 500, color: '#666', marginBottom: '6px' }}>
+                    Comando Build Backend
+                  </label>
+                  <input
+                    type="text"
+                    value={newProjectData.backendBuildCmd || ''}
+                    onChange={(e) => setNewProjectData({ ...newProjectData, backendBuildCmd: e.target.value })}
+                    placeholder="npm run build"
+                    style={{
+                      width: '100%',
+                      padding: '10px',
+                      border: '1px solid #ddd',
+                      borderRadius: '6px',
+                      fontSize: '13px'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1370,6 +1413,46 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     Caminho absoluto da pasta base do projeto (opcional)
                   </div>
                 </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                      Comando Build Frontend
+                    </label>
+                    <input
+                      type="text"
+                      value={editProjectData.frontendBuildCmd !== undefined ? editProjectData.frontendBuildCmd : (editingProject.frontendBuildCmd || '')}
+                      onChange={(e) => setEditProjectData({ ...editProjectData, frontendBuildCmd: e.target.value })}
+                      placeholder="npm run build"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                  
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
+                      Comando Build Backend
+                    </label>
+                    <input
+                      type="text"
+                      value={editProjectData.backendBuildCmd !== undefined ? editProjectData.backendBuildCmd : (editingProject.backendBuildCmd || '')}
+                      onChange={(e) => setEditProjectData({ ...editProjectData, backendBuildCmd: e.target.value })}
+                      placeholder="npm run build"
+                      style={{
+                        width: '100%',
+                        padding: '12px',
+                        border: '1px solid #ddd',
+                        borderRadius: '8px',
+                        fontSize: '14px'
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1424,7 +1507,9 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                     backendPath: editProjectData.backendPath !== undefined ? editProjectData.backendPath : editingProject.backendPath,
                     backendPort: editProjectData.backendPort !== undefined ? editProjectData.backendPort : editingProject.backendPort,
                     repositoryUrl: editProjectData.repositoryUrl !== undefined ? editProjectData.repositoryUrl : editingProject.repositoryUrl,
-                    pastaBase: editProjectData.pastaBase !== undefined ? editProjectData.pastaBase : editingProject.pastaBase
+                    pastaBase: editProjectData.pastaBase !== undefined ? editProjectData.pastaBase : editingProject.pastaBase,
+                    frontendBuildCmd: editProjectData.frontendBuildCmd !== undefined ? editProjectData.frontendBuildCmd : editingProject.frontendBuildCmd,
+                    backendBuildCmd: editProjectData.backendBuildCmd !== undefined ? editProjectData.backendBuildCmd : editingProject.backendBuildCmd
                   };
 
                   // Validation
