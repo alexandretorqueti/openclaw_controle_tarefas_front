@@ -532,6 +532,49 @@ class ApiService {
     const endpoint = queryParams ? `/logs?${queryParams}` : '/logs';
     return this.request(endpoint);
   }
+
+  // Agent Management
+  async getAgents() {
+    return this.request('/agents');
+  }
+
+  async getAgent(id: string) {
+    return this.request(`/agents/${id}`);
+  }
+
+  async createAgent(data: { name: string; workspace?: string }) {
+    return this.request('/agents', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async updateAgentIdentity(id: string, data: { name?: string; emoji?: string; avatar?: string }) {
+    return this.request(`/agents/${id}/identity`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async addAgentBinding(id: string, binding: string) {
+    return this.request(`/agents/${id}/bindings`, {
+      method: 'POST',
+      body: JSON.stringify({ binding })
+    });
+  }
+
+  async removeAgentBinding(id: string, binding: string) {
+    return this.request(`/agents/${id}/bindings`, {
+      method: 'DELETE',
+      body: JSON.stringify({ binding })
+    });
+  }
+
+  async deleteAgent(id: string) {
+    return this.request(`/agents/${id}`, {
+      method: 'DELETE'
+    });
+  }
 }
 
 export default new ApiService();

@@ -13,12 +13,13 @@ import NextTaskManager from './components/NextTaskManager';
 import RecurrenceManager from './components/RecurrenceManager';
 import LogsViewer from './components/LogsViewer';
 import LogErros from './components/LogErros';
+import AgentManager from './components/AgentManager';
 import UserDropdownMenu from './components/UserDropdownMenu';
 import UserProfileEdit from './components/UserProfileEdit';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
-import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync, FaTerminal, FaExclamationTriangle } from 'react-icons/fa';
+import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync, FaTerminal, FaExclamationTriangle, FaRobot } from 'react-icons/fa';
 
 // Tarefa de teste para IA - Processamento concluído em 2026-02-25 18:35 GMT-3
 
@@ -496,6 +497,11 @@ const AppContent: React.FC = () => {
           <LogErros onBack={handleBackFromErrorLogs} />
         );
 
+      case 'agents':
+        return (
+          <AgentManager />
+        );
+
       case 'projects':
       default:
         return (
@@ -677,6 +683,31 @@ const AppContent: React.FC = () => {
               >
                 <FaExclamationTriangle size={12} />
                 Erros
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('agents');
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: viewMode === 'agents' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'agents' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                  fontWeight: 500
+                }}
+              >
+                <FaRobot size={12} />
+                Agentes
               </button>
             </div>
 
