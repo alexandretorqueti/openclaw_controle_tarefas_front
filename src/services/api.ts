@@ -7,6 +7,15 @@ interface ProjectData {
   regras?: string;
   status?: boolean;
   ativo?: boolean;
+  projectTypeId?: string;
+  frontendPath?: string;
+  frontendPort?: number;
+  backendPath?: string;
+  backendPort?: number;
+  repositoryUrl?: string;
+  pastaBase?: string;
+  frontendBuildCmd?: string;
+  backendBuildCmd?: string;
 }
 
 interface UpdateProjectData {
@@ -15,6 +24,15 @@ interface UpdateProjectData {
   regras?: string;
   status?: boolean;
   ativo?: boolean;
+  projectTypeId?: string;
+  frontendPath?: string;
+  frontendPort?: number;
+  backendPath?: string;
+  backendPort?: number;
+  repositoryUrl?: string;
+  pastaBase?: string;
+  frontendBuildCmd?: string;
+  backendBuildCmd?: string;
 }
 
 interface TaskData {
@@ -394,7 +412,7 @@ class ApiService {
     return this.request('/recurrence/due');
   }
 
-  async markTaskAsExecuted(id) {
+  async markTaskAsExecuted(id: string) {
     return this.request(`/recurrence/${id}/execute`, {
       method: 'POST',
     });
@@ -406,7 +424,7 @@ class ApiService {
     });
   }
 
-  async calculateNextExecution(id) {
+  async calculateNextExecution(id: string) {
     return this.request(`/recurrence/${id}/next-execution`);
   }
 
@@ -440,57 +458,57 @@ class ApiService {
   }
 
   // Comment endpoints
-  async getCommentsByTask(taskId) {
+  async getCommentsByTask(taskId: string) {
     return this.request(`/comments/task/${taskId}`);
   }
 
-  async getComment(id) {
+  async getComment(id: string) {
     return this.request(`/comments/${id}`);
   }
 
-  async createComment(data) {
+  async createComment(data: any) {
     return this.request('/comments', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateComment(id, data) {
+  async updateComment(id: string, data: any) {
     return this.request(`/comments/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteComment(id) {
+  async deleteComment(id: string) {
     return this.request(`/comments/${id}`, {
       method: 'DELETE',
     });
   }
   // Task History endpoints
-  async getTaskHistoryByTask(taskId) {
+  async getTaskHistoryByTask(taskId: string) {
     return this.request(`/task-history/task/${taskId}`);
   }
 
-  async getTaskHistory(id) {
+  async getTaskHistory(id: string) {
     return this.request(`/task-history/${id}`);
   }
 
-  async createTaskHistory(data) {
+  async createTaskHistory(data: any) {
     return this.request('/task-history', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async deleteTaskHistory(id) {
+  async deleteTaskHistory(id: string) {
     return this.request(`/task-history/${id}`, {
       method: 'DELETE',
     });
   }
 
 
-  async getCommentReplies(commentId) {
+  async getCommentReplies(commentId: string) {
     return this.request(`/comments/${commentId}/replies`);
   }
 

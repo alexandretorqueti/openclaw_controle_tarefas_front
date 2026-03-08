@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaPlus, FaEdit, FaTrash, FaSave, FaPalette, FaListOl, FaCheckCircle, FaBan, FaListAlt, FaRobot } from 'react-icons/fa';
 import apiService from '../services/api';

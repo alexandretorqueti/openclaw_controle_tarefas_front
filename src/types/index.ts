@@ -2,6 +2,7 @@
 export interface User {
   id: string;
   name: string;
+  nickname?: string;
   email: string;
   avatarUrl?: string;
   role: 'Admin' | 'Viewer' | 'Editor';
@@ -36,6 +37,8 @@ export interface Project {
   backendPort?: number;
   repositoryUrl?: string;
   pastaBase?: string; // Campo pasta base (não obrigatório)
+  frontendBuildCmd?: string; // Comando de build do frontend
+  backendBuildCmd?: string; // Comando de build do backend
 }
 
 export interface ProjectType {

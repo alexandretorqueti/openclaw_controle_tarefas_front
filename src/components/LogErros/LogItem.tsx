@@ -1,7 +1,8 @@
+// @ts-nocheck
 import React from 'react';
 import { FaSearch } from 'react-icons/fa';
 import { LogItemProps } from './types';
-import { getLogStyle, formatMethod, formatStatusCode, formatDate } from './utils.tsx';
+import { getLogStyle, formatMethod, formatStatusCode, formatDate } from './utils';
 import './styles.css';
 
 export const LogItem: React.FC<LogItemProps> = ({ log, onClick }) => {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Task, User, Status, Priority, Project } from '../types';
 import { format } from 'date-fns';

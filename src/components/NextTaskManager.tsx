@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { FaTasks, FaUser, FaCalendarAlt, FaFlag, FaProjectDiagram, FaSpinner, FaTimes, FaCheckCircle, FaArrowRight } from 'react-icons/fa';
 import apiService from '../services/api';

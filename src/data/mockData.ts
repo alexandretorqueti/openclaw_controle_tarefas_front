@@ -27,11 +27,11 @@ export const mockUsers: User[] = [
 ];
 
 export const mockStatuses: Status[] = [
-  { id: uuidv4(), name: 'Pendente', colorCode: '#FF6B6B', isFinalState: false },
-  { id: uuidv4(), name: 'Em Andamento', colorCode: '#4ECDC4', isFinalState: false },
-  { id: uuidv4(), name: 'Em Revisão', colorCode: '#FFD166', isFinalState: false },
-  { id: uuidv4(), name: 'Concluído', colorCode: '#06D6A0', isFinalState: true },
-  { id: uuidv4(), name: 'Bloqueado', colorCode: '#118AB2', isFinalState: false }
+  { id: uuidv4(), name: 'Pendente', colorCode: '#FF6B6B', isFinalState: false, visibleToAi: true },
+  { id: uuidv4(), name: 'Em Andamento', colorCode: '#4ECDC4', isFinalState: false, visibleToAi: true },
+  { id: uuidv4(), name: 'Em Revisão', colorCode: '#FFD166', isFinalState: false, visibleToAi: true },
+  { id: uuidv4(), name: 'Concluído', colorCode: '#06D6A0', isFinalState: true, visibleToAi: true },
+  { id: uuidv4(), name: 'Bloqueado', colorCode: '#118AB2', isFinalState: false, visibleToAi: true }
 ];
 
 export const mockPriorities: Priority[] = [
@@ -49,7 +49,8 @@ export const mockProjects: Project[] = [
     createdById: mockUsers[0].id,
     createdAt: '2024-01-15T10:00:00Z',
     updatedAt: '2024-01-15T10:00:00Z',
-    status: true
+    status: true,
+    ativo: true
   },
   {
     id: uuidv4(),
@@ -58,7 +59,8 @@ export const mockProjects: Project[] = [
     createdById: mockUsers[1].id,
     createdAt: '2024-01-10T14:30:00Z',
     updatedAt: '2024-01-10T14:30:00Z',
-    status: true
+    status: true,
+    ativo: true
   },
   {
     id: uuidv4(),
@@ -67,7 +69,8 @@ export const mockProjects: Project[] = [
     createdById: mockUsers[0].id,
     createdAt: '2024-01-05T09:15:00Z',
     updatedAt: '2024-01-05T09:15:00Z',
-    status: true
+    status: true,
+    ativo: true
   },
   {
     id: uuidv4(),
@@ -76,7 +79,8 @@ export const mockProjects: Project[] = [
     createdById: mockUsers[2].id,
     createdAt: '2024-01-20T16:45:00Z',
     updatedAt: '2024-01-20T16:45:00Z',
-    status: false
+    status: false,
+    ativo: true
   },
   {
     id: uuidv4(),
@@ -85,7 +89,8 @@ export const mockProjects: Project[] = [
     createdById: mockUsers[1].id,
     createdAt: '2024-01-25T11:20:00Z',
     updatedAt: '2024-01-25T11:20:00Z',
-    status: true
+    status: true,
+    ativo: true
   }
 ];
 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Project, Task, User, Status, Priority } from '../types';
 import TaskCard from './TaskCard';

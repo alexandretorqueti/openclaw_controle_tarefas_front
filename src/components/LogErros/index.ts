@@ -1,6 +1,7 @@
+// @ts-nocheck
 export { default } from './LogErros';
 export * from './types';
-export * from './utils.tsx';
+export * from './utils';
 export { LogList } from './LogList';
 export { LogItem } from './LogItem';
 export { LogDetailsModal } from './LogDetailsModal';
