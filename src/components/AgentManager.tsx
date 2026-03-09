@@ -4,6 +4,14 @@ import { Agent, AgentsResponse, OperationResponse } from '../types/agent';
 import api from '../services/api';
 import { FaRobot, FaPlus, FaEdit, FaTrash, FaLink, FaUnlink, FaSync, FaCheck, FaTimes, FaUserCircle, FaSpinner } from 'react-icons/fa';
 
+// Estilos inline para animações
+const styles = {
+  '@keyframes spin': {
+    '0%': { transform: 'rotate(0deg)' },
+    '100%': { transform: 'rotate(360deg)' }
+  }
+};
+
 const AgentManager: React.FC = () => {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -11,8 +19,17 @@ const AgentManager: React.FC = () => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showBindingsModal, setShowBindingsModal] = useState<boolean>(false);
   const [newAgentName, setNewAgentName] = useState<string>('');
   const [newAgentWorkspace, setNewAgentWorkspace] = useState<string>('');
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [editAgentName, setEditAgentName] = useState<string>('');
+  const [editAgentEmoji, setEditAgentEmoji] = useState<string>('');
+  const [editAgentAvatar, setEditAgentAvatar] = useState<string>('');
+  const [editAgentModel, setEditAgentModel] = useState<string>('');
+  const [newBinding, setNewBinding] = useState<string>('');
+  const [models, setModels] = useState<string[]>([]);
   
   const loadAgents = async () => {
     setLoading(true);
@@ -33,6 +50,18 @@ const AgentManager: React.FC = () => {
   
   useEffect(() => {
     loadAgents();
+    
+    // Load models
+    const loadModels = async () => {
+      try {
+        const data = await api.request('/models');
+        setModels(data.models || []);
+      } catch (error) {
+        console.error('Error loading models:', error);
+      }
+    };
+    
+    loadModels();
   }, []);
   
   const handleCreateAgent = async () => {
@@ -88,31 +117,90 @@ const AgentManager: React.FC = () => {
     }
   };
   
+  const handleUpdateAgent = async () => {
+    if (!selectedAgent) return;
+    
+    if (!editAgentName.trim()) {
+      setError('O nome do agente é obrigatório');
+      return;
+    }
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await api.updateAgentIdentity(selectedAgent.id, {
+        name: editAgentName,
+        emoji: editAgentEmoji,
+        avatar: editAgentAvatar,
+        model: editAgentModel
+      }) as OperationResponse;
+      
+      if (response.success) {
+        setSuccessMessage('Agente atualizado com sucesso!');
+        setShowEditModal(false);
+        setSelectedAgent(null);
+        setEditAgentName('');
+        setEditAgentEmoji('');
+        setEditAgentAvatar('');
+        setEditAgentModel('');
+        loadAgents();
+      } else {
+        setError(response.error || 'Erro ao atualizar agente');
+      }
+    } catch (err: any) {
+      setError(err.message || 'Erro ao atualizar agente');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const clearMessages = () => {
     setError(null);
     setSuccessMessage(null);
   };
   
-  const renderAgentAvatar = (agent: Agent) => {
-    if (agent.identity && agent.identity.avatar) {
+  const AgentAvatar: React.FC<{agent: Agent}> = ({ agent }) => {
+    const [imgError, setImgError] = useState(false);
+    
+    if (agent.identity && agent.identity.avatar && !imgError) {
       return (
         <img 
           src={agent.identity.avatar} 
           alt={agent.identity.name || 'Agente'}
-          className="w-8 h-8 rounded-full object-cover"
+          style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '50%',
+            objectFit: 'cover'
+          }}
+          onError={() => setImgError(true)}
         />
       );
     }
     
     if (agent.identity && agent.identity.emoji) {
       return (
-        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-lg">
+        <div style={{
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
+          backgroundColor: '#f0f0f0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '18px'
+        }}>
           {agent.identity.emoji}
         </div>
       );
     }
     
-    return <FaUserCircle className="w-8 h-8 text-gray-400" />;
+    return <FaUserCircle style={{ width: '32px', height: '32px', color: '#999' }} />;
+  };
+  
+  const renderAgentAvatar = (agent: Agent) => {
+    return <AgentAvatar agent={agent} />;
   };
   
   const formatDate = (dateString?: string) => {
@@ -127,29 +215,70 @@ const AgentManager: React.FC = () => {
   };
   
   return (
-    <div className="p-6 bg-white rounded-lg shadow">
-      <div className="flex justify-between items-center mb-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <FaRobot className="text-blue-500" />
+          <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#333', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ width: '40px', height: '40px', backgroundColor: '#4ECDC4', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <FaRobot size={20} color="#fff" />
+            </div>
             Gerenciamento de Agentes OpenClaw
-          </h1>
-          <p className="text-gray-600 mt-1">Gerencie agentes através da CLI do OpenClaw</p>
+          </h2>
+          <p style={{ fontSize: '14px', color: '#666', margin: '8px 0 0' }}>
+            Gerencie agentes através da CLI do OpenClaw
+          </p>
         </div>
         
-        <div className="flex gap-2">
+        <div style={{ display: 'flex', gap: '12px' }}>
           <button 
             onClick={loadAgents}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center gap-2"
+            style={{
+              padding: '10px 16px',
+              backgroundColor: '#f8f9fa',
+              color: '#333',
+              border: '1px solid #e0e0e0',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+              opacity: loading ? 0.6 : 1
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#e9ecef';
+              e.currentTarget.style.borderColor = '#ced4da';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#f8f9fa';
+              e.currentTarget.style.borderColor = '#e0e0e0';
+            }}
             disabled={loading}
           >
-            <FaSync className={loading ? 'animate-spin' : ''} />
+            <FaSync style={loading ? { animation: 'spin 1s linear infinite' } : {}} />
             Atualizar
           </button>
           
           <button 
             onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2"
+            style={{
+              padding: '10px 16px',
+              backgroundColor: '#4ECDC4',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#3dbcb4';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#4ECDC4';
+            }}
           >
             <FaPlus />
             Novo Agente
@@ -158,15 +287,37 @@ const AgentManager: React.FC = () => {
       </div>
       
       {error && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
-          <FaTimes className="text-red-500" />
+        <div style={{
+          marginBottom: '16px',
+          padding: '16px',
+          backgroundColor: '#FFE5E5',
+          border: '1px solid #FF6B6B',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <FaTimes style={{ color: '#FF6B6B' }} />
           <div>
-            <p className="text-red-700 font-medium">Erro</p>
-            <p className="text-red-600 text-sm">{error}</p>
+            <p style={{ color: '#FF6B6B', fontWeight: 500, margin: 0 }}>Erro</p>
+            <p style={{ color: '#FF6B6B', fontSize: '14px', margin: '4px 0 0' }}>{error}</p>
           </div>
           <button 
             onClick={clearMessages}
-            className="ml-auto text-red-500 hover:text-red-700"
+            style={{
+              marginLeft: 'auto',
+              color: '#FF6B6B',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#ff5252';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#FF6B6B';
+            }}
           >
             <FaTimes />
           </button>
@@ -174,125 +325,365 @@ const AgentManager: React.FC = () => {
       )}
       
       {successMessage && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-          <FaCheck className="text-green-500" />
+        <div style={{
+          marginBottom: '16px',
+          padding: '16px',
+          backgroundColor: '#E5FFE5',
+          border: '1px solid #06D6A0',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <FaCheck style={{ color: '#06D6A0' }} />
           <div>
-            <p className="text-green-700 font-medium">Sucesso</p>
-            <p className="text-green-600 text-sm">{successMessage}</p>
+            <p style={{ color: '#06D6A0', fontWeight: 500, margin: 0 }}>Sucesso</p>
+            <p style={{ color: '#06D6A0', fontSize: '14px', margin: '4px 0 0' }}>{successMessage}</p>
           </div>
           <button 
             onClick={clearMessages}
-            className="ml-auto text-green-500 hover:text-green-700"
+            style={{
+              marginLeft: 'auto',
+              color: '#06D6A0',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '4px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = '#05c595';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = '#06D6A0';
+            }}
           >
             <FaTimes />
           </button>
         </div>
       )}
       
-      <div className="overflow-x-auto">
+      <div style={{
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        border: '1px solid #e0e0e0',
+        overflow: 'auto'
+      }}>
         {loading && agents.length === 0 ? (
-          <div className="flex justify-center items-center py-12">
-            <FaSpinner className="animate-spin text-3xl text-blue-500" />
-            <span className="ml-3 text-gray-600">Carregando agentes...</span>
+          <div style={{
+            padding: '48px',
+            textAlign: 'center',
+            color: '#666',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
+            <FaSpinner style={{ animation: 'spin 1s linear infinite', fontSize: '32px', color: '#4ECDC4' }} />
+            <span style={{ fontSize: '16px' }}>Carregando agentes...</span>
           </div>
         ) : agents.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <FaRobot className="text-4xl mx-auto mb-3 text-gray-300" />
-            <p className="text-lg">Nenhum agente encontrado</p>
-            <p className="text-sm mt-1">Crie seu primeiro agente para começar</p>
+          <div style={{
+            padding: '48px',
+            textAlign: 'center',
+            color: '#666'
+          }}>
+            <FaRobot style={{ fontSize: '48px', margin: '0 auto 16px', color: '#ddd' }} />
+            <p style={{ fontSize: '18px', margin: '0 0 8px' }}>Nenhum agente encontrado</p>
+            <p style={{ fontSize: '14px' }}>Crie seu primeiro agente para começar</p>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse'
+          }}>
             <thead>
-              <tr className="bg-gray-50">
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <tr style={{
+                backgroundColor: '#f8f9fa',
+                borderBottom: '1px solid #e0e0e0'
+              }}>
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   Agente
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   ID
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   Bindings
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  Modelo
+                </th>
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   Workspace
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   Criado em
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th style={{
+                  padding: '16px 24px',
+                  textAlign: 'left',
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: '#666',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
                   Ações
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody style={{
+              backgroundColor: '#fff'
+            }}>
               {agents.map((agent) => (
-                <tr key={agent.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
+                <tr 
+                  key={agent.id} 
+                  style={{
+                    borderBottom: '1px solid #f0f0f0',
+                    transition: 'background-color 0.2s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#f8f9fa';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#fff';
+                  }}
+                >
+                  <td style={{
+                    padding: '16px 24px',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <div style={{ flexShrink: 0 }}>
                         {renderAgentAvatar(agent)}
                       </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                      <div style={{ marginLeft: '16px' }}>
+                        <div style={{
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          color: '#333'
+                        }}>
                           {agent.identity ? agent.identity.name : 'Sem nome'}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div style={{
+                          fontSize: '14px',
+                          color: '#666',
+                          marginTop: '4px'
+                        }}>
                           {agent.identity && agent.identity.emoji && (
-                            <span className="mr-2">{agent.identity.emoji}</span>
+                            <span style={{ marginRight: '8px' }}>{agent.identity.emoji}</span>
                           )}
                           {agent.identity && agent.identity.avatar && (
-                            <span className="text-xs">Avatar configurado</span>
+                            <span style={{ fontSize: '12px' }}>Avatar configurado</span>
                           )}
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 font-mono">{agent.id}</div>
+                  <td style={{
+                    padding: '16px 24px',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    <div style={{
+                      fontSize: '14px',
+                      color: '#333',
+                      fontFamily: 'monospace'
+                    }}>{agent.id}</div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1">
+                  <td style={{
+                    padding: '16px 24px'
+                  }}>
+                    <div style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '4px'
+                    }}>
                       {agent.bindings && agent.bindings.length > 0 ? (
                         agent.bindings.map((binding, index) => (
                           <span 
                             key={index}
-                            className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '12px',
+                              fontWeight: 500,
+                              backgroundColor: '#e3f2fd',
+                              color: '#1976d2'
+                            }}
                           >
                             {binding}
                           </span>
                         ))
                       ) : (
-                        <span className="text-sm text-gray-500">Nenhum binding</span>
+                        <span style={{
+                          fontSize: '14px',
+                          color: '#666'
+                        }}>Nenhum binding</span>
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td style={{
+                    padding: '16px 24px',
+                    whiteSpace: 'nowrap',
+                    fontSize: '14px',
+                    color: '#666'
+                  }}>
+                    {agent.identity?.model || '—'}
+                  </td>
+                  <td style={{
+                    padding: '16px 24px',
+                    whiteSpace: 'nowrap',
+                    fontSize: '14px',
+                    color: '#666'
+                  }}>
                     {agent.workspace || '—'}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td style={{
+                    padding: '16px 24px',
+                    whiteSpace: 'nowrap',
+                    fontSize: '14px',
+                    color: '#666'
+                  }}>
                     {formatDate(agent.createdAt)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex gap-2">
+                  <td style={{
+                    padding: '16px 24px',
+                    whiteSpace: 'nowrap',
+                    fontSize: '14px',
+                    fontWeight: 500
+                  }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
                       <button
-                        onClick={() => alert('Edição ainda não implementada')}
-                        className="text-blue-600 hover:text-blue-900"
+                        onClick={() => {
+                          setSelectedAgent(agent);
+                          setEditAgentName(agent.identity?.name || '');
+                          setEditAgentEmoji(agent.identity?.emoji || '');
+                          setEditAgentAvatar(agent.identity?.avatar || '');
+                          setEditAgentModel(agent.identity?.model || '');
+                          setShowEditModal(true);
+                        }}
+                        style={{
+                          color: '#1976d2',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          borderRadius: '4px',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#0d47a1';
+                          e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#1976d2';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
                       >
-                        <FaEdit />
+                        <FaEdit size={16} />
                       </button>
                       <button
                         onClick={() => handleDeleteAgent(agent.id)}
-                        className="text-red-600 hover:text-red-900"
+                        style={{
+                          color: '#d32f2f',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          borderRadius: '4px',
+                          transition: 'all 0.2s',
+                          opacity: loading ? 0.5 : 1
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!loading) {
+                            e.currentTarget.style.color = '#b71c1c';
+                            e.currentTarget.style.backgroundColor = '#f5f5f5';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!loading) {
+                            e.currentTarget.style.color = '#d32f2f';
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }
+                        }}
                         disabled={loading}
                       >
-                        <FaTrash />
+                        <FaTrash size={16} />
                       </button>
                       <button
-                        onClick={() => alert('Bindings ainda não implementado')}
-                        className="text-green-600 hover:text-green-900"
+                        onClick={() => {
+                          setSelectedAgent(agent);
+                          setShowBindingsModal(true);
+                        }}
+                        style={{
+                          color: '#388e3c',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          borderRadius: '4px',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = '#1b5e20';
+                          e.currentTarget.style.backgroundColor = '#f5f5f5';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = '#388e3c';
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                        }}
                       >
-                        <FaLink />
+                        <FaLink size={16} />
                       </button>
                     </div>
                   </td>
@@ -304,63 +695,493 @@ const AgentManager: React.FC = () => {
       </div>
       
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Criar Novo Agente</h3>
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            width: '100%',
+            maxWidth: '28rem',
+            padding: '24px'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#333'
+              }}>Criar Novo Agente</h3>
               <button 
                 onClick={() => setShowCreateModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                style={{
+                  color: '#999',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#666';
+                  e.currentTarget.style.backgroundColor = '#f5f5f5';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#999';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
               >
                 <FaTimes />
               </button>
             </div>
             
-            <div className="space-y-4">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
                   Nome do Agente *
                 </label>
                 <input
                   type="text"
                   value={newAgentName}
                   onChange={(e) => setNewAgentName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#4ECDC4';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(78, 205, 196, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e0e0e0';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   placeholder="Ex: MeuAgente"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
                   Workspace (opcional)
                 </label>
                 <input
                   type="text"
                   value={newAgentWorkspace}
                   onChange={(e) => setNewAgentWorkspace(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#4ECDC4';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(78, 205, 196, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e0e0e0';
+                    e.target.style.boxShadow = 'none';
+                  }}
                   placeholder="/caminho/para/workspace"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p style={{
+                  fontSize: '12px',
+                  color: '#666',
+                  marginTop: '4px'
+                }}>
                   Caminho absoluto para o workspace do agente
                 </p>
               </div>
             </div>
             
-            <div className="flex justify-end gap-3 mt-6">
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '12px',
+              marginTop: '24px'
+            }}>
               <button
                 onClick={() => setShowCreateModal(false)}
-                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                style={{
+                  padding: '10px 16px',
+                  color: '#333',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#e9ecef';
+                  e.currentTarget.style.borderColor = '#ced4da';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8f9fa';
+                  e.currentTarget.style.borderColor = '#e0e0e0';
+                }}
               >
                 Cancelar
               </button>
               <button
                 onClick={handleCreateAgent}
                 disabled={loading || !newAgentName.trim()}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: '#4ECDC4',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: loading || !newAgentName.trim() ? 'not-allowed' : 'pointer',
+                  opacity: loading || !newAgentName.trim() ? 0.5 : 1,
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading && newAgentName.trim()) {
+                    e.currentTarget.style.backgroundColor = '#3dbcb4';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading && newAgentName.trim()) {
+                    e.currentTarget.style.backgroundColor = '#4ECDC4';
+                  }
+                }}
               >
-                {loading ? <FaSpinner className="animate-spin" /> : <FaPlus />}
+                {loading ? <FaSpinner style={{ animation: 'spin 1s linear infinite' }} /> : <FaPlus />}
                 Criar Agente
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {showEditModal && selectedAgent && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50
+        }}>
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: '12px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            width: '100%',
+            maxWidth: '28rem',
+            padding: '24px'
+          }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px'
+            }}>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#333'
+              }}>Editar Agente</h3>
+              <button 
+                onClick={() => {
+                  setShowEditModal(false);
+                  setSelectedAgent(null);
+                  setEditAgentName('');
+                  setEditAgentEmoji('');
+                  setEditAgentAvatar('');
+                  setEditAgentModel('');
+                }}
+                style={{
+                  color: '#999',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px',
+                  borderRadius: '4px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#666';
+                  e.currentTarget.style.backgroundColor = '#f5f5f5';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = '#999';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <FaTimes />
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
+                  Nome do Agente *
+                </label>
+                <input
+                  type="text"
+                  value={editAgentName}
+                  onChange={(e) => setEditAgentName(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#4ECDC4';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(78, 205, 196, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e0e0e0';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                  placeholder="Ex: MeuAgente"
+                />
+              </div>
+              
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
+                  Emoji (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={editAgentEmoji}
+                  onChange={(e) => setEditAgentEmoji(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#4ECDC4';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(78, 205, 196, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e0e0e0';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                  placeholder="Ex: 🤖"
+                />
+                <p style={{
+                  fontSize: '12px',
+                  color: '#666',
+                  marginTop: '4px'
+                }}>
+                  Emoji para representar o agente
+                </p>
+              </div>
+              
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
+                  Avatar URL (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={editAgentAvatar}
+                  onChange={(e) => setEditAgentAvatar(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#4ECDC4';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(78, 205, 196, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e0e0e0';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                  placeholder="https://exemplo.com/avatar.jpg"
+                />
+                <p style={{
+                  fontSize: '12px',
+                  color: '#666',
+                  marginTop: '4px'
+                }}>
+                  URL da imagem de avatar do agente
+                </p>
+              </div>
+              
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
+                  Modelo (opcional)
+                </label>
+                <select
+                  value={editAgentModel || ''}
+                  onChange={(e) => setEditAgentModel(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#fff'
+                  }}
+                >
+                  <option value="">Selecione um modelo</option>
+                  {models.length > 0 ? (
+                    models.map((model, index) => (
+                      <option key={index} value={model}>
+                        {model}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">Carregando modelos...</option>
+                  )}
+                </select>
+                <p style={{
+                  fontSize: '12px',
+                  color: '#666',
+                  marginTop: '4px'
+                }}>
+                  Modelo de IA para o agente
+                </p>
+              </div>
+            </div>
+            
+            <div style={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              gap: '12px',
+              marginTop: '24px'
+            }}>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setSelectedAgent(null);
+                  setEditAgentName('');
+                  setEditAgentEmoji('');
+                  setEditAgentAvatar('');
+                  setEditAgentModel('');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  color: '#333',
+                  backgroundColor: '#f8f9fa',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = '#e9ecef';
+                  e.currentTarget.style.borderColor = '#ced4da';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = '#f8f9fa';
+                  e.currentTarget.style.borderColor = '#e0e0e0';
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleUpdateAgent}
+                disabled={loading || !editAgentName.trim()}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: '#4ECDC4',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: loading || !editAgentName.trim() ? 'not-allowed' : 'pointer',
+                  opacity: loading || !editAgentName.trim() ? 0.5 : 1,
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading && editAgentName.trim()) {
+                    e.currentTarget.style.backgroundColor = '#3dbcb4';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading && editAgentName.trim()) {
+                    e.currentTarget.style.backgroundColor = '#4ECDC4';
+                  }
+                }}
+              >
+                {loading ? <FaSpinner style={{ animation: 'spin 1s linear infinite' }} /> : <FaCheck />}
+                Salvar Alterações
               </button>
             </div>
           </div>

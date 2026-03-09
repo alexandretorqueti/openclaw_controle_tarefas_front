@@ -3,7 +3,10 @@ import React, { useState } from 'react';
 import api from '../services/api';
 import { Task, User, Status, Priority, Project } from '../types';
 import TaskCard from './TaskCard';
+import Card from './shared/Card';
+import Button from './shared/Button';
 import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle , FaArrowUp} from 'react-icons/fa';
+import { safeParseDate } from '../utils/dateUtils';
 
 interface TaskListProps {
   tasks: Task[];
@@ -47,7 +50,7 @@ const TaskList: React.FC<TaskListProps> = ({
   // Estado local para compatibilidade, caso a prop não seja fornecida
   const [localShowCompleted, setLocalShowCompleted] = useState(false);
   const showCompleted = onToggleShowCompleted ? propShowCompleted : localShowCompleted;
-  const [models, setModels] = useState<string[]>([]);
+  const [agents, setAgents] = useState<string[]>([]);
   // Back to top functionality
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -81,7 +84,7 @@ const TaskList: React.FC<TaskListProps> = ({
     priorityId: priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '',
     assignedToId: users.length > 0 ? users[0]?.id || '' : '',
     deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
-    model: typeof window !== 'undefined' ? localStorage.getItem('lastUsedModel') || '' : '',
+    agent: typeof window !== 'undefined' ? localStorage.getItem('lastUsedAgent') || '' : '',
     parentTaskId: null
   });
 
@@ -109,34 +112,36 @@ const TaskList: React.FC<TaskListProps> = ({
     }
   }, [selectedProject]);
 
-  // Load models from openclaw.json
+  // Load agents from API
   React.useEffect(() => {
-    const loadModels = async () => {
+    const loadAgents = async () => {
       try {
-        const data = await api.request('/models');
-        setModels(data.models || []);
+        const data = await api.request('/agents');
+        // Extract agent IDs from the response
+        const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
+        setAgents(agentIds);
       } catch (error) {
-        console.error('Error loading models:', error);
+        console.error('Error loading agents:', error);
       }
     };
-    loadModels();
+    loadAgents();
   }, []);
 
-  // Load last used model from localStorage
+  // Load last used agent from localStorage
   React.useEffect(() => {
-    const lastModel = localStorage.getItem('lastUsedModel');
+    const lastModel = localStorage.getItem('lastUsedAgent');
     if (lastModel) {
       setNewTaskData(prev => ({
         ...prev,
-        model: lastModel
+        agent: lastModel
       }));
     }
   }, []);
 
   const shouldFilterByCompletion = !onToggleShowCompleted;
   const filteredTasks = tasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (task.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (task.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = !selectedStatus || task.statusId === selectedStatus;
     const matchesPriority = !selectedPriority || task.priorityId === selectedPriority;
@@ -148,7 +153,9 @@ const TaskList: React.FC<TaskListProps> = ({
   const sortedTasks = [...filteredTasks].sort((a, b) => {
     switch (sortBy) {
       case 'deadline':
-        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+        const dateA = a.deadline ? safeParseDate(a.deadline)?.getTime() : Infinity;
+        const dateB = b.deadline ? safeParseDate(b.deadline)?.getTime() : Infinity;
+        return (dateA || Infinity) - (dateB || Infinity);
       case 'priority':
         const priorityA = priorities.find(p => p.id === a.priorityId)?.weight || 0;
         const priorityB = priorities.find(p => p.id === b.priorityId)?.weight || 0;
@@ -177,7 +184,7 @@ const TaskList: React.FC<TaskListProps> = ({
     console.log('🔍 Title exists:', !!newTaskData.title);
     console.log('🔍 ProjectId exists:', !!newTaskData.projectId);
     console.log('🔍 Deadline exists:', !!newTaskData.deadline);
-    console.log('🔍 Model exists:', !!newTaskData.model);
+    console.log('🔍 Model exists:', !!newTaskData.agent);
     
     if (!onCreateTask || !newTaskData.title || !newTaskData.projectId || !newTaskData.deadline) {
       console.error('❌ Missing required data for task creation');
@@ -195,17 +202,17 @@ const TaskList: React.FC<TaskListProps> = ({
         ...newTaskData,
         // createdById will be set by the parent component (App.tsx)
         position: tasks.length,
-        // Ensure model is null if empty string
-        model: newTaskData.model || null
+        // Ensure agent is null if empty string
+        agent: newTaskData.agent || null
       };
 
       console.log('📤 Dados completos:', taskData);
       
       await onCreateTask(taskData);
       
-      // Save the selected model to localStorage
-      if (newTaskData.model) {
-        localStorage.setItem('lastUsedModel', newTaskData.model);
+      // Save the selected agent to localStorage
+      if (newTaskData.agent) {
+        localStorage.setItem('lastUsedAgent', newTaskData.agent);
       }
       
       // Reset form with current values (not empty strings)
@@ -221,7 +228,7 @@ const TaskList: React.FC<TaskListProps> = ({
         priorityId: defaultPriority,
         assignedToId: defaultUser,
         deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
-        model: newTaskData.model || '' // Keep the same model for next task
+        agent: newTaskData.agent || '' // Keep the same model for next task
       });
       setIsCreatingTask(false);
     } catch (error: any) {
@@ -251,51 +258,39 @@ const TaskList: React.FC<TaskListProps> = ({
 
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h1 style={{ fontSize: '28px', fontWeight: 700, color: '#333', marginBottom: '8px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#333', margin: 0 }}>
               {selectedProject ? `Tarefas do Projeto: ${selectedProject.name}` : 'Todas as Tarefas'}
-            </h1>
-            <p style={{ fontSize: '16px', color: '#666' }}>
+            </h2>
+            <p style={{ fontSize: '14px', color: '#666', margin: '8px 0 0' }}>
               {selectedProject 
                 ? selectedProject.description
                 : 'Gerencie todas as tarefas de todos os projetos em um único lugar'}
             </p>
           </div>
           
-          {selectedProject && onBackToProjects && (
-            <button
-              onClick={onBackToProjects}
-              style={{
-                padding: '10px 16px',
-                backgroundColor: '#f8f9fa',
-                color: '#333',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '14px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                transition: 'all 0.2s',
-                fontWeight: 500
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#e9ecef';
-                e.currentTarget.style.borderColor = '#ccc';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#f8f9fa';
-                e.currentTarget.style.borderColor = '#ddd';
-              }}
+          <div style={{ display: 'flex', gap: '12px' }}>
+            {selectedProject && onBackToProjects && (
+              <Button
+                variant="secondary"
+                icon={<FaArrowLeft size={14} />}
+                onClick={onBackToProjects}
+              >
+                Voltar para Projetos
+              </Button>
+            )}
+            <Button
+              variant="primary"
+              icon={<FaPlus size={16} />}
+              onClick={() => setIsCreatingTask(!isCreatingTask)}
             >
-              <FaArrowLeft size={14} />
-              Voltar para Projetos
-            </button>
-          )}
+              Nova Tarefa
+            </Button>
+          </div>
         </div>
-      </div>
 
       {/* Filtros e Controles */}
       <div style={{
@@ -449,44 +444,6 @@ const TaskList: React.FC<TaskListProps> = ({
                 Mostrar completas
               </label>
             </div>
-          </div>
-
-          {/* Botão Nova Tarefa */}
-          <div style={{ minWidth: '200px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-              <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {/* Espaço reservado para ícone alinhado */}
-              </div>
-              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Ações
-              </label>
-            </div>
-            <button
-              onClick={() => setIsCreatingTask(!isCreatingTask)}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                backgroundColor: '#4ECDC4',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '14px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontWeight: 500,
-                transition: 'background-color 0.2s',
-                height: '44px',
-                boxSizing: 'border-box'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
-            >
-              <FaPlus size={16} />
-              Nova Tarefa
-            </button>
           </div>
         </div>
 
@@ -667,11 +624,11 @@ const TaskList: React.FC<TaskListProps> = ({
 
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  Modelo *
+                  Agente *
                 </label>
                 <select
-                  value={newTaskData.model || ''}
-                  onChange={(e) => setNewTaskData({ ...newTaskData, model: e.target.value })}
+                  value={newTaskData.agent || ''}
+                  onChange={(e) => setNewTaskData({ ...newTaskData, agent: e.target.value })}
                   required
                   style={{
                     width: '100%',
@@ -682,14 +639,14 @@ const TaskList: React.FC<TaskListProps> = ({
                     backgroundColor: '#fff'
                   }}
                 >
-                  {models.length > 0 ? (
-                    models.map((model, index) => (
-                      <option key={index} value={model}>
-                        {model}
+                  {agents.length > 0 ? (
+                    agents.map((agentId, index) => (
+                      <option key={index} value={agentId}>
+                        {agentId}
                       </option>
                     ))
                   ) : (
-                    <option value="">Carregando modelos...</option>
+                    <option value="">Carregando agentes...</option>
                   )}
                 </select>
                 <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
@@ -703,12 +660,16 @@ const TaskList: React.FC<TaskListProps> = ({
                 </label>
                 <input
                   type="datetime-local"
-                  value={newTaskData.deadline ? new Date(newTaskData.deadline).toISOString().slice(0, 16) : ''}
+                  value={newTaskData.deadline ? safeParseDate(newTaskData.deadline)?.toISOString().slice(0, 16) || '' : ''}
                   onChange={(e) => {
                     const dateValue = e.target.value;
                     if (dateValue) {
-                      const date = new Date(dateValue);
-                      setNewTaskData({ ...newTaskData, deadline: date.toISOString() });
+                      const date = safeParseDate(dateValue + ':00.000Z'); // Adiciona segundos para formato ISO
+                      if (date) {
+                        setNewTaskData({ ...newTaskData, deadline: date.toISOString() });
+                      } else {
+                        setNewTaskData({ ...newTaskData, deadline: '' });
+                      }
                     } else {
                       setNewTaskData({ ...newTaskData, deadline: '' });
                     }
@@ -752,7 +713,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     .filter(task => !task.isCompleted && task.projectId === newTaskData.projectId)
                     .map(task => (
                       <option key={task.id} value={task.id}>
-                        {task.title} {task.isCompleted ? '(Concluída)' : ''}
+                        {task.title || 'Sem título'} {task.isCompleted ? '(Concluída)' : ''}
                       </option>
                     ))
                   }
@@ -800,19 +761,19 @@ const TaskList: React.FC<TaskListProps> = ({
               </button>
               <button
                 onClick={handleCreateTask}
-                disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.deadline || !newTaskData.model}
+                disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.deadline || !newTaskData.agent}
                 style={{
                   padding: '10px 20px',
-                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.model) ? '#4ECDC4' : '#ccc',
+                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? '#4ECDC4' : '#ccc',
                   color: '#fff',
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.model) ? 'pointer' : 'not-allowed'
+                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? 'pointer' : 'not-allowed'
                 }}
               >
                 Criar Tarefa
-                {(!newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.model) && ' (carregando...)'}
+                {(!newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.agent) && ' (carregando...)'}
               </button>
             </div>
           </div>
@@ -856,7 +817,11 @@ const TaskList: React.FC<TaskListProps> = ({
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#FF6B6B' }}>
-                {tasks.filter(t => !t.isCompleted && new Date(t.deadline) < new Date()).length}
+                {tasks.filter(t => {
+                  if (t.isCompleted) return false;
+                  const deadlineDate = safeParseDate(t.deadline || '');
+                  return deadlineDate && deadlineDate < new Date();
+                }).length}
               </div>
               <div style={{ fontSize: '12px', color: '#666' }}>Atrasadas</div>
             </div>
@@ -936,7 +901,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 onUpdateTask={onUpdateTask}
                 onDeleteTask={onDeleteTask}
                 onToggleCompletion={onToggleCompletion}
-                models={models}
+                agents={models}
               />
             ))}
           </div>
@@ -982,7 +947,8 @@ const TaskList: React.FC<TaskListProps> = ({
           <FaArrowUp />
         </button>
       )}
-</div>
+      </div>
+    </div>
   );
 };
 

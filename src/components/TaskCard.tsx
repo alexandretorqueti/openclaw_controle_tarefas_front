@@ -4,13 +4,14 @@ import { Task, User, Status, Priority, Project } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle } from 'react-icons/fa';
+import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
 
 interface TaskCardProps {
   task: Task;
   users: User[];
   statuses: Status[];
   priorities: Priority[];
-  models?: string[];
+  agents?: string[];
   projects: Project[];
   onTaskClick: (task: Task) => void;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
@@ -24,7 +25,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   users, 
   statuses, 
   priorities,
-  models = [], 
+  agents = [], 
   projects,
   onTaskClick,
   onUpdateTask,
@@ -48,9 +49,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const creator = getCreator();
   const project = getProject();
 
-  const deadlineDate = new Date(task.deadline);
-  const isOverdue = !task.isCompleted && deadlineDate < new Date();
-  const formattedDeadline = format(deadlineDate, "dd 'de' MMMM 'de' yyyy", { locale: ptBR });
+  const deadlineDate = safeParseDate(task.deadline);
+  const isOverdue = !task.isCompleted && deadlineDate && deadlineDate < new Date();
+  const formattedDeadline = safeFormatDate(task.deadline, "dd 'de' MMMM 'de' yyyy") || 'Sem prazo definido';
 
   const handleToggleCompletion = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -329,7 +330,7 @@ if (compact) {
                 textDecoration: task.isCompleted ? 'line-through' : 'none',
                 opacity: task.isCompleted ? 0.7 : 1
               }}>
-                {task.title}
+                {task.title || 'Sem título'}
               </h3>
             </div>
 
@@ -494,7 +495,7 @@ if (compact) {
             opacity: task.isCompleted ? 0.7 : 1,
             flex: 1
           }}>
-            {task.title}
+            {task.title || 'Sem título'}
           </h3>
           
           {priority && (
@@ -695,7 +696,7 @@ if (compact) {
       }}>
         <div style={{ fontSize: '12px', color: '#666' }}>
           Criado por: {creator?.name || 'Desconhecido'} • 
-          {format(new Date(task.createdAt), " dd/MM/yyyy", { locale: ptBR })}
+          {safeFormatDate(task.createdAt, " dd/MM/yyyy") || 'Data inválida'}
         </div>
 
         <div style={{ display: 'flex', gap: '8px' }}>

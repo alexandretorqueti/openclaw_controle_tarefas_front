@@ -2,6 +2,7 @@ export interface AgentIdentity {
   name: string;
   emoji?: string;
   avatar?: string;
+  model?: string;
 }
 
 export interface Agent {
@@ -22,6 +23,7 @@ export interface UpdateAgentIdentityRequest {
   name?: string;
   emoji?: string;
   avatar?: string;
+  model?: string;
 }
 
 export interface BindingRequest {

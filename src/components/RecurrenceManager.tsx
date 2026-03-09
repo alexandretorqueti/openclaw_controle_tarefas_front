@@ -4,6 +4,7 @@ import { Task } from '../types';
 import api from '../services/api';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
 import { 
   FaSync, 
   FaClock, 
@@ -124,7 +125,9 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
   const getStatusColor = (task: Task) => {
     if (!task.nextExecutionAt) return 'gray';
     
-    const nextExecution = new Date(task.nextExecutionAt);
+    const nextExecution = safeParseDate(task.nextExecutionAt);
+    if (!nextExecution) return 'gray';
+    
     const now = new Date();
     const hoursUntil = (nextExecution.getTime() - now.getTime()) / (1000 * 60 * 60);
     
@@ -182,7 +185,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaHistory size={12} color="#666" />
                 <span style={{ fontSize: '14px', color: '#666' }}>
-                  Última execução: {format(new Date(task.lastExecutedAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  Última execução: {safeFormatDate(task.lastExecutedAt, 'dd/MM/yyyy HH:mm')}
                 </span>
               </div>
             )}
@@ -199,7 +202,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
                   color: getStatusColor(task) === 'red' ? '#FF6B6B' : 
                          getStatusColor(task) === 'orange' ? '#FFD166' : '#4ECDC4'
                 }}>
-                  Próxima: {format(new Date(task.nextExecutionAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  Próxima: {safeFormatDate(task.nextExecutionAt, 'dd/MM/yyyy HH:mm')}
                   {getStatusColor(task) === 'red' && ' (Atrasada!)'}
                   {getStatusColor(task) === 'orange' && ' (Em breve)'}
                 </span>

@@ -4,6 +4,7 @@ import api from '../services/api';
 import { Task, User, Status, Priority, Project } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
 import { 
   FaUser, 
   FaCalendarAlt, 
@@ -61,7 +62,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [models, setModels] = useState<string[]>([]);
+  const [agents, setAgents] = useState<string[]>([]);
 
   const getAssignedUser = () => users.find(user => user.id === task.assignedToId);
   const getStatus = () => statuses.find(status => status.id === task.statusId);
@@ -75,10 +76,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const creator = getCreator();
   const project = getProject();
 
-  const deadlineDate = new Date(task.deadline);
-  const isOverdue = !task.isCompleted && deadlineDate < new Date();
-  const formattedDeadline = format(deadlineDate, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR });
-  const formattedCreatedAt = format(new Date(task.createdAt), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR });
+  const deadlineDate = safeParseDate(task.deadline);
+  const isOverdue = !task.isCompleted && deadlineDate && deadlineDate < new Date();
+  const formattedDeadline = safeFormatDate(task.deadline, "dd 'de' MMMM 'de' yyyy 'às' HH:mm") || 'Não definido';
+  const formattedCreatedAt = safeFormatDate(task.createdAt, "dd 'de' MMMM 'de' yyyy 'às' HH:mm") || 'Data inválida';
   // Back to top functionality
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -96,17 +97,19 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Load models from openclaw.json
+  // Load agents from API
   React.useEffect(() => {
-    const loadModels = async () => {
+    const loadAgents = async () => {
       try {
-        const data = await api.request('/models');
-        setModels(data.models || []);
+        const data = await api.request('/agents');
+        // Extract agent IDs from the response
+        const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
+        setAgents(agentIds);
       } catch (error) {
-        console.error('Error loading models:', error);
+        console.error('Error loading agents:', error);
       }
     };
-    loadModels();
+    loadAgents();
   }, []);
 
   const handleSave = async () => {
@@ -143,8 +146,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       if (editedTask.projectId !== undefined && editedTask.projectId !== task.projectId) {
         updateData.projectId = editedTask.projectId;
       }
-      if (editedTask.model !== undefined && editedTask.model !== task.model) {
-        updateData.model = editedTask.model;
+      if (editedTask.agent !== undefined && editedTask.agent !== task.agent) {
+        updateData.agent = editedTask.agent;
       }
       
       // Campo parentTaskId - precisa ser sempre enviado quando está definido
@@ -173,8 +176,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         await onUpdateTask(task.id, updateData);
         
         // Save the model to localStorage if it was changed
-        if (updateData.model !== undefined && updateData.model !== null) {
-          localStorage.setItem('lastUsedModel', updateData.model);
+        if (updateData.agent !== undefined && updateData.agent !== null) {
+          localStorage.setItem('lastUsedAgent', updateData.agent);
         }
         
         setIsEditing(false);
@@ -351,7 +354,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     textDecoration: task.isCompleted ? 'line-through' : 'none',
                     opacity: task.isCompleted ? 0.7 : 1
                   }}>
-                    {task.title}
+                    {task.title || 'Sem título'}
                   </h1>
                   <button
                     onClick={handleToggleCompletion}
@@ -615,14 +618,18 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           {isEditing ? (
             <input
               type="datetime-local"
-              value={editedTask.deadline ? new Date(editedTask.deadline).toISOString().slice(0, 16) : ''}
+              value={editedTask.deadline ? safeParseDate(editedTask.deadline)?.toISOString().slice(0, 16) || '' : ''}
               onChange={(e) => {
                 // Quando o usuário seleciona uma data/hora, precisamos garantir o formato correto
                 const dateValue = e.target.value;
                 if (dateValue) {
                   // Adiciona segundos e timezone para formato ISO 8601 completo
-                  const date = new Date(dateValue);
-                  setEditedTask({ ...editedTask, deadline: date.toISOString() });
+                  const date = safeParseDate(dateValue + ':00.000Z');
+                  if (date) {
+                    setEditedTask({ ...editedTask, deadline: date.toISOString() });
+                  } else {
+                    setEditedTask({ ...editedTask, deadline: '' });
+                  }
                 } else {
                   setEditedTask({ ...editedTask, deadline: '' });
                 }
@@ -719,7 +726,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <FaHistory size={14} color="#666" />
                   <span>
-                    Última execução: {format(new Date(task.lastExecutedAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                    Última execução: {safeFormatDate(task.lastExecutedAt, 'dd/MM/yyyy HH:mm')}
                   </span>
                 </div>
               )}
@@ -728,7 +735,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <FaCalendarAlt size={14} color="#4ECDC4" />
                   <span style={{ fontWeight: 500 }}>
-                    Próxima execução: {format(new Date(task.nextExecutionAt), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                    Próxima execução: {safeFormatDate(task.nextExecutionAt, 'dd/MM/yyyy HH:mm')}
                   </span>
                 </div>
               )}
@@ -822,11 +829,11 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
         }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
-            Modelo
+            Agente
           </h3>
           {isEditing ? (
             <select
-              value={editedTask.model || ''}
+              value={editedTask.agent || ''}
               onChange={(e) => {
                 const newValue = e.target.value;
                 // Se for string vazia, define como undefined
@@ -843,8 +850,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 backgroundColor: '#fff'
               }}
             >
-              {models.length > 0 ? (
-                models.map((model, index) => (
+              {agents.length > 0 ? (
+                agents.map((model, index) => (
                   <option key={index} value={model}>
                     {model}
                   </option>
@@ -868,10 +875,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               </div>
               <div>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
-                  {task.model || 'Não definido'}
+                  {task.agent || 'Não definido'}
                 </div>
                 <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                  Modelo de IA para processamento
+                  Agente para processamento
                 </div>
               </div>
             </div>
@@ -1075,25 +1082,25 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           <div>
             <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Criado em</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-              {format(new Date(task.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+              {safeFormatDate(task.createdAt, "dd/MM/yyyy HH:mm") || 'Data inválida'}
             </div>
           </div>
           <div>
             <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Atualizado em</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-              {format(new Date(task.updatedAt), "dd/MM/yyyy HH:mm", { locale: ptBR })}
+              {safeFormatDate(task.updatedAt, "dd/MM/yyyy HH:mm") || 'Data inválida'}
             </div>
           </div>
           <div>
             <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da última execução</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-              {task.lastExecutedAt ? format(new Date(task.lastExecutedAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : 'Nunca executada'}
+              {safeFormatDate(task.lastExecutedAt, "dd/MM/yyyy HH:mm") || 'Nunca executada'}
             </div>
           </div>
           <div>
             <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da próxima execução</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-              {task.nextExecutionAt ? format(new Date(task.nextExecutionAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : 'Não agendada'}
+              {safeFormatDate(task.nextExecutionAt, "dd/MM/yyyy HH:mm") || 'Não agendada'}
             </div>
           </div>
           <div>

@@ -2,9 +2,8 @@
 import React, { useState, useEffect, Component, ErrorInfo } from 'react';
 import TaskList from './components/TaskList';
 import TaskDetail from './components/TaskDetail';
-import ProjectView from './components/ProjectView';
+import ProjectViewNew from './components/ProjectViewNew';
 import Login from './components/Login';
-import FloatingMenu from './components/FloatingMenu';
 import StatusManager from './components/StatusManager';
 import PriorityManager from './components/PriorityManager';
 import UserManager from './components/UserManager';
@@ -14,56 +13,14 @@ import RecurrenceManager from './components/RecurrenceManager';
 import LogsViewer from './components/LogsViewer';
 import LogErros from './components/LogErros';
 import AgentManager from './components/AgentManager';
-import UserDropdownMenu from './components/UserDropdownMenu';
 import UserProfileEdit from './components/UserProfileEdit';
+import MainLayout from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
 import { Task, Project, User, Status, Priority } from './types';
-import { FaTasks, FaFolder, FaBars, FaHome, FaSpinner, FaUser, FaSignOutAlt, FaSync, FaTerminal, FaExclamationTriangle, FaRobot } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 
-// Tarefa de teste para IA - Processamento concluído em 2026-02-25 18:35 GMT-3
-
-// Helper function to get backend URL based on current frontend URL
-const getBackendUrl = (): string => {
-  const hostname = window.location.hostname;
-  const port = window.location.port;
-
-  // Determine backend port based on frontend port
-  let backendPort = 3001; // Default to development
-
-  if (port === '8090' || port === '8091') {
-    // Production environment
-    backendPort = 8091;
-  } else if (port === '3000' || port === '3001') {
-    // Development environment
-    backendPort = 3001;
-  } else if (!port) {
-    // No port specified (default ports)
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      // Default to development for localhost without port
-      backendPort = 3001;
-    } else {
-      // For other hosts without port, assume production
-      backendPort = 8091;
-    }
-  }
-
-  console.log(`🌐 App Component: Frontend ${hostname}:${port} → Backend port ${backendPort}`);
-
-  // Build backend URL
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return `http://localhost:${backendPort}`;
-  } else if (hostname === '192.168.1.70') {
-    return `http://192.168.1.70:${backendPort}`;
-  } else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
-    return `http://api.tarefas.local:${backendPort}`;
-  } else {
-    // For any other hostname
-    return `http://${hostname}:${backendPort}`;
-  }
-};
-
-// Error Boundary para capturar erros no React
+// Error Boundary
 class ErrorBoundary extends Component<
   { children: React.ReactNode },
   { hasError: boolean; error: Error | null }
@@ -119,12 +76,11 @@ class ErrorBoundary extends Component<
         </div>
       );
     }
-
     return this.props.children;
   }
 }
 
-type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs';
+type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs' | 'agents' | 'recurrence';
 
 // Main app content that requires authentication
 const AppContent: React.FC = () => {
@@ -139,13 +95,11 @@ const AppContent: React.FC = () => {
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [priorities, setPriorities] = useState<Priority[]>([]);
 
-  // Filtros para tarefas
   const [taskFilters, setTaskFilters] = useState<{ isCompleted?: boolean }>({});
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Estados para os modais
+  // Modal states
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isPriorityModalOpen, setIsPriorityModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -158,7 +112,34 @@ const AppContent: React.FC = () => {
     loadInitialData();
   }, []);
 
-  // Carrega tarefas com base no projeto selecionado e filtros atuais
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+      const [projectsData, tasksData, usersData, statusesData, prioritiesData] = await Promise.all([
+        apiService.getProjects(),
+        apiService.getTasks(),
+        apiService.getUsers(),
+        apiService.getStatuses(),
+        apiService.getPriorities()
+      ]);
+      // @ts-expect-error data is unknown
+      setProjects(projectsData.projects || []);
+      // @ts-expect-error data is unknown
+      setTasks(tasksData.tasks || []);
+      // @ts-expect-error data is unknown
+      setUsers(usersData.users || []);
+      // @ts-expect-error data is unknown
+      setStatuses(statusesData.statuses || []);
+      // @ts-expect-error data is unknown
+      setPriorities(prioritiesData.priorities || []);
+    } catch (err) {
+      console.error('Failed to load initial data:', err);
+      setError('Falha ao carregar dados. Verifique a conexão com o servidor.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const loadTasks = async (projectId?: string | null, filters = taskFilters) => {
     try {
       let tasksData;
@@ -175,70 +156,10 @@ const AppContent: React.FC = () => {
     }
   };
 
-  // Atualiza filtros de tarefas e recarrega a lista
   const updateTaskFilters = async (newFilters: { isCompleted?: boolean }) => {
-    setTaskFilters(newFilters);
-    // Recarrega as tarefas com os novos filtros
-    await loadTasks(selectedProject?.id, newFilters);
-  };
-
-  const loadInitialData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Load all data from API
-      const [projectsData, tasksData, usersData, statusesData, prioritiesData] = await Promise.all([
-        apiService.getProjects().catch(() => ({ projects: [] })),
-        apiService.getTasks(taskFilters).catch(() => ({ tasks: [] })),
-        apiService.getUsers().catch(() => ({ users: [] })),
-        apiService.getStatuses().catch(() => ({ statuses: [] })),
-        apiService.getPriorities().catch(() => ({ priorities: [] }))
-      ]);
-
-      console.log('🚀 Loaded users data:', usersData);
-      console.log('🚀 Users array:', usersData.users);
-      console.log('🚀 Users count:', usersData.users?.length || 0);
-
-      // @ts-expect-error projectsData é unknown
-      setProjects(projectsData.projects || []);
-      // @ts-expect-error tasksData é unknown
-      setTasks(tasksData.tasks || []);
-      // @ts-expect-error usersData é unknown
-      setUsers(usersData.users || []);
-      // @ts-expect-error statusesData é unknown
-      setStatuses(statusesData.statuses || []);
-      // @ts-expect-error prioritiesData é unknown
-      setPriorities(prioritiesData.priorities || []);
-
-    } catch (err) {
-      console.error('Failed to load data:', err);
-      setError('Falha ao carregar dados. Tente novamente.');
-
-      // Clear all data on error
-      setProjects([]);
-      setTasks([]);
-      setUsers([]);
-      setStatuses([]);
-      setPriorities([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Função para recarregar apenas status e prioridades
-  const reloadStatusesAndPriorities = async () => {
-    try {
-      const [statusesData, prioritiesData] = await Promise.all([
-        apiService.getStatuses().catch(() => ({ statuses: [] })),
-        apiService.getPriorities().catch(() => ({ priorities: [] }))
-      ]);
-
-      setStatuses(statusesData.statuses || []);
-      setPriorities(prioritiesData.priorities || []);
-    } catch (err) {
-      console.error('Failed to reload statuses/priorities:', err);
-    }
+    const updatedFilters = { ...taskFilters, ...newFilters };
+    setTaskFilters(updatedFilters);
+    await loadTasks(selectedProject?.id, updatedFilters);
   };
 
   const handleTaskSelect = (task: Task) => {
@@ -246,63 +167,46 @@ const AppContent: React.FC = () => {
     setViewMode('task-detail');
   };
 
-  const handleBackToList = () => {
-    setSelectedTask(null);
-    setViewMode(selectedProject ? 'tasks' : 'projects');
-  };
-
-  const handleProjectSelect = async (project: Project) => {
+  const handleProjectSelect = (project: Project) => {
     setSelectedProject(project);
     setViewMode('tasks');
-
-    try {
-      // Load tasks for this project with current filters
-      await loadTasks(project.id);
-    } catch (err) {
-      console.error('Failed to load project tasks:', err);
-    }
+    loadTasks(project.id);
   };
 
-  const handleBackToProjects = async () => {
-    setSelectedProject(null);
-    setViewMode('projects');
+  const handleBackToList = () => {
+    setSelectedTask(null);
+    setViewMode('tasks');
+  };
 
-    try {
-      // Load all tasks with current filters
-      await loadTasks();
-    } catch (err) {
-      console.error('Failed to load all tasks:', err);
-    }
+  const handleBackToProjects = () => {
+    setSelectedProject(null);
+    setSelectedTask(null);
+    setViewMode('projects');
   };
 
   const handleBackFromErrorLogs = () => {
-    setViewMode('projects');
+    setViewMode('logs');
   };
 
-  const handleCreateProject = async (projectData: Partial<Project>) => {
+  const handleCreateProject = async (projectData: any) => {
     try {
-      // Use logged in user's ID
-      const data = {
-        ...projectData,
-        status: true,
-        ativo: true,
-        createdById: user?.id || ''
-      };
-
-      const response = await apiService.createProject(data);
-      setProjects(prev => [response.project, ...prev]);
-      return response.project;
+      const newProject = await apiService.createProject(projectData);
+      // @ts-expect-error newProject is unknown
+      setProjects([...projects, newProject]);
+      return newProject;
     } catch (err) {
       console.error('Failed to create project:', err);
       throw err;
     }
   };
 
-  const handleUpdateProject = async (id: string, projectData: Partial<Project>) => {
+  const handleUpdateProject = async (id: string, projectData: any) => {
     try {
-      const response = await apiService.updateProject(id, projectData);
-      setProjects(prev => prev.map(p => p.id === id ? response.project : p));
-      return response.project;
+      const updatedProject = await apiService.updateProject(id, projectData);
+      setProjects(projects.map(p => p.id === id ? updatedProject : p));
+      if (selectedProject?.id === id) {
+        setSelectedProject(updatedProject);
+      }
     } catch (err) {
       console.error('Failed to update project:', err);
       throw err;
@@ -312,11 +216,10 @@ const AppContent: React.FC = () => {
   const handleDeleteProject = async (id: string) => {
     try {
       await apiService.deleteProject(id);
-      setProjects(prev => prev.filter(p => p.id !== id));
-
-      // If we're viewing this project, go back to projects list
+      setProjects(projects.filter(p => p.id !== id));
       if (selectedProject?.id === id) {
-        handleBackToProjects();
+        setSelectedProject(null);
+        setViewMode('projects');
       }
     } catch (err) {
       console.error('Failed to delete project:', err);
@@ -324,38 +227,31 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleCreateTask = async (taskData: Partial<Task>) => {
+  const handleCreateTask = async (taskData: any) => {
     try {
-      // Use logged in user's ID for createdById, fallback to Alexandre's ID
-      const userId = user?.id || '5fe303cc-19be-4d03-abe6-91a63414005f'; // Alexandre's ID
-      
-      const data = {
-        ...taskData,
-        createdById: userId
-      };
-
-      console.log('📤 Creating task with data:', data);
-      
-      const response = await apiService.createTask(data);
-      setTasks(prev => [response.task, ...prev]);
-      return response.task;
+      const newTask = await apiService.createTask(taskData);
+      // @ts-expect-error newTask is unknown
+      setTasks([...tasks, newTask]);
+      if (selectedProject) {
+        loadTasks(selectedProject.id);
+      }
+      return newTask;
     } catch (err) {
       console.error('Failed to create task:', err);
       throw err;
     }
   };
 
-  const handleUpdateTask = async (id: string, taskData: Partial<Task>) => {
+  const handleUpdateTask = async (id: string, taskData: any) => {
     try {
-      const response = await apiService.updateTask(id, taskData);
-      setTasks(prev => prev.map(t => t.id === id ? response.task : t));
-
-      // Update selected task if it's the one being edited
+      const updatedTask = await apiService.updateTask(id, taskData);
+      setTasks(tasks.map(t => t.id === id ? updatedTask : t));
       if (selectedTask?.id === id) {
-        setSelectedTask(response.task);
+        setSelectedTask(updatedTask);
       }
-
-      return response.task;
+      if (selectedProject) {
+        loadTasks(selectedProject.id);
+      }
     } catch (err) {
       console.error('Failed to update task:', err);
       throw err;
@@ -365,11 +261,13 @@ const AppContent: React.FC = () => {
   const handleDeleteTask = async (id: string) => {
     try {
       await apiService.deleteTask(id);
-      setTasks(prev => prev.filter(t => t.id !== id));
-
-      // If we're viewing this task, go back to list
+      setTasks(tasks.filter(t => t.id !== id));
       if (selectedTask?.id === id) {
-        handleBackToList();
+        setSelectedTask(null);
+        setViewMode('tasks');
+      }
+      if (selectedProject) {
+        loadTasks(selectedProject.id);
       }
     } catch (err) {
       console.error('Failed to delete task:', err);
@@ -379,14 +277,24 @@ const AppContent: React.FC = () => {
 
   const handleToggleTaskCompletion = async (id: string) => {
     try {
-      const response = await apiService.toggleTaskCompletion(id);
-      setTasks(prev => prev.map(t => t.id === id ? response.task : t));
-
+      // Encontra a tarefa atual para obter o estado atual
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      
+      // Alterna o estado de conclusão
+      const newIsCompleted = !task.isCompleted;
+      
+      // Atualiza no backend
+      await apiService.updateTask(id, { isCompleted: newIsCompleted });
+      
+      // Atualiza no estado local
+      setTasks(tasks.map(t => t.id === id ? { ...t, isCompleted: newIsCompleted } : t));
       if (selectedTask?.id === id) {
-        setSelectedTask(response.task);
+        setSelectedTask({ ...selectedTask, isCompleted: newIsCompleted });
       }
     } catch (err) {
       console.error('Failed to toggle task completion:', err);
+      throw err; // Propaga o erro para o TaskCard exibir
     }
   };
 
@@ -395,14 +303,11 @@ const AppContent: React.FC = () => {
       return (
         <div style={{
           display: 'flex',
-          justifyContent: 'center',
           alignItems: 'center',
-          minHeight: '400px',
-          flexDirection: 'column',
-          gap: '20px'
+          justifyContent: 'center',
+          height: '300px'
         }}>
-          <FaSpinner size={48} className="spin" style={{ animation: 'spin 1s linear infinite' }} />
-          <p style={{ color: '#666', fontSize: '16px' }}>Carregando dados...</p>
+          <FaSpinner size={48} style={{ animation: 'spin 1s linear infinite', color: '#4ECDC4' }} />
         </div>
       );
     }
@@ -412,29 +317,20 @@ const AppContent: React.FC = () => {
         <div style={{
           padding: '40px',
           textAlign: 'center',
-          backgroundColor: '#fff',
-          borderRadius: '12px',
-          margin: '24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+          color: '#FF6B6B'
         }}>
-          <h2 style={{ color: '#FF6B6B', marginBottom: '16px' }}>⚠️ {error}</h2>
-          <p style={{ color: '#666', marginBottom: '24px' }}>
-            O servidor pode não estar disponível. Verifique se o backend está rodando.
-          </p>
+          <h3>Erro ao carregar dados</h3>
+          <p>{error}</p>
           <button
             onClick={loadInitialData}
             style={{
               padding: '10px 20px',
               backgroundColor: '#4ECDC4',
-              color: '#fff',
+              color: 'white',
               border: 'none',
               borderRadius: '6px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s'
+              cursor: 'pointer'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
           >
             Tentar Novamente
           </button>
@@ -505,7 +401,7 @@ const AppContent: React.FC = () => {
       case 'projects':
       default:
         return (
-          <ProjectView
+          <ProjectViewNew
             projects={projects}
             tasks={tasks}
             users={users}
@@ -523,346 +419,68 @@ const AppContent: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div style={{
-        minHeight: '100vh',
-        backgroundColor: '#f5f5f5',
-        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
-      }}>
-        {/* Navigation Bar */}
-        <div style={{
-          backgroundColor: '#fff',
-          padding: '0 16px',
-          borderBottom: '1px solid #e0e0e0',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100
-        }}>
-          <div style={{
-            maxWidth: '1200px',
-            margin: '0 auto',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            height: '56px'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <FloatingMenu
-                onOpenStatus={() => setIsStatusModalOpen(true)}
-                onOpenPriority={() => setIsPriorityModalOpen(true)}
-                onOpenUser={() => setIsUserModalOpen(true)}
-                onOpenNextTask={() => setIsNextTaskModalOpen(true)}
-                onOpenProjectType={() => setIsProjectTypeModalOpen(true)}
-              />
-              <h1 style={{ fontSize: '16px', fontWeight: 600, color: '#333', letterSpacing: '-0.3px' }}>
-                Sistema de Gestão
-              </h1>
-            </div>
-
-            <div style={{ display: 'flex', gap: '4px' }}>
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
-                  setViewMode('projects');
-                }}
-                style={{
-                  padding: '8px 12px',
-                  backgroundColor: viewMode === 'projects' ? '#4ECDC4' : '#f8f9fa',
-                  color: viewMode === 'projects' ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s',
-                  fontWeight: 500
-                }}
-              >
-                <FaFolder size={12} />
-                Projetos
-              </button>
-
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
-                  setViewMode('tasks');
-                }}
-                style={{
-                  padding: '8px 12px',
-                  backgroundColor: viewMode === 'tasks' ? '#4ECDC4' : '#f8f9fa',
-                  color: viewMode === 'tasks' ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s',
-                  fontWeight: 500
-                }}
-              >
-                <FaTasks size={12} />
-                Tarefas
-              </button>
-              
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
-                  setViewMode('recurrence');
-                }}
-                style={{
-                  padding: '8px 12px',
-                  backgroundColor: viewMode === 'recurrence' ? '#4ECDC4' : '#f8f9fa',
-                  color: viewMode === 'recurrence' ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s',
-                  fontWeight: 500
-                }}
-              >
-                <FaSync size={12} />
-                Recorrência
-              </button>
-              
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
-                  setViewMode('logs');
-                }}
-                style={{
-                  padding: '8px 12px',
-                  backgroundColor: viewMode === 'logs' ? '#4ECDC4' : '#f8f9fa',
-                  color: viewMode === 'logs' ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s',
-                  fontWeight: 500
-                }}
-              >
-                <FaTerminal size={12} />
-                Logs
-              </button>
-              
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
-                  setViewMode('error-logs');
-                }}
-                style={{
-                  padding: '8px 12px',
-                  backgroundColor: viewMode === 'error-logs' ? '#4ECDC4' : '#f8f9fa',
-                  color: viewMode === 'error-logs' ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s',
-                  fontWeight: 500
-                }}
-              >
-                <FaExclamationTriangle size={12} />
-                Erros
-              </button>
-              
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
-                  setViewMode('agents');
-                }}
-                style={{
-                  padding: '8px 12px',
-                  backgroundColor: viewMode === 'agents' ? '#4ECDC4' : '#f8f9fa',
-                  color: viewMode === 'agents' ? '#fff' : '#333',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s',
-                  fontWeight: 500
-                }}
-              >
-                <FaRobot size={12} />
-                Agentes
-              </button>
-            </div>
-
-            <UserDropdownMenu
-              onLogout={logout}
-              onEditProfile={() => setIsProfileEditModalOpen(true)}
-            />
-          </div>
-        </div>
-
-        {/* Breadcrumb */}
-        {(selectedProject || viewMode !== 'projects') && (
-          <div style={{
-            backgroundColor: '#f8f9fa',
-            padding: '12px 24px',
-            borderBottom: '1px solid #e0e0e0'
-          }}>
-            <div style={{
-              maxWidth: '1200px',
-              margin: '0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontSize: '14px',
-              color: '#666'
-            }}>
-              <button
-                onClick={() => {
-                  setSelectedProject(null);
-                  setSelectedTask(null);
-                  setViewMode('projects');
-                }}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#4ECDC4',
-                  cursor: 'pointer',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
-                <FaHome size={12} />
-                Projetos
-              </button>
-
-              {selectedProject && (
-                <>
-                  <span style={{ color: '#999' }}>/</span>
-                  <button
-                    onClick={handleBackToProjects}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: '#4ECDC4',
-                      cursor: 'pointer',
-                      padding: '4px 8px',
-                      borderRadius: '4px'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                  >
-                    {selectedProject.name}
-                  </button>
-                </>
-              )}
-
-              {selectedTask && (
-                <>
-                  <span style={{ color: '#999' }}>/</span>
-                  <span style={{ color: '#333', fontWeight: 500 }}>
-                    {selectedTask.title}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Main Content */}
+      <MainLayout
+        currentView={viewMode}
+        onViewChange={(view) => {
+          console.log('Changing view to:', view);
+          setViewMode(view as ViewMode);
+        }}
+        onOpenStatus={() => {
+          console.log('Opening status modal');
+          setIsStatusModalOpen(true);
+        }}
+        onOpenPriority={() => {
+          console.log('Opening priority modal');
+          setIsPriorityModalOpen(true);
+        }}
+        onOpenUser={() => {
+          console.log('Opening user modal');
+          setIsUserModalOpen(true);
+        }}
+        onOpenProjectType={() => {
+          console.log('Opening project type modal');
+          setIsProjectTypeModalOpen(true);
+        }}
+        onOpenNextTask={() => {
+          console.log('Opening next task modal');
+          setIsNextTaskModalOpen(true);
+        }}
+        onOpenAgents={() => {
+          console.log('Opening agents view');
+          setViewMode('agents');
+        }}
+        onOpenErrorLogs={() => {
+          console.log('Opening error logs view');
+          setViewMode('error-logs');
+        }}
+        onLogout={() => {
+          console.log('Logging out');
+          logout();
+        }}
+        user={user}
+      >
         {renderContent()}
+      </MainLayout>
 
-        {/* Footer */}
-        <div style={{
-          padding: '20px',
-          textAlign: 'center',
-          color: '#666',
-          fontSize: '14px',
-          borderTop: '1px solid #e0e0e0',
-          marginTop: '40px',
-          backgroundColor: '#fff'
-        }}>
-          <p>
-            Sistema de Gestão de Tarefas • API REST com Node.js e PostgreSQL •
-            Frontend com React e TypeScript
-          </p>
-          <p style={{ fontSize: '12px', marginTop: '8px' }}>
-            {tasks.length} tarefas • {users.length} usuários • {projects.length} projetos
-          </p>
-          <p style={{ fontSize: '11px', marginTop: '4px', color: '#999' }}>
-            Backend: {getBackendUrl()} • Frontend: http://{window.location.hostname}:{window.location.port || (window.location.protocol === 'https:' ? '443' : '80')}
-          </p>
-        </div>
-
-        {/* Modais de Configuração */}
-        <StatusManager
-          isOpen={isStatusModalOpen}
-          onClose={() => setIsStatusModalOpen(false)}
-          onStatusUpdate={reloadStatusesAndPriorities}
-        />
-
-        <PriorityManager
-          isOpen={isPriorityModalOpen}
-          onClose={() => setIsPriorityModalOpen(false)}
-          onPriorityUpdate={reloadStatusesAndPriorities}
-        />
-
-        <UserManager
-          isOpen={isUserModalOpen}
-          onClose={() => setIsUserModalOpen(false)}
-          onUserUpdate={loadInitialData}
-        />
-
-        <ProjectTypeManager
-          isOpen={isProjectTypeModalOpen}
-          onClose={() => setIsProjectTypeModalOpen(false)}
-          onProjectTypeUpdate={loadInitialData}
-        />
-
-        <NextTaskManager
-          isOpen={isNextTaskModalOpen}
-          onClose={() => setIsNextTaskModalOpen(false)}
-        />
-
-        <UserProfileEdit
-          isOpen={isProfileEditModalOpen}
-          onClose={() => setIsProfileEditModalOpen(false)}
-          onProfileUpdate={loadInitialData}
-        />
-
-        <style>{`
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-
-          .spin {
-            animation: spin 1s linear infinite;
-          }
-        `}</style>
-      </div>
+      {/* Modals */}
+      {isStatusModalOpen && (
+        <StatusManager isOpen={true} onClose={() => setIsStatusModalOpen(false)} />
+      )}
+      {isPriorityModalOpen && (
+        <PriorityManager isOpen={true} onClose={() => setIsPriorityModalOpen(false)} />
+      )}
+      {isUserModalOpen && (
+        <UserManager isOpen={true} onClose={() => setIsUserModalOpen(false)} />
+      )}
+      {isProjectTypeModalOpen && (
+        <ProjectTypeManager isOpen={true} onClose={() => setIsProjectTypeModalOpen(false)} />
+      )}
+      {isNextTaskModalOpen && (
+        <NextTaskManager isOpen={true} onClose={() => setIsNextTaskModalOpen(false)} />
+      )}
+      {isProfileEditModalOpen && (
+        <UserProfileEdit isOpen={true} onClose={() => setIsProfileEditModalOpen(false)} />
+      )}
     </ErrorBoundary>
   );
 };
@@ -880,7 +498,7 @@ const App: React.FC = () => {
         justifyContent: 'center',
         backgroundColor: '#f5f5f5'
       }}>
-        <FaSpinner size={48} className="spin" style={{ animation: 'spin 1s linear infinite', color: '#4ECDC4' }} />
+        <FaSpinner size={48} style={{ animation: 'spin 1s linear infinite', color: '#4ECDC4' }} />
       </div>
     );
   }
@@ -900,7 +518,5 @@ const AppWithAuth: React.FC = () => {
     </AuthProvider>
   );
 };
-
-// Teste completo do novo task-processor - modificação de teste pelo agente Jarbas em 2026-02-25 18:55 GMT-3
 
 export default AppWithAuth;
