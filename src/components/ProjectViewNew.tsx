@@ -481,12 +481,14 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
       render: (project) => (
         <div style={{ display: 'flex', gap: '8px' }}>
           <Button
+            className="prevent-row-click"
             variant="outline"
             size="sm"
             icon={<FaEdit size={14} />}
             data-prevent-row-click="true"
             onClick={(e) => {
               e.stopPropagation();
+              e.preventDefault();
               setSelectedProject(project);
               setFormData({ ...initialFormData, ...project });
               setIsEditModalOpen(true);
@@ -495,12 +497,14 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
             Editar
           </Button>
           <Button
+            className="prevent-row-click"
             variant="danger"
             size="sm"
             icon={<FaTrash size={14} />}
             data-prevent-row-click="true"
             onClick={(e) => {
               e.stopPropagation();
+              e.preventDefault();
               setSelectedProject(project);
               setIsDeleteConfirmOpen(true);
             }}

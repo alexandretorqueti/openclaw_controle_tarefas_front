@@ -8,19 +8,19 @@ const getBackendUrl = (): string => {
   const port = window.location.port;
   
   // Determine backend port based on frontend port
-  let backendPort = 3001; // Default to development
+  let backendPort = 3000; // Default to backend development port (not 3001)
   
   if (port === '8090' || port === '8091') {
     // Production environment
     backendPort = 8091;
-  } else if (port === '3000' || port === '3001') {
-    // Development environment
-    backendPort = 3001;
+  } else if (port === '3000' || port === '3001' || port === '3002') {
+    // Development environment - backend runs on port 3000
+    backendPort = 3000;
   } else if (!port) {
     // No port specified (default ports)
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       // Default to development for localhost without port
-      backendPort = 3001;
+      backendPort = 3000;
     } else {
       // For other hosts without port, assume production
       backendPort = 8091;

@@ -282,7 +282,9 @@ const ProjectView: React.FC<ProjectViewProps> = ({
               <div style={{ display: 'flex', gap: '12px' }}>
                 {onUpdateProject && (
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
                       setEditingProject(selectedProject);
                       setEditProjectData({});
                       setUpdateError(null);
@@ -309,7 +311,11 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 )}
                 {onDeleteProject && (
                   <button
-                    onClick={() => handleDeleteProject(selectedProject.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      handleDeleteProject(selectedProject.id);
+                    }}
                     disabled={isDeleting === selectedProject.id}
                     style={{
                       padding: '10px 16px',
@@ -887,7 +893,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
           return (
             <div
               key={project.id}
-              onClick={() => handleProjectClick(project)}
+              onClick={(e) => handleProjectClick(e, project)}
               style={{
                 backgroundColor: '#fff',
                 borderRadius: '12px',
@@ -896,7 +902,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 cursor: 'pointer',
                 transition: 'transform 0.2s, box-shadow 0.2s',
                 border: '1px solid #e0e0e0',
-                position: 'relative'
+                position: 'relative',
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px)';
@@ -915,8 +921,10 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                 display: 'flex',
                 gap: '8px',
                 zIndex: 20
-              }}>
-                {onUpdateProject && (
+              }} onClick={(e) => e.stopPropagation()}>
+</xai:function_call >  
+<xai:function_call name="read">
+<parameter name="file_path">/home/alexandrebragatorqueti/projetos/tarefas-web/src/components/ProjectView.tsx                {onUpdateProject && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

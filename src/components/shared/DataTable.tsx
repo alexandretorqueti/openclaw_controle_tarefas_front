@@ -106,7 +106,11 @@ const DataTable = <T extends Record<string, any>>({
                 const target = e.target as HTMLElement;
                 const isButton = target.tagName === 'BUTTON' || 
                                  target.closest('button') !== null ||
-                                 target.closest('[data-prevent-row-click]') !== null;
+                                 target.closest('[data-prevent-row-click]') !== null ||
+                                 target.closest('.prevent-row-click') !== null ||
+                                 target.tagName === 'svg' || 
+                                 target.closest('svg') !== null ||
+                                 target.closest('[role="img"]') !== null;
                 
                 if (!isButton && onRowClick) {
                   onRowClick(item);
