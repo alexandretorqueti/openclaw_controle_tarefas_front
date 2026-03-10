@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Component, ErrorInfo } from 'react';
 import TaskList from './components/TaskList';
 import TaskDetail from './components/TaskDetail';
-import ProjectViewNew from './components/ProjectViewNew';
+import ProjectView from './components/ProjectView';
 import Login from './components/Login';
 import StatusManager from './components/StatusManager';
 import PriorityManager from './components/PriorityManager';
@@ -410,7 +410,7 @@ const AppContent: React.FC = () => {
       case 'projects':
       default:
         return (
-          <ProjectViewNew
+          <ProjectView
             projects={projects}
             tasks={tasks}
             users={users}
