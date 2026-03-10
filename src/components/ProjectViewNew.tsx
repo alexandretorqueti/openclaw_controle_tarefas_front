@@ -484,6 +484,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
             variant="outline"
             size="sm"
             icon={<FaEdit size={14} />}
+            data-prevent-row-click="true"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedProject(project);
@@ -497,6 +498,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
             variant="danger"
             size="sm"
             icon={<FaTrash size={14} />}
+            data-prevent-row-click="true"
             onClick={(e) => {
               e.stopPropagation();
               setSelectedProject(project);
@@ -511,45 +513,9 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
   ];
 
   if (selectedProject && onProjectSelect) {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <Button
-            variant="ghost"
-            icon={<FaArrowLeft size={16} />}
-            onClick={() => setSelectedProject(null)}
-          >
-            Voltar
-          </Button>
-          <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#333', margin: 0 }}>
-            {selectedProject.name}
-          </h2>
-        </div>
-        <Card title="Detalhes do Projeto" padding="lg">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
-            <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#666', marginBottom: '8px' }}>Descrição</h4>
-              <p style={{ color: '#333', lineHeight: 1.6 }}>{selectedProject.description || 'Sem descrição'}</p>
-            </div>
-            <div>
-              <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#666', marginBottom: '8px' }}>Regras</h4>
-              <pre style={{
-                backgroundColor: '#f8f9fa',
-                padding: '16px',
-                borderRadius: '8px',
-                fontSize: '13px',
-                color: '#333',
-                whiteSpace: 'pre-wrap',
-                maxHeight: '200px',
-                overflowY: 'auto',
-              }}>
-                {selectedProject.regras || 'Nenhuma regra definida'}
-              </pre>
-            </div>
-          </div>
-        </Card>
-      </div>
-    );
+    // Quando um projeto é selecionado, redireciona para a lista de tarefas
+    onProjectSelect(selectedProject);
+    return null;
   }
 
   return (

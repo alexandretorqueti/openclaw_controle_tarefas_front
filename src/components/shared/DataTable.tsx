@@ -101,7 +101,17 @@ const DataTable = <T extends Record<string, any>>({
           {data.map((item, rowIndex) => (
             <tr
               key={keyExtractor(item)}
-              onClick={() => onRowClick?.(item)}
+              onClick={(e) => {
+                // Não acionar onRowClick se o clique veio de um botão ou elemento que previne o clique
+                const target = e.target as HTMLElement;
+                const isButton = target.tagName === 'BUTTON' || 
+                                 target.closest('button') !== null ||
+                                 target.closest('[data-prevent-row-click]') !== null;
+                
+                if (!isButton && onRowClick) {
+                  onRowClick(item);
+                }
+              }}
               style={{
                 backgroundColor: striped && rowIndex % 2 === 0 ? '#fafafa' : '#fff',
                 borderBottom: '1px solid #f0f0f0',

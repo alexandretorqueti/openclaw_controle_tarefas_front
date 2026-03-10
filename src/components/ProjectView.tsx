@@ -910,16 +910,17 @@ const ProjectView: React.FC<ProjectViewProps> = ({
               {/* Action buttons */}
               <div style={{
                 position: 'absolute',
-                top: '50px',
+                top: '12px',
                 right: '12px',
                 display: 'flex',
                 gap: '8px',
-                zIndex: 10
+                zIndex: 20
               }}>
                 {onUpdateProject && (
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      e.preventDefault();
                       setEditingProject(project);
                       setEditProjectData({});
                       setUpdateError(null);
@@ -935,7 +936,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: 'pointer',
-                      transition: 'background-color 0.2s'
+                      transition: 'background-color 0.2s',
+                      pointerEvents: 'auto'
                     }}
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
@@ -947,6 +949,7 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
+                      e.preventDefault();
                       handleDeleteProject(project.id);
                     }}
                     disabled={isDeleting === project.id}
@@ -961,7 +964,8 @@ const ProjectView: React.FC<ProjectViewProps> = ({
                       alignItems: 'center',
                       justifyContent: 'center',
                       cursor: isDeleting === project.id ? 'not-allowed' : 'pointer',
-                      transition: 'background-color 0.2s'
+                      transition: 'background-color 0.2s',
+                      pointerEvents: 'auto'
                     }}
                     onMouseEnter={(e) => {
                       if (isDeleting !== project.id) e.currentTarget.style.backgroundColor = '#e55a5a';
