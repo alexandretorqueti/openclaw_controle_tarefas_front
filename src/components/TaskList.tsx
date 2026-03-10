@@ -14,6 +14,7 @@ interface TaskListProps {
   statuses: Status[];
   priorities: Priority[];
   projects: Project[];
+  agents?: string[];
   selectedProject: Project | null;
   onTaskSelect: (task: Task) => void;
   onBackToProjects?: () => void;
@@ -31,6 +32,7 @@ const TaskList: React.FC<TaskListProps> = ({
   statuses, 
   priorities, 
   projects,
+  agents = [],
   selectedProject,
   onTaskSelect,
   onBackToProjects,
@@ -50,7 +52,6 @@ const TaskList: React.FC<TaskListProps> = ({
   // Estado local para compatibilidade, caso a prop não seja fornecida
   const [localShowCompleted, setLocalShowCompleted] = useState(false);
   const showCompleted = onToggleShowCompleted ? propShowCompleted : localShowCompleted;
-  const [agents, setAgents] = useState<string[]>([]);
   // Back to top functionality
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -111,21 +112,6 @@ const TaskList: React.FC<TaskListProps> = ({
       }));
     }
   }, [selectedProject]);
-
-  // Load agents from API
-  React.useEffect(() => {
-    const loadAgents = async () => {
-      try {
-        const data = await api.request('/agents');
-        // Extract agent IDs from the response
-        const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
-        setAgents(agentIds);
-      } catch (error) {
-        console.error('Error loading agents:', error);
-      }
-    };
-    loadAgents();
-  }, []);
 
   // Load last used agent from localStorage
   React.useEffect(() => {
@@ -640,8 +626,8 @@ const TaskList: React.FC<TaskListProps> = ({
                   }}
                 >
                   {agents.length > 0 ? (
-                    agents.map((agentId, index) => (
-                      <option key={index} value={agentId}>
+                    agents.map((agentId) => (
+                      <option key={agentId} value={agentId}>
                         {agentId}
                       </option>
                     ))
@@ -650,7 +636,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   )}
                 </select>
                 <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                  Modelo de IA para processamento da tarefa
+                  Agente responsável pelo processamento da tarefa
                 </p>
               </div>
 
@@ -901,7 +887,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 onUpdateTask={onUpdateTask}
                 onDeleteTask={onDeleteTask}
                 onToggleCompletion={onToggleCompletion}
-                agents={models}
+                agents={agents}
               />
             ))}
           </div>

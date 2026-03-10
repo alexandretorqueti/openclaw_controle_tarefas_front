@@ -54,6 +54,25 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
     backendBuildCmd: '',
   };
   const [formData, setFormData] = useState<Partial<Project>>(initialFormData);
+  const [agents, setAgents] = useState<string[]>([]);
+
+  // Carregar agentes
+  React.useEffect(() => {
+    const loadAgents = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/agents');
+        if (response.ok) {
+          const data = await response.json();
+          // Extrair IDs dos agentes do array de objetos
+          const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
+          setAgents(agentIds);
+        }
+      } catch (error) {
+        console.error('Erro ao carregar agentes:', error);
+      }
+    };
+    loadAgents();
+  }, []);
 
   const handleCreateProject = async () => {
     if (!onCreateProject) return;
@@ -312,6 +331,37 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
             </div>
             <div style={{ gridColumn: 'span 2' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                Agente Padrão
+              </label>
+              <select
+                value={formData.agent || ''}
+                onChange={(e) => setFormData({ ...formData, agent: e.target.value || null })}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: '#fff'
+                }}
+              >
+                <option value="">Selecione um agente...</option>
+                {agents.length > 0 ? (
+                  agents.map((agentId) => (
+                    <option key={agentId} value={agentId}>
+                      {agentId}
+                    </option>
+                  ))
+                ) : (
+                  <option value="">Carregando agentes...</option>
+                )}
+              </select>
+              <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                Agente padrão para tarefas deste projeto
+              </p>
+            </div>
+            <div style={{ gridColumn: 'span 2' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
                 Comando Build Frontend
               </label>
               <input
@@ -403,6 +453,24 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
           fontWeight: 500,
         }}>
           {project.status ? 'Ativo' : 'Inativo'}
+        </div>
+      ),
+    },
+    {
+      key: 'agent',
+      header: 'Agente',
+      render: (project) => (
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          padding: '4px 12px',
+          borderRadius: '20px',
+          backgroundColor: project.agent ? '#dbeafe' : '#f3f4f6',
+          color: project.agent ? '#1e40af' : '#6b7280',
+          fontSize: '12px',
+          fontWeight: 500,
+        }}>
+          {project.agent || 'Não definido'}
         </div>
       ),
     },

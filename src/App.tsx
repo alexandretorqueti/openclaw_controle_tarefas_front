@@ -94,7 +94,8 @@ const AppContent: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [priorities, setPriorities] = useState<Priority[]>([]);
-
+  const [agents, setAgents] = useState<string[]>([]);
+  
   const [taskFilters, setTaskFilters] = useState<{ isCompleted?: boolean }>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -115,12 +116,13 @@ const AppContent: React.FC = () => {
   const loadInitialData = async () => {
     try {
       setLoading(true);
-      const [projectsData, tasksData, usersData, statusesData, prioritiesData] = await Promise.all([
+      const [projectsData, tasksData, usersData, statusesData, prioritiesData, agentsData] = await Promise.all([
         apiService.getProjects(),
         apiService.getTasks(),
         apiService.getUsers(),
         apiService.getStatuses(),
-        apiService.getPriorities()
+        apiService.getPriorities(),
+        apiService.getAgents()
       ]);
       // @ts-expect-error data is unknown
       setProjects(projectsData.projects || []);
@@ -132,6 +134,8 @@ const AppContent: React.FC = () => {
       setStatuses(statusesData.statuses || []);
       // @ts-expect-error data is unknown
       setPriorities(prioritiesData.priorities || []);
+      // @ts-expect-error data is unknown
+      setAgents(agentsData.agents || []);
     } catch (err) {
       console.error('Failed to load initial data:', err);
       setError('Falha ao carregar dados. Verifique a conexão com o servidor.');
@@ -280,13 +284,13 @@ const AppContent: React.FC = () => {
       // Encontra a tarefa atual para obter o estado atual
       const task = tasks.find(t => t.id === id);
       if (!task) return;
-      
+
       // Alterna o estado de conclusão
       const newIsCompleted = !task.isCompleted;
-      
+
       // Atualiza no backend
       await apiService.updateTask(id, { isCompleted: newIsCompleted });
-      
+
       // Atualiza no estado local
       setTasks(tasks.map(t => t.id === id ? { ...t, isCompleted: newIsCompleted } : t));
       if (selectedTask?.id === id) {
@@ -364,6 +368,7 @@ const AppContent: React.FC = () => {
             statuses={statuses}
             priorities={priorities}
             projects={projects}
+            agents={agents}
             selectedProject={selectedProject}
             onTaskSelect={handleTaskSelect}
             onBackToProjects={handleBackToProjects}

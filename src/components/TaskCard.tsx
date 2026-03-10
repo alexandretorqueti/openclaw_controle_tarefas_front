@@ -211,7 +211,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
   };
 
-    const handleModelChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleAgentChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
     if (!onUpdateTask) return;
     
@@ -220,12 +220,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
     
     try {
       const newValue = e.target.value === '' ? null : e.target.value;
-      await onUpdateTask(task.id, { model: newValue });
+      await onUpdateTask(task.id, { agent: newValue });
     } catch (error: any) {
-      console.error('Failed to update task model:', error);
+      console.error('Failed to update task agent:', error);
       
       // Extrai mensagem de erro amigável
-      let errorMessage = 'Erro ao atualizar modelo da tarefa.';
+      let errorMessage = 'Erro ao atualizar agente da tarefa.';
       
       if (error.message) {
         errorMessage = error.message;
