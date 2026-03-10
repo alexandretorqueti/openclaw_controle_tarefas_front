@@ -237,6 +237,11 @@ const AppContent: React.FC = () => {
 
   const handleCreateTask = async (taskData: any) => {
     try {
+      const nickName = localStorage.getItem('saved_nickname') || '';
+      const user = {
+        nickname: nickName,
+      }
+      taskData.createdBy = user;
       const newTask = await apiService.createTask(taskData);
       // @ts-expect-error newTask is unknown
       setTasks([...tasks, newTask]);
