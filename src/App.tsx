@@ -135,7 +135,11 @@ const AppContent: React.FC = () => {
       // @ts-expect-error data is unknown
       setPriorities(prioritiesData.priorities || []);
       // @ts-expect-error data is unknown
-      setAgents(agentsData.agents || []);
+      // A API retorna { success: true, data: [...], count: 5 }
+      // Precisamos extrair os IDs do array data
+      const agentIds = agentsData.data ? agentsData.data.map((agent: any) => agent.id) : [];
+      console.log('📋 Agentes carregados:', agentIds);
+      setAgents(agentIds);
     } catch (err) {
       console.error('Failed to load initial data:', err);
       setError('Falha ao carregar dados. Verifique a conexão com o servidor.');
