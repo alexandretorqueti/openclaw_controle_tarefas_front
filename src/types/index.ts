@@ -81,7 +81,7 @@ export interface Task {
   isCompleted: boolean;
   createdAt: string;
   updatedAt: string;
-  model?: string | null;
+  agent?: string | null;
   
   // Recurrence fields
   isRecurring?: boolean;

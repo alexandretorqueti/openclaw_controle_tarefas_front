@@ -104,15 +104,18 @@ const DataTable = <T extends Record<string, any>>({
               onClick={(e) => {
                 // Não acionar onRowClick se o clique veio de um botão ou elemento que previne o clique
                 const target = e.target as HTMLElement;
-                const isButton = target.tagName === 'BUTTON' || 
-                                 target.closest('button') !== null ||
-                                 target.closest('[data-prevent-row-click]') !== null ||
-                                 target.closest('.prevent-row-click') !== null ||
-                                 target.tagName === 'svg' || 
-                                 target.closest('svg') !== null ||
-                                 target.closest('[role="img"]') !== null;
                 
-                if (!isButton && onRowClick) {
+                // Verificar se o clique veio de qualquer elemento interativo
+                const interactiveElement = target.closest('button, a, input, select, textarea, [role="button"], [tabindex]');
+                const hasPreventClick = target.closest('[data-prevent-row-click]') !== null || 
+                                       target.closest('.prevent-row-click') !== null;
+                
+                // Se for um elemento interativo OU tiver atributo/classe de prevenção, não aciona onRowClick
+                if (interactiveElement || hasPreventClick) {
+                  return;
+                }
+                
+                if (onRowClick) {
                   onRowClick(item);
                 }
               }}

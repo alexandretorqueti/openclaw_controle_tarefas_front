@@ -170,7 +170,7 @@ const TaskList: React.FC<TaskListProps> = ({
     console.log('🔍 Title exists:', !!newTaskData.title);
     console.log('🔍 ProjectId exists:', !!newTaskData.projectId);
     console.log('🔍 Deadline exists:', !!newTaskData.deadline);
-    console.log('🔍 Model exists:', !!newTaskData.agent);
+    console.log('🔍 Agent exists:', !!newTaskData.agent);
     
     if (!onCreateTask || !newTaskData.title || !newTaskData.projectId || !newTaskData.deadline) {
       console.error('❌ Missing required data for task creation');

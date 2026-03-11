@@ -175,7 +175,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       if (Object.keys(updateData).length > 0) {
         await onUpdateTask(task.id, updateData);
         
-        // Save the model to localStorage if it was changed
+        // Save the agent to localStorage if it was changed
         if (updateData.agent !== undefined && updateData.agent !== null) {
           localStorage.setItem('lastUsedAgent', updateData.agent);
         }
@@ -837,8 +837,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               onChange={(e) => {
                 const newValue = e.target.value;
                 // Se for string vazia, define como undefined
-                const model = newValue === '' ? undefined : newValue;
-                setEditedTask({ ...editedTask, model });
+                const agent = newValue === '' ? undefined : newValue;
+                setEditedTask({ ...editedTask, agent });
               }}
               required
               style={{
@@ -851,13 +851,13 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               }}
             >
               {agents.length > 0 ? (
-                agents.map((model, index) => (
-                  <option key={index} value={model}>
-                    {model}
+                agents.map((agent, index) => (
+                  <option key={index} value={agent}>
+                    {agent}
                   </option>
                 ))
               ) : (
-                <option value="">Carregando modelos...</option>
+                <option value="">Carregando agentes...</option>
               )}
             </select>
           ) : (

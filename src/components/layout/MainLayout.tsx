@@ -14,7 +14,7 @@ import {
   FaBars,
   FaTimes,
   FaHome,
-  FaSignOutAlt
+  FaSignOutAlt, FaChevronLeft, FaChevronRight
 } from 'react-icons/fa';
 
 interface MainLayoutProps {
@@ -241,12 +241,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
-              aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+              aria-label={sidebarOpen ? 'Fechar menu lateral' : 'Abrir menu lateral'}
             >
-              <FaTimes size={16} color="#666" style={{ 
-                transform: sidebarOpen ? 'rotate(0deg)' : 'rotate(180deg)',
-                transition: 'transform 0.3s'
-              }} />
+              {sidebarOpen ? <FaChevronLeft size={16} color="#fff" /> : <FaChevronRight size={16} color="#fff" />}
             </button>
           </div>
 

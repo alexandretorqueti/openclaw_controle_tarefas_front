@@ -45,6 +45,7 @@ interface TaskData {
   deadline: string;
   parentTaskId?: string | null;
   position?: number;
+  agent?: string | null;
 }
 
 interface UpdateTaskData {
@@ -56,6 +57,7 @@ interface UpdateTaskData {
   deadline?: string;
   position?: number;
   isCompleted?: boolean;
+  agent?: string | null;
 }
 
 interface UpdateTaskPositionData {

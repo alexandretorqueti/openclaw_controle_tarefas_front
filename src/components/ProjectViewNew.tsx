@@ -38,6 +38,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [disableRowClick, setDisableRowClick] = useState(false);
   const initialFormData: Partial<Project> = {
     name: '',
     description: '',
@@ -492,6 +493,10 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
               setSelectedProject(project);
               setFormData({ ...initialFormData, ...project });
               setIsEditModalOpen(true);
+              
+              // Desabilitar clique na linha temporariamente
+              setDisableRowClick(true);
+              setTimeout(() => setDisableRowClick(false), 100);
             }}
           >
             Editar
@@ -507,6 +512,10 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
               e.preventDefault();
               setSelectedProject(project);
               setIsDeleteConfirmOpen(true);
+              
+              // Desabilitar clique na linha temporariamente
+              setDisableRowClick(true);
+              setTimeout(() => setDisableRowClick(false), 100);
             }}
           >
             Excluir
@@ -546,7 +555,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
             data={projects}
             columns={columns}
             keyExtractor={(project) => project.id}
-            onRowClick={(project) => onProjectSelect?.(project)}
+            onRowClick={disableRowClick ? undefined : ((project) => onProjectSelect?.(project))}
             hover
             bordered={false}
             emptyMessage="Nenhum projeto encontrado. Clique em 'Novo Projeto' para criar um."
