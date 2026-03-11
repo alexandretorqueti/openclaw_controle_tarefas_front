@@ -249,7 +249,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
             {/* Avatar */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{
-                display: 'block',
+                
                 fontSize: '14px',
                 fontWeight: 500,
                 color: '#333',
@@ -314,7 +314,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
             {/* Nome */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{
-                display: 'block',
+                
                 fontSize: '14px',
                 fontWeight: 500,
                 color: '#333',
@@ -357,7 +357,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
             {/* Email */}
             <div style={{ marginBottom: '20px' }}>
               <label style={{
-                display: 'block',
+                
                 fontSize: '14px',
                 fontWeight: 500,
                 color: '#333',
@@ -400,7 +400,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
             {/* Apelido */}
             <div style={{ marginBottom: '32px' }}>
               <label style={{
-                display: 'block',
+                
                 fontSize: '14px',
                 fontWeight: 500,
                 color: '#333',

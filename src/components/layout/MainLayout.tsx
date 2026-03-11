@@ -232,18 +232,25 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               style={{
-                backgroundColor: 'transparent',
-                border: 'none',
+                backgroundColor: '#f5f5f5',
+                border: '1px solid #e0e0e0',
                 cursor: 'pointer',
                 padding: '8px',
                 borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#e0e0e0';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = '#f5f5f5';
               }}
               aria-label={sidebarOpen ? 'Fechar menu lateral' : 'Abrir menu lateral'}
             >
-              {sidebarOpen ? <FaChevronLeft size={16} color="#fff" /> : <FaChevronRight size={16} color="#fff" />}
+              {sidebarOpen ? <FaChevronLeft size={16} color="#666" /> : <FaChevronRight size={16} color="#666" />}
             </button>
           </div>
 
@@ -319,8 +326,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               right: 0,
               bottom: 0,
               backgroundColor: 'rgba(0,0,0,0.5)',
-              zIndex: 999,
-              display: 'none'
+              zIndex: 999
             }}
             onClick={() => setMobileOpen(false)}
           />
@@ -451,12 +457,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           }
           aside:first-of-type {
             display: none !important;
-          }
-          aside:last-of-type {
-            display: flex !important;
-          }
-          div[style*="position: fixed"][style*="background-color: rgba"] {
-            display: block !important;
           }
         }
         @media (min-width: 769px) {

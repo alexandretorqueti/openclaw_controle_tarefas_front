@@ -163,14 +163,7 @@ const TaskList: React.FC<TaskListProps> = ({
   };
 
   const handleCreateTask = async () => {
-    console.log('🔄 handleCreateTask called');
-    console.log('📝 Current newTaskData:', newTaskData);
-    console.log('👥 Users:', users.length, 'Statuses:', statuses.length, 'Priorities:', priorities.length);
-    console.log('🔍 onCreateTask exists:', !!onCreateTask);
-    console.log('🔍 Title exists:', !!newTaskData.title);
-    console.log('🔍 ProjectId exists:', !!newTaskData.projectId);
-    console.log('🔍 Deadline exists:', !!newTaskData.deadline);
-    console.log('🔍 Agent exists:', !!newTaskData.agent);
+
     
     if (!onCreateTask || !newTaskData.title || !newTaskData.projectId || !newTaskData.deadline) {
       console.error('❌ Missing required data for task creation');
@@ -182,7 +175,7 @@ const TaskList: React.FC<TaskListProps> = ({
     
     try {
       // Debug: log what we're sending
-      console.log('📤 Enviando dados da tarefa:', newTaskData);
+
       
       const taskData = {
         ...newTaskData,
@@ -192,7 +185,7 @@ const TaskList: React.FC<TaskListProps> = ({
         agent: newTaskData.agent || null
       };
 
-      console.log('📤 Dados completos:', taskData);
+
       
       await onCreateTask(taskData);
       

@@ -35,7 +35,7 @@ class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught error:', error, errorInfo);
+
   }
 
   render() {
@@ -138,7 +138,7 @@ const AppContent: React.FC = () => {
       // A API retorna { success: true, data: [...], count: 5 }
       // Precisamos extrair os IDs do array data
       const agentIds = agentsData.data ? agentsData.data.map((agent: any) => agent.id) : [];
-      console.log('📋 Agentes carregados:', agentIds);
+
       setAgents(agentIds);
     } catch (err) {
       console.error('Failed to load initial data:', err);
@@ -436,39 +436,30 @@ const AppContent: React.FC = () => {
       <MainLayout
         currentView={viewMode}
         onViewChange={(view) => {
-          console.log('Changing view to:', view);
           setViewMode(view as ViewMode);
         }}
         onOpenStatus={() => {
-          console.log('Opening status modal');
           setIsStatusModalOpen(true);
         }}
         onOpenPriority={() => {
-          console.log('Opening priority modal');
           setIsPriorityModalOpen(true);
         }}
         onOpenUser={() => {
-          console.log('Opening user modal');
           setIsUserModalOpen(true);
         }}
         onOpenProjectType={() => {
-          console.log('Opening project type modal');
           setIsProjectTypeModalOpen(true);
         }}
         onOpenNextTask={() => {
-          console.log('Opening next task modal');
           setIsNextTaskModalOpen(true);
         }}
         onOpenAgents={() => {
-          console.log('Opening agents view');
           setViewMode('agents');
         }}
         onOpenErrorLogs={() => {
-          console.log('Opening error logs view');
           setViewMode('error-logs');
         }}
         onLogout={() => {
-          console.log('Logging out');
           logout();
         }}
         user={user}
