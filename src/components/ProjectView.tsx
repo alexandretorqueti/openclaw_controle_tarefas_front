@@ -1,11 +1,16 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Project, Task, User, Status, Priority } from '../types';
 import DataTable, { Column } from './shared/DataTable';
 import Card from './shared/Card';
 import Button from './shared/Button';
 import FormModal from './shared/FormModal';
-import { FaFolder, FaTasks, FaUsers, FaCalendarAlt, FaPlus, FaEdit, FaTrash, FaArrowLeft, FaCodeBranch, FaServer, FaTerminal, FaDatabase } from 'react-icons/fa';
+import { 
+  FaFolder, FaTasks, FaUsers, FaCalendarAlt, FaPlus, 
+  FaEdit, FaTrash, FaArrowLeft, FaCodeBranch, FaServer, 
+  FaTerminal, FaDatabase, FaEye, FaCheck, FaTimes, 
+  FaCog, FaExternalLinkAlt, FaInfoCircle 
+} from 'react-icons/fa';
 
 interface ProjectViewProps {
   projects: Project[];
@@ -38,592 +43,586 @@ const ProjectView: React.FC<ProjectViewProps> = ({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [disableRowClick, setDisableRowClick] = useState(false);
-  const initialFormData: Partial<Project> = {
-    name: '',
-    description: '',
-    regras: '',
-    status: true,
-    ativo: true,
-    frontendPath: '',
-    pastaBase: '',
-    frontendPort: 0,
-    backendPath: '',
-    backendPort: 0,
-    repositoryUrl: '',
-    frontendBuildCmd: '',
-    backendBuildCmd: '',
-  };
-  const [formData, setFormData] = useState<Partial<Project>>(initialFormData);
   const [agents, setAgents] = useState<string[]>([]);
 
-  // Carregar agentes
-  React.useEffect(() => {
-    const loadAgents = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/api/agents');
-        if (response.ok) {
-          const data = await response.json();
-          // Extrair IDs dos agentes do array de objetos
-          const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
-          setAgents(agentIds);
-        }
-      } catch (error) {
-        console.error('Erro ao carregar agentes:', error);
-      }
-    };
-    loadAgents();
-  }, []);
+  // Handle project selection
+  const handleProjectSelect = (project: Project) => {
+    setSelectedProject(project);
+    onProjectSelect?.(project);
+  };
 
+  // Handle create project
   const handleCreateProject = async () => {
-    if (!onCreateProject) return;
-    setLoading(true);
-    setError(null);
     try {
-      await onCreateProject(formData);
-      setIsCreateModalOpen(false);
-      resetForm();
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar projeto');
+      setLoading(true);
+      const newProject = await onCreateProject?.({
+        name: 'Novo Projeto',
+        description: 'Description...',
+        status: 'active',
+        priority: 'medium'
+      });
+      if (newProject) {
+        setSelectedProject(newProject);
+        alert('Projeto criado com sucesso!');
+      }
+    } catch (err) {
+      setError('Erro ao criar projeto');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleUpdateProject = async () => {
-    if (!onUpdateProject || !selectedProject) return;
-    setLoading(true);
-    setError(null);
+  // Handle update project
+  const handleUpdateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     try {
-      await onUpdateProject(selectedProject.id, formData);
-      setIsEditModalOpen(false);
-      resetForm();
-    } catch (err: any) {
-      setError(err.message || 'Erro ao atualizar projeto');
+      setLoading(true);
+      setError(null);
+      
+      if (!selectedProject) {
+        throw new Error('Nenhum projeto selecionado para edição');
+      }
+      
+      // Extrair dados do formulário
+      const form = e.target as HTMLFormElement;
+      const formData = new FormData(form);
+      
+      const name = formData.get('name') as string;
+      const description = formData.get('description') as string;
+      const status = formData.get('status') as string;
+      const ativo = formData.get('ativo') as string;
+      const regras = formData.get('regras') as string;
+      const agent = formData.get('agent') as string;
+      const frontendPath = formData.get('frontendPath') as string;
+      const frontendPort = formData.get('frontendPort') as string;
+      const backendPath = formData.get('backendPath') as string;
+      const backendPort = formData.get('backendPort') as string;
+      const repositoryUrl = formData.get('repositoryUrl') as string;
+      const pastaBase = formData.get('pastaBase') as string;
+      const frontendBuildCmd = formData.get('frontendBuildCmd') as string;
+      const backendBuildCmd = formData.get('backendBuildCmd') as string;
+      
+      // Validar dados obrigatórios
+      if (!name || name.trim() === '') {
+        throw new Error('O nome do projeto é obrigatório');
+      }
+      
+      if (!status) {
+        throw new Error('O status do projeto é obrigatório');
+      }
+      
+      // Chamar API para atualizar
+      const updatedProject = await onUpdateProject?.(selectedProject.id, {
+        name: name.trim(),
+        description: description?.trim() || '',
+        status: status === 'true',
+        ativo: ativo === 'true',
+        regras: regras?.trim() || '',
+        agent: agent?.trim() || null,
+        frontendPath: frontendPath?.trim() || '',
+        frontendPort: frontendPort ? parseInt(frontendPort) : null,
+        backendPath: backendPath?.trim() || '',
+        backendPort: backendPort ? parseInt(backendPort) : null,
+        repositoryUrl: repositoryUrl?.trim() || '',
+        pastaBase: pastaBase?.trim() || '',
+        frontendBuildCmd: frontendBuildCmd?.trim() || '',
+        backendBuildCmd: backendBuildCmd?.trim() || ''
+      });
+      
+      if (updatedProject) {
+        // Atualizar estado local se necessário
+        setIsEditModalOpen(false);
+        setSelectedProject(null);
+        alert('Projeto atualizado com sucesso!');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao atualizar projeto');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteProject = async () => {
-    if (!onDeleteProject || !selectedProject) return;
-    setLoading(true);
-    setError(null);
+  // Handle delete project
+  const handleDeleteProject = async (id: string) => {
+    console.log('🔍 ProjectView.handleDeleteProject - ID recebido:', id);
+    console.log('🔍 ProjectView.handleDeleteProject - Projeto selecionado:', selectedProject);
+    
+    if (!id || id.trim() === '') {
+      console.error('❌ ProjectView.handleDeleteProject - ID vazio ou inválido');
+      setError('ID do projeto é obrigatório');
+      return;
+    }
+    
     try {
-      await onDeleteProject(selectedProject.id);
-      setIsDeleteConfirmOpen(false);
+      setLoading(true);
+      setError(null);
+      
+      console.log('🔍 ProjectView.handleDeleteProject - Chamando onDeleteProject...');
+      await onDeleteProject?.(id);
+      
+      console.log('✅ ProjectView.handleDeleteProject - Projeto excluído com sucesso');
       setSelectedProject(null);
+      setIsDeleteConfirmOpen(false);
+      
+      // Usar toast em vez de alert para melhor UX
+      if (typeof window !== 'undefined' && (window as any).toast) {
+        (window as any).toast.success('Projeto excluído com sucesso!');
+      } else {
+        alert('Projeto excluído com sucesso!');
+      }
+      
     } catch (err: any) {
-      setError(err.message || 'Erro ao excluir projeto');
+      console.error('❌ ProjectView.handleDeleteProject - Erro:', err);
+      
+      let errorMessage = 'Erro ao excluir projeto';
+      
+      if (err.response?.status === 404) {
+        errorMessage = 'Projeto não encontrado';
+      } else if (err.response?.status === 400) {
+        if (err.response?.data?.code === 'PROJECT_HAS_TASKS') {
+          errorMessage = 'Não é possível excluir projeto com tarefas ativas. Exclua as tarefas primeiro.';
+        } else if (err.response?.data?.message?.includes('Invalid project ID format')) {
+          errorMessage = 'ID do projeto inválido';
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      
+      // Mostrar erro para o usuário
+      if (typeof window !== 'undefined' && (window as any).toast) {
+        (window as any).toast.error(errorMessage);
+      } else {
+        alert(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const resetForm = () => {
-    setFormData(initialFormData);
-    setSelectedProject(null);
-    setError(null);
-  };
-
-  const renderFormFields = () => (
-    <>
-      {error && (
-        <div style={{
-          padding: '12px 16px',
-          backgroundColor: '#fee2e2',
-          border: '1px solid #fecaca',
-          borderRadius: '8px',
-          color: '#dc2626',
-          marginBottom: '20px',
-          fontSize: '14px',
-        }}>
-          {error}
-        </div>
-      )}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-            Nome do Projeto *
-          </label>
-          <input
-            type="text"
-            value={formData.name || ''}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              fontSize: '14px',
-              transition: 'all 0.2s',
-            }}
-            required
-          />
-        </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-            Status
-          </label>
-          <select
-            value={formData.status ? 'true' : 'false'}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value === 'true' })}
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              fontSize: '14px',
-              backgroundColor: '#fff',
-            }}
-          >
-            <option value="true">Ativo</option>
-            <option value="false">Inativo</option>
-          </select>
-        </div>
-        <div style={{ gridColumn: 'span 2' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-            Descrição
-          </label>
-          <textarea
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            rows={3}
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              fontSize: '14px',
-              resize: 'vertical',
-            }}
-          />
-        </div>
-        <div style={{ gridColumn: 'span 2' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-            Regras (opcional)
-          </label>
-          <textarea
-            value={formData.regras || ''}
-            onChange={(e) => setFormData({ ...formData, regras: e.target.value })}
-            rows={4}
-            placeholder="Insira as regras específicas para este projeto..."
-            style={{
-              width: '100%',
-              padding: '12px 16px',
-              border: '1px solid #e0e0e0',
-              borderRadius: '8px',
-              fontSize: '14px',
-              resize: 'vertical',
-              fontFamily: 'monospace',
-            }}
-          />
-        </div>
-        <div style={{ gridColumn: 'span 2', marginTop: '20px', paddingTop: '20px', borderTop: '1px solid #e0e0e0' }}>
-          <h4 style={{ marginBottom: '16px', color: '#555', fontSize: '16px' }}>Configurações Avançadas</h4>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Caminho Frontend
-              </label>
-              <input
-                type="text"
-                value={formData.frontendPath || ''}
-                onChange={(e) => setFormData({ ...formData, frontendPath: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="/caminho/para/frontend"
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Caminho Backend
-              </label>
-              <input
-                type="text"
-                value={formData.backendPath || ''}
-                onChange={(e) => setFormData({ ...formData, backendPath: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="/caminho/para/backend"
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Porta Frontend
-              </label>
-              <input
-                type="number"
-                value={formData.frontendPort || ''}
-                onChange={(e) => setFormData({ ...formData, frontendPort: parseInt(e.target.value) || 0 })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="3000"
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Porta Backend
-              </label>
-              <input
-                type="number"
-                value={formData.backendPort || ''}
-                onChange={(e) => setFormData({ ...formData, backendPort: parseInt(e.target.value) || 0 })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="3001"
-              />
-            </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                URL do Repositório
-              </label>
-              <input
-                type="text"
-                value={formData.repositoryUrl || ''}
-                onChange={(e) => setFormData({ ...formData, repositoryUrl: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="https://github.com/usuario/projeto"
-              />
-            </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Pasta Base (pastaBase)
-              </label>
-              <input
-                type="text"
-                value={formData.pastaBase || ''}
-                onChange={(e) => setFormData({ ...formData, pastaBase: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="/caminho/para/pasta-base"
-              />
-            </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Agente Padrão
-              </label>
-              <select
-                value={formData.agent || ''}
-                onChange={(e) => setFormData({ ...formData, agent: e.target.value || null })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  backgroundColor: '#fff'
-                }}
-              >
-                <option value="">Selecione um agente...</option>
-                {agents.length > 0 ? (
-                  agents.map((agentId) => (
-                    <option key={agentId} value={agentId}>
-                      {agentId}
-                    </option>
-                  ))
-                ) : (
-                  <option value="">Carregando agentes...</option>
-                )}
-              </select>
-              <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                Agente padrão para tarefas deste projeto
-              </p>
-            </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Comando Build Frontend
-              </label>
-              <input
-                type="text"
-                value={formData.frontendBuildCmd || ''}
-                onChange={(e) => setFormData({ ...formData, frontendBuildCmd: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="npm run build"
-              />
-            </div>
-            <div style={{ gridColumn: 'span 2' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Comando Build Backend
-              </label>
-              <input
-                type="text"
-                value={formData.backendBuildCmd || ''}
-                onChange={(e) => setFormData({ ...formData, backendBuildCmd: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                }}
-                placeholder="npm run build"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-
-  const columns: Column<Project>[] = [
+  // Define columns for DataTable
+  const columns: Column[] = [
     {
       key: 'name',
       header: 'Nome',
+      align: 'left',
       render: (project) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '8px',
-            backgroundColor: '#f0f9ff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#2563eb',
-          }}>
-            <FaFolder size={20} />
-          </div>
-          <div>
-            <div style={{ fontWeight: 600, color: '#333' }}>{project.name}</div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
-              {project.tasks?.length || 0} tarefas
-            </div>
-          </div>
+        <div className="font-medium text-gray-800">
+          {project.name}
         </div>
-      ),
+      )
     },
     {
-      key: 'description',
-      header: 'Descrição',
+      key: 'tasksCount',
+      header: 'Tarefas',
+      align: 'left',
       render: (project) => (
-        <div style={{ color: '#666', fontSize: '14px' }}>
-          {project.description || 'Sem descrição'}
+        <div className="text-blue-600 font-semibold">
+          {project.tasksCount}
         </div>
-      ),
+      )
     },
     {
       key: 'status',
       header: 'Status',
+      align: 'left',
       render: (project) => (
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: '4px 12px',
-          borderRadius: '20px',
-          backgroundColor: project.status ? '#dcfce7' : '#fee2e2',
-          color: project.status ? '#166534' : '#991b1b',
-          fontSize: '12px',
-          fontWeight: 500,
-        }}>
-          {project.status ? 'Ativo' : 'Inativo'}
+        <div className={
+          `px-2 py-1 rounded-full text-xs font-semibold text-center`
+          + ` ${project.status === 'active' ? 'bg-green-100 text-green-800' : ''}`
+          + ` ${project.status === 'inactive' ? 'bg-red-100 text-red-800' : ''}`
+        }>
+          {project.status}
         </div>
-      ),
-    },
-    {
-      key: 'agent',
-      header: 'Agente',
-      render: (project) => (
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: '4px 12px',
-          borderRadius: '20px',
-          backgroundColor: project.agent ? '#dbeafe' : '#f3f4f6',
-          color: project.agent ? '#1e40af' : '#6b7280',
-          fontSize: '12px',
-          fontWeight: 500,
-        }}>
-          {project.agent || 'Não definido'}
-        </div>
-      ),
+      )
     },
     {
       key: 'actions',
       header: 'Ações',
-      align: 'center',
+      align: 'right',
       render: (project) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+          {/* BOTÃO VER TAREFAS */}
           <Button
-            className="prevent-row-click"
-            variant="outline"
+            variant="primary"
             size="sm"
-            icon={<FaEdit size={14} />}
-            data-prevent-row-click="true"
+            icon={<FaEye size={14} />}
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
+              if (onProjectSelect) {
+                onProjectSelect(project);
+              }
+            }}
+            style={{
+              backgroundColor: '#3b82f6',
+              borderColor: '#3b82f6',
+              color: 'white',
+              fontWeight: 500,
+              padding: '8px 16px',
+              borderRadius: '8px',
+            }}
+          >
+            Ver Tarefas
+          </Button>
+          
+          {/* Botão Editar */}
+          <Button
+            variant="outline"
+            size="sm"
+            icon={<FaEdit size={14} />}
+            onClick={() => {
               setSelectedProject(project);
-              setFormData({ ...initialFormData, ...project });
               setIsEditModalOpen(true);
-              
-              // Desabilitar clique na linha temporariamente
-              setDisableRowClick(true);
-              setTimeout(() => setDisableRowClick(false), 100);
             }}
           >
             Editar
           </Button>
+          
+          {/* Botão Excluir */}
           <Button
-            className="prevent-row-click"
             variant="danger"
             size="sm"
             icon={<FaTrash size={14} />}
-            data-prevent-row-click="true"
             onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
               setSelectedProject(project);
               setIsDeleteConfirmOpen(true);
-              
-              // Desabilitar clique na linha temporariamente
-              setDisableRowClick(true);
-              setTimeout(() => setDisableRowClick(false), 100);
             }}
           >
             Excluir
           </Button>
         </div>
-      ),
-    },
+      )
+    }
   ];
 
-  if (selectedProject && onProjectSelect) {
-    // Quando um projeto é selecionado, redireciona para a lista de tarefas
-    onProjectSelect(selectedProject);
-    return null;
-  }
-
+  // Render the project view
   return (
-    <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#333', margin: 0 }}>Projetos</h2>
-            <p style={{ fontSize: '14px', color: '#666', margin: '8px 0 0' }}>
-              Gerencie seus projetos e visualize as tarefas associadas
-            </p>
+    <div className="p-4 bg-white rounded-xl shadow-md">
+      <h1 className="text-2xl font-bold text-gray-800 mb-4 flex items-center">
+        <FaTasks className="text-3xl mr-2" />
+        Seus Projetos
+      </h1>
+      
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        </div>
+      )}
+      
+      {error && (
+        <div className="text-red-500 text-center py-2 mb-4">
+          {error}
+        </div>
+      )}
+      
+      {projects.length > 0 ? (
+        <DataTable
+          data={projects}
+          columns={columns}
+          keyExtractor={(project) => project.id}
+          onRowClick={undefined}
+          hover={false}
+          emptyMessage={{
+            title: 'Nenhum projeto encontrado',
+            description: 'Crie um novo projeto para começar',
+            action: {
+              label: 'Criar projeto',
+              onClick: () => setIsCreateModalOpen(true)
+            }
+          }}
+        />
+      ) : (
+        <div className="text-center py-12">
+          <div className="text-gray-500 text-lg mb-2">
+            Você não tem projetos criados
           </div>
           <Button
             variant="primary"
-            icon={<FaPlus size={16} />}
+            size="sm"
             onClick={() => setIsCreateModalOpen(true)}
+            icon={<FaPlus size={14} />}
           >
-            Novo Projeto
+            Criar Projeto
           </Button>
         </div>
+      )}
+      
+      {/* Create Modal */}
+      {isCreateModalOpen && (
+        <FormModal
+          isOpen={isCreateModalOpen}
+          title="Criar Projeto"
+          onClose={() => setIsCreateModalOpen(false)}
+          onSubmit={handleCreateProject}
+        />
+      )}
+      
+      {/* Edit Modal */}
+      {isEditModalOpen && selectedProject && (
+        <FormModal
+          isOpen={isEditModalOpen}
+          title="Editar Projeto"
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setSelectedProject(null);
+          }}
+          onSubmit={handleUpdateProject}
+          size="lg"
+        >
+          <div className="space-y-4">
+            {/* Nome do Projeto */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nome do Projeto *
+              </label>
+              <input
+                type="text"
+                name="name"
+                defaultValue={selectedProject.name || ''}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Digite o nome do projeto"
+                required
+              />
+            </div>
 
-        <Card padding="none">
-          <DataTable
-            data={projects}
-            columns={columns}
-            keyExtractor={(project) => project.id}
-            onRowClick={disableRowClick ? undefined : ((project) => onProjectSelect?.(project))}
-            hover
-            bordered={false}
-            emptyMessage="Nenhum projeto encontrado. Clique em 'Novo Projeto' para criar um."
-          />
-        </Card>
-      </div>
+            {/* Descrição */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Descrição
+              </label>
+              <textarea
+                name="description"
+                defaultValue={selectedProject.description || ''}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Digite a descrição do projeto"
+                rows={3}
+              />
+            </div>
 
-      {/* Create Project Modal */}
-      <FormModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        title="Criar Novo Projeto"
-        subtitle="Preencha os detalhes do projeto"
-        onSubmit={handleCreateProject}
-        submitLabel="Criar Projeto"
-        cancelLabel="Cancelar"
-        size="lg"
-        loading={loading}
-      >
-        {renderFormFields()}
-      </FormModal>
+            {/* Status */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Status *
+              </label>
+              <select
+                name="status"
+                defaultValue={selectedProject.status ? 'true' : 'false'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              >
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+            </div>
 
-      {/* Edit Project Modal */}
-      <FormModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        title="Editar Projeto"
-        subtitle={`Editando: ${selectedProject?.name}`}
-        onSubmit={handleUpdateProject}
-        submitLabel="Atualizar"
-        cancelLabel="Cancelar"
-        size="lg"
-        loading={loading}
-      >
-        {renderFormFields()}
-      </FormModal>
+            {/* Ativo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Ativo
+              </label>
+              <select
+                name="ativo"
+                defaultValue={selectedProject.ativo ? 'true' : 'false'}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
 
-      {/* Delete Confirmation Modal */}
-      <FormModal
-        isOpen={isDeleteConfirmOpen}
-        onClose={() => setIsDeleteConfirmOpen(false)}
-        title="Confirmar Exclusão"
-        subtitle={`Tem certeza que deseja excluir o projeto "${selectedProject?.name}"? Esta ação não pode ser desfeita.`}
-        hideFooter
-        size="sm"
-      >
-        <div style={{ textAlign: 'center', padding: '20px 0' }}>
-          <p style={{ color: '#666', marginBottom: '24px' }}>
-            Todas as tarefas associadas a este projeto serão mantidas, mas o projeto será removido permanentemente.
-          </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <Button
-              variant="ghost"
-              onClick={() => setIsDeleteConfirmOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              variant="danger"
-              onClick={handleDeleteProject}
-              loading={loading}
-            >
+            {/* Regras */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Regras
+              </label>
+              <textarea
+                name="regras"
+                defaultValue={selectedProject.regras || ''}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Digite as regras do projeto"
+                rows={2}
+              />
+            </div>
+
+            {/* Configurações Avançadas */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-medium text-gray-800 mb-3">Configurações Avançadas</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Agente */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Agente Responsável
+                  </label>
+                  <input
+                    type="text"
+                    name="agent"
+                    defaultValue={selectedProject.agent || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nome do agente responsável"
+                  />
+                </div>
+
+                {/* Frontend Path */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Caminho do Frontend
+                  </label>
+                  <input
+                    type="text"
+                    name="frontendPath"
+                    defaultValue={selectedProject.frontendPath || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="/caminho/para/frontend"
+                  />
+                </div>
+
+                {/* Frontend Port */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Porta do Frontend
+                  </label>
+                  <input
+                    type="number"
+                    name="frontendPort"
+                    defaultValue={selectedProject.frontendPort || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="3000"
+                  />
+                </div>
+
+                {/* Backend Path */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Caminho do Backend
+                  </label>
+                  <input
+                    type="text"
+                    name="backendPath"
+                    defaultValue={selectedProject.backendPath || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="/caminho/para/backend"
+                  />
+                </div>
+
+                {/* Backend Port */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Porta do Backend
+                  </label>
+                  <input
+                    type="number"
+                    name="backendPort"
+                    defaultValue={selectedProject.backendPort || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="3001"
+                  />
+                </div>
+
+                {/* Repository URL */}
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    URL do Repositório
+                  </label>
+                  <input
+                    type="text"
+                    name="repositoryUrl"
+                    defaultValue={selectedProject.repositoryUrl || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="https://github.com/usuario/repositorio"
+                  />
+                </div>
+
+                {/* Pasta Base */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Pasta Base
+                  </label>
+                  <input
+                    type="text"
+                    name="pastaBase"
+                    defaultValue={selectedProject.pastaBase || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="/home/usuario/projetos"
+                  />
+                </div>
+
+                {/* Frontend Build Command */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Comando Build Frontend
+                  </label>
+                  <input
+                    type="text"
+                    name="frontendBuildCmd"
+                    defaultValue={selectedProject.frontendBuildCmd || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="npm run build"
+                  />
+                </div>
+
+                {/* Backend Build Command */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Comando Build Backend
+                  </label>
+                  <input
+                    type="text"
+                    name="backendBuildCmd"
+                    defaultValue={selectedProject.backendBuildCmd || ''}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="npm run build"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </FormModal>
+      )}
+      
+      {/* Delete Confirmation */}
+      {isDeleteConfirmOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 w-96 relative">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
               Excluir Projeto
-            </Button>
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Tem certeza que deseja excluir este projeto?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <Button
+                variant="secondary"
+                onClick={() => setIsDeleteConfirmOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => {
+                  if (selectedProject?.id) {
+                    console.log('🔍 Modal de confirmação - Excluindo projeto:', selectedProject.id);
+                    handleDeleteProject(selectedProject.id);
+                  } else {
+                    console.error('❌ Modal de confirmação - Nenhum projeto selecionado');
+                    setError('Nenhum projeto selecionado para exclusão');
+                    setIsDeleteConfirmOpen(false);
+                  }
+                }}
+                disabled={loading}
+              >
+                {loading ? 'Excluindo...' : 'Excluir'}
+              </Button>
+            </div>
           </div>
         </div>
-      </FormModal>
-    </>
+      )}
+    </div>
   );
 };
 
