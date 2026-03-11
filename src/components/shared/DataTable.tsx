@@ -10,9 +10,9 @@ export interface Column<T> {
 }
 
 interface DataTableProps<T> {
-  data: T[];
+  data: T[] | undefined;
   columns: Column<T>[];
-  keyExtractor: (item: T) => string;
+  keyExtractor?: (item: T) => string;
   onRowClick?: (item: T) => void;
   emptyMessage?: string;
   loading?: boolean;
@@ -47,7 +47,7 @@ const DataTable = <T extends Record<string, any>>({
     );
   }
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div style={{
         padding: '40px',
@@ -61,6 +61,7 @@ const DataTable = <T extends Record<string, any>>({
   }
 
   return (
+    keyExtractor &&
     <div style={{
       overflowX: 'auto',
       borderRadius: '8px',

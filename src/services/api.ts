@@ -551,7 +551,7 @@ class ApiService {
     });
   }
 
-  async updateAgentIdentity(id: string, data: { name?: string; emoji?: string; avatar?: string }) {
+  async updateAgentIdentity(id: string, data: { name?: string; emoji?: string; avatar?: string; model?: string; workspace?: string }) {
     return this.request(`/agents/${id}/identity`, {
       method: 'PUT',
       body: JSON.stringify(data)

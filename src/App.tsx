@@ -469,22 +469,40 @@ const AppContent: React.FC = () => {
 
       {/* Modals */}
       {isStatusModalOpen && (
-        <StatusManager isOpen={true} onClose={() => setIsStatusModalOpen(false)} />
+        <StatusManager 
+          isOpen={isStatusModalOpen} 
+          onClose={() => setIsStatusModalOpen(false)} 
+        />
       )}
       {isPriorityModalOpen && (
-        <PriorityManager isOpen={true} onClose={() => setIsPriorityModalOpen(false)} />
+        <PriorityManager 
+          isOpen={isPriorityModalOpen} 
+          onClose={() => setIsPriorityModalOpen(false)} 
+        />
       )}
       {isUserModalOpen && (
-        <UserManager isOpen={true} onClose={() => setIsUserModalOpen(false)} />
+        <UserManager 
+          isOpen={isUserModalOpen} 
+          onClose={() => setIsUserModalOpen(false)} 
+        />
       )}
       {isProjectTypeModalOpen && (
-        <ProjectTypeManager isOpen={true} onClose={() => setIsProjectTypeModalOpen(false)} />
+        <ProjectTypeManager 
+          isOpen={isProjectTypeModalOpen} 
+          onClose={() => setIsProjectTypeModalOpen(false)} 
+        />
       )}
       {isNextTaskModalOpen && (
-        <NextTaskManager isOpen={true} onClose={() => setIsNextTaskModalOpen(false)} />
+        <NextTaskManager 
+          isOpen={isNextTaskModalOpen} 
+          onClose={() => setIsNextTaskModalOpen(false)} 
+        />
       )}
       {isProfileEditModalOpen && (
-        <UserProfileEdit isOpen={true} onClose={() => setIsProfileEditModalOpen(false)} />
+        <UserProfileEdit 
+          isOpen={isProfileEditModalOpen} 
+          onClose={() => setIsProfileEditModalOpen(false)} 
+        />
       )}
     </ErrorBoundary>
   );

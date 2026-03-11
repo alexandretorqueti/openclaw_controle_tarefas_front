@@ -28,6 +28,7 @@ const AgentManager: React.FC = () => {
   const [editAgentEmoji, setEditAgentEmoji] = useState<string>('');
   const [editAgentAvatar, setEditAgentAvatar] = useState<string>('');
   const [editAgentModel, setEditAgentModel] = useState<string>('');
+  const [editAgentWorkspace, setEditAgentWorkspace] = useState<string>('');
   const [newBinding, setNewBinding] = useState<string>('');
   const [models, setModels] = useState<string[]>([]);
   
@@ -133,7 +134,8 @@ const AgentManager: React.FC = () => {
         name: editAgentName,
         emoji: editAgentEmoji,
         avatar: editAgentAvatar,
-        model: editAgentModel
+        model: editAgentModel,
+        workspace: editAgentWorkspace || undefined
       }) as OperationResponse;
       
       if (response.success) {
@@ -144,6 +146,7 @@ const AgentManager: React.FC = () => {
         setEditAgentEmoji('');
         setEditAgentAvatar('');
         setEditAgentModel('');
+        setEditAgentWorkspace('');
         loadAgents();
       } else {
         setError(response.error || 'Erro ao atualizar agente');
@@ -610,6 +613,7 @@ const AgentManager: React.FC = () => {
                           setEditAgentEmoji(agent.identity?.emoji || '');
                           setEditAgentAvatar(agent.identity?.avatar || '');
                           setEditAgentModel(agent.identity?.model || '');
+                          setEditAgentWorkspace(agent.workspace || '');
                           setShowEditModal(true);
                         }}
                         style={{
@@ -932,6 +936,7 @@ const AgentManager: React.FC = () => {
                   setEditAgentEmoji('');
                   setEditAgentAvatar('');
                   setEditAgentModel('');
+                  setEditAgentWorkspace('');
                 }}
                 style={{
                   color: '#999',
@@ -1116,6 +1121,48 @@ const AgentManager: React.FC = () => {
                   Modelo de IA para o agente
                 </p>
               </div>
+              
+              <div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: '#333',
+                  marginBottom: '8px'
+                }}>
+                  Workspace (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={editAgentWorkspace}
+                  onChange={(e) => setEditAgentWorkspace(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'all 0.2s'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#4ECDC4';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(78, 205, 196, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#e0e0e0';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                  placeholder="/caminho/para/workspace"
+                />
+                <p style={{
+                  fontSize: '12px',
+                  color: '#666',
+                  marginTop: '4px'
+                }}>
+                  Caminho absoluto para o workspace do agente
+                </p>
+              </div>
             </div>
             
             <div style={{
@@ -1132,6 +1179,7 @@ const AgentManager: React.FC = () => {
                   setEditAgentEmoji('');
                   setEditAgentAvatar('');
                   setEditAgentModel('');
+                  setEditAgentWorkspace('');
                 }}
                 style={{
                   padding: '10px 16px',
