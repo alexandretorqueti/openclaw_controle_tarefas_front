@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import api from '../services/api';
-import { Task, User, Status, Priority, Project } from '../types';
+import { Task, User, Status, Priority, Project, Agent } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
@@ -62,7 +62,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [agents, setAgents] = useState<string[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
 
   const getAssignedUser = () => users.find(user => user.id === task.assignedToId);
   const getStatus = () => statuses.find(status => status.id === task.statusId);
@@ -102,9 +102,9 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     const loadAgents = async () => {
       try {
         const data = await api.request('/agents');
-        // Extract agent IDs from the response
-        const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
-        setAgents(agentIds);
+        // Store full agent objects to access model information
+        const agentsList = data.data ? data.data : [];
+        setAgents(agentsList);
       } catch (error) {
         console.error('Error loading agents:', error);
       }
@@ -852,8 +852,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             >
               {agents.length > 0 ? (
                 agents.map((agent, index) => (
-                  <option key={index} value={agent}>
-                    {agent}
+                  <option key={index} value={agent.id}>
+                    {agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
                   </option>
                 ))
               ) : (
@@ -875,7 +875,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               </div>
               <div>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
-                  {task.agent || 'Não definido'}
+                  {(() => {
+                    const agentObj = agents.find(a => a.id === task.agent);
+                    return agentObj 
+                      ? `${agentObj.id}${agentObj.identity?.model ? ` (${agentObj.identity.model})` : ''}`
+                      : task.agent || 'Não definido';
+                  })()}
                 </div>
                 <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
                   Agente para processamento

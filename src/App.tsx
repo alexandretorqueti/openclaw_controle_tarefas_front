@@ -17,7 +17,7 @@ import UserProfileEdit from './components/UserProfileEdit';
 import MainLayout from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
-import { Task, Project, User, Status, Priority } from './types';
+import { Task, Project, User, Status, Priority, Agent } from './types';
 import { FaSpinner } from 'react-icons/fa';
 
 // Error Boundary
@@ -94,7 +94,7 @@ const AppContent: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [priorities, setPriorities] = useState<Priority[]>([]);
-  const [agents, setAgents] = useState<string[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
   
   const [taskFilters, setTaskFilters] = useState<{ isCompleted?: boolean }>({});
   const [loading, setLoading] = useState(true);
@@ -136,10 +136,10 @@ const AppContent: React.FC = () => {
       setPriorities(prioritiesData.priorities || []);
       // @ts-expect-error data is unknown
       // A API retorna { success: true, data: [...], count: 5 }
-      // Precisamos extrair os IDs do array data
-      const agentIds = agentsData.data ? agentsData.data.map((agent: any) => agent.id) : [];
+      // Armazenamos os objetos completos do agente para ter acesso ao modelo
+      const agentsList = agentsData.data ? agentsData.data : [];
 
-      setAgents(agentIds);
+      setAgents(agentsList);
     } catch (err) {
       console.error('Failed to load initial data:', err);
       setError('Falha ao carregar dados. Verifique a conexão com o servidor.');
@@ -209,14 +209,21 @@ const AppContent: React.FC = () => {
   };
 
   const handleUpdateProject = async (id: string, projectData: any) => {
+    console.log('DEBUG: handleUpdateProject chamado', { id, projectData });
     try {
       const updatedProject = await apiService.updateProject(id, projectData);
-      setProjects(projects.map(p => p.id === id ? updatedProject : p));
+      console.log('DEBUG: Resposta da API updateProject:', updatedProject);
+      console.log('DEBUG: Tipo de updatedProject:', typeof updatedProject);
+      console.log('DEBUG: updatedProject tem propriedade project?', 'project' in updatedProject);
+      console.log('DEBUG: projects antes da atualização:', projects.length, projects);
+      const newProjects = projects.map(p => p.id === id ? updatedProject : p);
+      console.log('DEBUG: newProjects após atualização:', newProjects.length, newProjects);
+      setProjects(newProjects);
       if (selectedProject?.id === id) {
         setSelectedProject(updatedProject);
       }
     } catch (err) {
-      console.error('Failed to update project:', err);
+      console.error('DEBUG: Failed to update project:', err);
       throw err;
     }
   };

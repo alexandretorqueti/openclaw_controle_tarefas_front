@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState } from 'react';
-import { Task, User, Status, Priority, Project } from '../types';
+import { Task, User, Status, Priority, Project, Agent } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle } from 'react-icons/fa';
@@ -11,7 +11,7 @@ interface TaskCardProps {
   users: User[];
   statuses: Status[];
   priorities: Priority[];
-  agents?: string[];
+  agents?: Agent[];
   projects: Project[];
   onTaskClick: (task: Task) => void;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
@@ -25,7 +25,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   users, 
   statuses, 
   priorities,
-  agents = [], 
+  agents = [] as Agent[], 
   projects,
   onTaskClick,
   onUpdateTask,

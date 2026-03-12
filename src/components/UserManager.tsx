@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { FaTimes, FaPlus, FaEdit, FaTrash, FaSave, FaUser, FaEnvelope, FaImage, FaUserTag, FaCalendarAlt, FaKey } from 'react-icons/fa';
 import apiService from '../services/api';
 import { User } from '../types';
+import AvatarUpload from './shared/AvatarUpload';
+import { getAvatarUrl } from '../utils/avatarUrl';
 
 interface UserManagerProps {
   isOpen: boolean;
@@ -25,6 +27,9 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
     avatarUrl: '',
     role: 'Viewer' as 'Admin' | 'Viewer' | 'Editor'
   });
+
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Opções de role
   const roleOptions = [
@@ -61,6 +66,16 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleAvatarChange = (file: File | null, previewUrl: string) => {
+    setAvatarFile(file);
+    // If we have a previewUrl from a file, don't update formData.avatarUrl yet
+    // We'll update it after successful upload
+    if (!file && previewUrl === '') {
+      // User removed avatar
+      setFormData(prev => ({ ...prev, avatarUrl: '' }));
+    }
+  };
+
   const handleRoleChange = (role: 'Admin' | 'Viewer' | 'Editor') => {
     setFormData(prev => ({ ...prev, role }));
   };
@@ -92,13 +107,52 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
 
     try {
       setError(null);
-      
+      let finalAvatarUrl = formData.avatarUrl;
+
+      // Upload avatar file if selected
+      if (avatarFile && editingId) {
+        setIsUploadingAvatar(true);
+        try {
+          const uploadResponse = await apiService.uploadAvatar(editingId, avatarFile);
+          finalAvatarUrl = uploadResponse.avatarUrl;
+        } catch (uploadErr: any) {
+          console.error('Erro ao fazer upload do avatar:', uploadErr);
+          const uploadErrorMessage = uploadErr?.response?.data?.error || uploadErr?.message || 'Erro ao fazer upload do avatar.';
+          setError(`Erro no upload do avatar: ${uploadErrorMessage}`);
+          setIsUploadingAvatar(false);
+          return;
+        } finally {
+          setIsUploadingAvatar(false);
+        }
+      }
+
+      // Prepare user data
+      const userData = {
+        ...formData,
+        avatarUrl: finalAvatarUrl || undefined
+      };
+
       if (editingId) {
         // Atualizar usuário existente
-        await apiService.updateUser(editingId, formData);
+        await apiService.updateUser(editingId, userData);
       } else {
         // Criar novo usuário
-        await apiService.createUser(formData);
+        const newUser = await apiService.createUser(userData);
+        
+        // If we have an avatar file for a new user, upload it after creation
+        if (avatarFile && newUser.id) {
+          setIsUploadingAvatar(true);
+          try {
+            const uploadResponse = await apiService.uploadAvatar(newUser.id, avatarFile);
+            // Update the new user with the avatar URL
+            await apiService.updateUser(newUser.id, { avatarUrl: uploadResponse.avatarUrl });
+          } catch (uploadErr: any) {
+            console.error('Erro ao fazer upload do avatar para novo usuário:', uploadErr);
+            // Don't fail the entire operation if avatar upload fails
+          } finally {
+            setIsUploadingAvatar(false);
+          }
+        }
       }
       
       // Recarregar lista
@@ -127,6 +181,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
       avatarUrl: user.avatarUrl || '',
       role: user.role
     });
+    setAvatarFile(null); // Reset avatar file when editing
     setEditingId(user.id);
     setIsEditing(true);
   };
@@ -154,12 +209,15 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
     setFormData({
       name: '',
       email: '',
+      nickname: '',
       avatarUrl: '',
-      role: 'Viewer'
+      role: 'Viewer' as 'Admin' | 'Viewer' | 'Editor'
     });
+    setAvatarFile(null);
     setEditingId(null);
     setIsEditing(false);
     setError(null);
+    setIsUploadingAvatar(false);
   };
 
   const handleClose = () => {
@@ -380,7 +438,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       flexShrink: 0
                     }}>
                       <img 
-                        src={user.avatarUrl || 'https://i.pravatar.cc/150?img=1'} 
+                        src={getAvatarUrl(user.avatarUrl)} 
                         alt={user.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
@@ -641,48 +699,23 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                 </div>
               </div>
 
-              {/* URL do Avatar */}
+              {/* Upload do Avatar */}
               <div style={{ marginBottom: '20px' }}>
                 <label style={{
                   display: 'block',
                   fontSize: '14px',
                   fontWeight: 600,
                   color: '#333',
-                  marginBottom: '8px'
+                  marginBottom: '12px'
                 }}>
-                  URL do Avatar (Opcional)
+                  Avatar (Opcional)
                 </label>
-                <div style={{ position: 'relative' }}>
-                  <FaImage size={16} style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: '#999'
-                  }} />
-                  <input
-                    type="text"
-                    value={formData.avatarUrl}
-                    onChange={(e) => handleInputChange('avatarUrl', e.target.value)}
-                    placeholder="Ex: https://example.com/avatar.jpg"
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px 12px 40px',
-                      border: '1px solid #ddd',
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                      boxSizing: 'border-box',
-                      transition: 'all 0.2s'
-                    }}
-                  />
-                </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: '#666',
-                  marginTop: '4px'
-                }}>
-                  Deixe em branco para usar avatar padrão
-                </div>
+                <AvatarUpload
+                  currentAvatarUrl={formData.avatarUrl}
+                  onAvatarChange={handleAvatarChange}
+                  userId={editingId || undefined}
+                  disabled={isUploadingAvatar}
+                />
               </div>
 
               {/* Role do Usuário */}

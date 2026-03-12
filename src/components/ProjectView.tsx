@@ -1,6 +1,6 @@
 // @ts-nocheck
-import React, { useState } from 'react';
-import { Project, Task, User, Status, Priority } from '../types';
+import React, { useState, useRef } from 'react';
+import { Project, Task, User, Status, Priority, Agent } from '../types';
 import DataTable, { Column } from './shared/DataTable';
 import Card from './shared/Card';
 import Button from './shared/Button';
@@ -56,7 +56,8 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
     backendBuildCmd: '',
   };
   const [formData, setFormData] = useState<Partial<Project>>(initialFormData);
-  const [agents, setAgents] = useState<string[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const projectFormRef = useRef<any>(null);
 
   // Carregar agentes
   React.useEffect(() => {
@@ -65,9 +66,9 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
         const response = await fetch('http://localhost:3001/api/agents');
         if (response.ok) {
           const data = await response.json();
-          // Extrair IDs dos agentes do array de objetos
-          const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
-          setAgents(agentIds);
+          // Armazenar objetos completos dos agentes para acessar informações do modelo
+          const agentsList = data.data ? data.data : [];
+          setAgents(agentsList);
         }
       } catch (error) {
         console.error('Erro ao carregar agentes:', error);
@@ -76,7 +77,8 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
     loadAgents();
   }, []);
 
-  const handleCreateProject = async () => {
+  const handleCreateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!onCreateProject) return;
     setLoading(true);
     setError(null);
@@ -91,18 +93,30 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
     }
   };
 
-  const handleUpdateProject = async () => {
-    if (!onUpdateProject || !selectedProject) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await onUpdateProject(selectedProject.id, formData);
-      setIsEditModalOpen(false);
-      resetForm();
-    } catch (err: any) {
-      setError(err.message || 'Erro ao atualizar projeto');
-    } finally {
-      setLoading(false);
+  const handleUpdateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('DEBUG: handleUpdateProject called (FormModal)', { selectedProject });
+    if (!onUpdateProject || !selectedProject) {
+      console.error('DEBUG: Missing onUpdateProject or selectedProject', { onUpdateProject, selectedProject });
+      return;
+    }
+    if (!selectedProject.id) {
+      console.error('DEBUG: selectedProject.id is undefined', selectedProject);
+      setError('ID do projeto não encontrado');
+      return;
+    }
+    
+    // Usar o ref do ProjectForm para obter os dados
+    if (projectFormRef.current) {
+      try {
+        await projectFormRef.current.submitForm();
+      } catch (err: any) {
+        console.error('DEBUG: Error from ProjectForm submit', err);
+        setError(err.message || 'Erro ao atualizar projeto');
+      }
+    } else {
+      console.error('DEBUG: projectFormRef.current is null');
+      setError('Erro interno: formulário não disponível');
     }
   };
 
@@ -159,11 +173,15 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
     {
       key: 'description',
       header: 'Descrição',
-      render: (project) => (
-        <div style={{ color: '#666', fontSize: '14px' }}>
-          {project.description || 'Sem descrição'}
-        </div>
-      ),
+      render: (project) => {
+        const description = project.description;
+        const displayText = !description || description.trim() === '' ? 'Sem descrição' : description;
+        return (
+          <div style={{ color: '#666', fontSize: '14px' }}>
+            {displayText}
+          </div>
+        );
+      },
     },
     {
       key: 'status',
@@ -217,7 +235,26 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
               e.stopPropagation();
               e.preventDefault();
               setSelectedProject(project);
-              setFormData({ ...initialFormData, ...project });
+              
+              // Extrair apenas os campos do projeto, não a resposta completa da API
+              const projectFields = {
+                name: project.name || '',
+                description: project.description || '',
+                regras: project.regras || '',
+                status: project.status !== undefined ? project.status : true,
+                ativo: project.ativo !== undefined ? project.ativo : true,
+                frontendPath: project.frontendPath || '',
+                frontendPort: project.frontendPort || 0,
+                backendPath: project.backendPath || '',
+                backendPort: project.backendPort || 0,
+                repositoryUrl: project.repositoryUrl || '',
+                pastaBase: project.pastaBase || '',
+                agent: project.agent || '',
+                frontendBuildCmd: project.frontendBuildCmd || '',
+                backendBuildCmd: project.backendBuildCmd || '',
+              };
+              
+              setFormData({ ...initialFormData, ...projectFields });
               setIsEditModalOpen(true);
               
               // Desabilitar clique na linha temporariamente
@@ -302,8 +339,25 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
         loading={loading}
       >
         <ProjectForm
+          ref={projectFormRef}
           project={null}
-          onSubmit={handleCreateProject}
+          onSubmit={async (data) => {
+            console.log('DEBUG: ProjectForm onSubmit (criação) chamado com dados:', data);
+            if (!onCreateProject) return;
+            setLoading(true);
+            setError(null);
+            try {
+              await onCreateProject(data);
+              setIsCreateModalOpen(false);
+              resetForm();
+            } catch (err: any) {
+              console.error('DEBUG: Error in ProjectForm onSubmit (criação)', err);
+              setError(err.message || 'Erro ao criar projeto');
+              throw err;
+            } finally {
+              setLoading(false);
+            }
+          }}
           loading={loading}
           error={error}
           agents={agents}
@@ -323,8 +377,25 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
         loading={loading}
       >
         <ProjectForm
+          ref={projectFormRef}
           project={selectedProject}
-          onSubmit={handleUpdateProject}
+          onSubmit={async (data) => {
+            console.log('DEBUG: ProjectForm onSubmit chamado com dados:', data);
+            if (!onUpdateProject || !selectedProject) return;
+            setLoading(true);
+            setError(null);
+            try {
+              await onUpdateProject(selectedProject.id, data);
+              setIsEditModalOpen(false);
+              resetForm();
+            } catch (err: any) {
+              console.error('DEBUG: Error in ProjectForm onSubmit', err);
+              setError(err.message || 'Erro ao atualizar projeto');
+              throw err; // Re-throw para o ProjectForm saber que falhou
+            } finally {
+              setLoading(false);
+            }
+          }}
           loading={loading}
           error={error}
           agents={agents}

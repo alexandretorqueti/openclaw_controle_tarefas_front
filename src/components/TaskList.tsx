@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React, { useState } from 'react';
 import api from '../services/api';
-import { Task, User, Status, Priority, Project } from '../types';
+import { Task, User, Status, Priority, Project, Agent } from '../types';
 import TaskCard from './TaskCard';
 import Card from './shared/Card';
 import Button from './shared/Button';
@@ -14,7 +14,7 @@ interface TaskListProps {
   statuses: Status[];
   priorities: Priority[];
   projects: Project[];
-  agents?: string[];
+  agents?: Agent[];
   selectedProject: Project | null;
   onTaskSelect: (task: Task) => void;
   onBackToProjects?: () => void;
@@ -32,7 +32,7 @@ const TaskList: React.FC<TaskListProps> = ({
   statuses, 
   priorities, 
   projects,
-  agents = [],
+  agents = [] as Agent[],
   selectedProject,
   onTaskSelect,
   onBackToProjects,
@@ -619,9 +619,9 @@ const TaskList: React.FC<TaskListProps> = ({
                   }}
                 >
                   {agents.length > 0 ? (
-                    agents.map((agentId) => (
-                      <option key={agentId} value={agentId}>
-                        {agentId}
+                    agents.map((agent) => (
+                      <option key={agent.id} value={agent.id}>
+                        {agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
                       </option>
                     ))
                   ) : (

@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { FaUser, FaEnvelope, FaImage, FaUserTag, FaSave, FaTimes, FaKey } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
+import AvatarUpload from './shared/AvatarUpload';
+import { getAvatarUrl } from '../utils/avatarUrl';
 
 interface UserProfileEditProps {
   isOpen: boolean;
@@ -23,6 +25,9 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
     avatarUrl: ''
   });
 
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+
   // Carregar dados do usuário quando o modal abrir
   useEffect(() => {
     if (isOpen && user) {
@@ -32,8 +37,10 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
         nickname: user.nickname || '',
         avatarUrl: user.avatarUrl || ''
       });
+      setAvatarFile(null); // Reset avatar file when opening
       setError(null);
       setSuccess(null);
+      setIsUploadingAvatar(false);
     }
   }, [isOpen, user]);
 
@@ -43,6 +50,16 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
       ...prev,
       [name]: value
     }));
+  };
+
+  const handleAvatarChange = (file: File | null, previewUrl: string) => {
+    setAvatarFile(file);
+    // If we have a previewUrl from a file, don't update formData.avatarUrl yet
+    // We'll update it after successful upload
+    if (!file && previewUrl === '') {
+      // User removed avatar
+      setFormData(prev => ({ ...prev, avatarUrl: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -67,8 +84,31 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
         throw new Error('Email é obrigatório');
       }
 
+      let finalAvatarUrl = formData.avatarUrl;
+
+      // Upload avatar file if selected
+      if (avatarFile && user) {
+        setIsUploadingAvatar(true);
+        try {
+          const uploadResponse = await apiService.uploadAvatar(user.id, avatarFile);
+          finalAvatarUrl = uploadResponse.avatarUrl;
+        } catch (uploadErr: any) {
+          console.error('Erro ao fazer upload do avatar:', uploadErr);
+          const uploadErrorMessage = uploadErr?.response?.data?.error || uploadErr?.message || 'Erro ao fazer upload do avatar.';
+          throw new Error(`Erro no upload do avatar: ${uploadErrorMessage}`);
+        } finally {
+          setIsUploadingAvatar(false);
+        }
+      }
+
+      // Prepare user data
+      const userData = {
+        ...formData,
+        avatarUrl: finalAvatarUrl || undefined
+      };
+
       // Atualizar usuário no backend
-      const response = await apiService.updateUser(user.id, formData);
+      const response = await apiService.updateUser(user.id, userData);
       
       // Atualizar no contexto de autenticação
       if (updateUser) {
@@ -249,66 +289,23 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
             {/* Avatar */}
             <div style={{ marginBottom: '24px' }}>
               <label style={{
-                
                 fontSize: '14px',
                 fontWeight: 500,
                 color: '#333',
-                marginBottom: '8px',
+                marginBottom: '12px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}>
                 <FaImage size={14} color="#4ECDC4" />
-                Foto do Perfil (URL)
+                Foto do Perfil
               </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{
-                  width: '80px',
-                  height: '80px',
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  backgroundColor: '#e3f2fd',
-                  flexShrink: 0
-                }}>
-                  <img
-                    src={formData.avatarUrl || 'https://i.pravatar.cc/150?img=1'}
-                    alt="Preview"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-                <input
-                  type="text"
-                  name="avatarUrl"
-                  value={formData.avatarUrl}
-                  onChange={handleInputChange}
-                  placeholder="https://exemplo.com/foto.jpg"
-                  style={{
-                    flex: 1,
-                    padding: '12px 16px',
-                    border: '1px solid #ddd',
-                    borderRadius: '8px',
-                    fontSize: '14px',
-                    color: '#333',
-                    backgroundColor: '#f8f9fa',
-                    transition: 'all 0.2s'
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#4ECDC4';
-                    e.target.style.backgroundColor = '#fff';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#ddd';
-                    e.target.style.backgroundColor = '#f8f9fa';
-                  }}
-                />
-              </div>
-              <p style={{
-                fontSize: '12px',
-                color: '#999',
-                marginTop: '8px'
-              }}>
-                Cole a URL de uma imagem para sua foto de perfil
-              </p>
+              <AvatarUpload
+                currentAvatarUrl={formData.avatarUrl}
+                onAvatarChange={handleAvatarChange}
+                userId={user?.id}
+                disabled={isUploadingAvatar || loading}
+              />
             </div>
 
             {/* Nome */}

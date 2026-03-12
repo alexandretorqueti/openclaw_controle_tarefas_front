@@ -130,14 +130,14 @@ const getApiBaseUrl = () => {
   const protocol = window.location.protocol;
   
   // Determine backend port based on frontend port
-  let backendPort = 3000; // Default to backend development port (not 3001)
+  let backendPort = 3001; // Default to backend development port
   
   if (port === '8090' || port === '8091') {
     // Production environment
     backendPort = 8091;
   } else if (port === '3000' || port === '3001' || port === '3002') {
-    // Development environment - backend runs on port 3000
-    backendPort = 3000;
+    // Development environment - backend runs on port 3001
+    backendPort = 3001;
   } else if (!port) {
     // No port specified (default ports)
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -177,7 +177,7 @@ class ApiService {
     this.baseUrl = getApiBaseUrl();
   }
 
-  async request(endpoint: string, options: any = {}) {
+  async request(endpoint: string, options: any = {}, skipJsonProcessing: boolean = false) {
     const url = `${this.baseUrl}${endpoint}`;
     
     const defaultOptions: RequestInit = {
@@ -196,8 +196,13 @@ class ApiService {
       },
     };
 
-    // Convert request body to snake_case if present
-    if (config.body && typeof config.body === 'string') {
+    // For FormData, remove Content-Type header so browser can set it with boundary
+    if (config.body instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+
+    // Convert request body to snake_case if present and not FormData
+    if (config.body && typeof config.body === 'string' && !skipJsonProcessing) {
       try {
         const parsedBody = JSON.parse(config.body);
         
@@ -251,10 +256,13 @@ class ApiService {
   }
 
   async updateProject(id: string, data: UpdateProjectData) {
-    return this.request(`/projects/${id}`, {
+    const response = await this.request(`/projects/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+    // A API retorna { message, project, correlationId }
+    // Precisamos retornar apenas o projeto
+    return response.project || response;
   }
 
   async deleteProject(id: string) {
@@ -395,6 +403,17 @@ class ApiService {
     return this.request(`/users/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+    });
+  }
+
+  async uploadAvatar(userId: string, file: File): Promise<{ avatarUrl: string }> {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    formData.append('userId', userId);
+
+    return this.request('/users/upload-avatar', {
+      method: 'POST',
+      body: formData,
     });
   }
 

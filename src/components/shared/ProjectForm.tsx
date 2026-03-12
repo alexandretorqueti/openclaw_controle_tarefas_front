@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Project } from '../types';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { Project, Agent } from '../types';
 import { FaFolder, FaCodeBranch, FaTerminal } from 'react-icons/fa';
 import './FormStyles.css';
 
@@ -8,16 +8,21 @@ interface ProjectFormProps {
   onSubmit: (data: Partial<Project>) => Promise<void>;
   loading?: boolean;
   error?: string | null;
-  agents?: string[];
+  agents?: Agent[];
 }
 
-const ProjectForm: React.FC<ProjectFormProps> = ({
+interface ProjectFormHandle {
+  submitForm: () => Promise<void>;
+  getFormData: () => Partial<Project>;
+}
+
+const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
   project,
   onSubmit,
   loading = false,
   error = null,
-  agents = [],
-}) => {
+  agents = [] as Agent[],
+}, ref) => {
   const [formData, setFormData] = useState<Partial<Project>>({
     name: '',
     description: '',
@@ -35,30 +40,43 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
     backendBuildCmd: '',
   });
 
-  const [localAgents, setLocalAgents] = useState<string[]>(agents);
+  const [localAgents, setLocalAgents] = useState<Agent[]>(agents);
 
   // Carregar agentes se não fornecidos
   useEffect(() => {
     if (agents.length === 0) {
       const loadAgents = async () => {
         try {
+          console.log('DEBUG: Carregando agentes...');
           const response = await fetch('http://localhost:3001/api/agents');
           if (response.ok) {
             const data = await response.json();
-            const agentIds = data.data ? data.data.map((agent: any) => agent.id) : [];
-            setLocalAgents(agentIds);
+            const agentsList = data.data ? data.data : [];
+            console.log('DEBUG: Agentes carregados:', agentsList.length, agentsList);
+            setLocalAgents(agentsList);
+          } else {
+            console.error('DEBUG: Erro na resposta ao carregar agentes:', response.status);
           }
         } catch (error) {
-          console.error('Erro ao carregar agentes:', error);
+          console.error('DEBUG: Erro ao carregar agentes:', error);
         }
       };
       loadAgents();
+    } else {
+      console.log('DEBUG: Agentes fornecidos via props:', agents.length);
+      setLocalAgents(agents);
     }
   }, [agents]);
 
   // Preencher formulário se projeto fornecido
   useEffect(() => {
     if (project) {
+      console.log('DEBUG: ProjectForm inicializando com projeto:', {
+        project,
+        agent: project.agent,
+        name: project.name,
+        description: project.description
+      });
       setFormData({
         name: project.name || '',
         description: project.description || '',
@@ -75,11 +93,13 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         frontendBuildCmd: project.frontendBuildCmd || '',
         backendBuildCmd: project.backendBuildCmd || '',
       });
+    } else {
+      console.log('DEBUG: ProjectForm em modo criação (project é null)');
     }
   }, [project]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    console.log('DEBUG: ProjectForm handleSubmit CHAMADO, formData:', formData);
     
     // Converter campos vazios para null/undefined conforme esperado pelo backend
     const submitData: Partial<Project> = {
@@ -97,18 +117,52 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
       backendBuildCmd: formData.backendBuildCmd || null,
     };
 
-    await onSubmit(submitData);
+    console.log('DEBUG: submitData após conversão:', submitData);
+    
+    // Remover campos que não foram modificados (valores padrão)
+    const cleanedData: Partial<Project> = {};
+    
+    // Apenas incluir campos que têm valores diferentes dos padrões
+    if (submitData.name && submitData.name !== '') cleanedData.name = submitData.name;
+    if (submitData.description !== undefined) cleanedData.description = submitData.description;
+    if (submitData.regras !== undefined) cleanedData.regras = submitData.regras;
+    if (submitData.status !== undefined) cleanedData.status = submitData.status;
+    if (submitData.ativo !== undefined) cleanedData.ativo = submitData.ativo;
+    if (submitData.frontendPath !== undefined) cleanedData.frontendPath = submitData.frontendPath;
+    if (submitData.frontendPort !== undefined && submitData.frontendPort !== 0) cleanedData.frontendPort = submitData.frontendPort;
+    if (submitData.backendPath !== undefined) cleanedData.backendPath = submitData.backendPath;
+    if (submitData.backendPort !== undefined && submitData.backendPort !== 0) cleanedData.backendPort = submitData.backendPort;
+    if (submitData.repositoryUrl !== undefined) cleanedData.repositoryUrl = submitData.repositoryUrl;
+    if (submitData.pastaBase !== undefined) cleanedData.pastaBase = submitData.pastaBase;
+    if (submitData.agent !== undefined) cleanedData.agent = submitData.agent;
+    if (submitData.frontendBuildCmd !== undefined) cleanedData.frontendBuildCmd = submitData.frontendBuildCmd;
+    if (submitData.backendBuildCmd !== undefined) cleanedData.backendBuildCmd = submitData.backendBuildCmd;
+
+    console.log('DEBUG: cleanedData a ser enviado:', cleanedData);
+    
+    await onSubmit(cleanedData);
   };
 
   const handleChange = (field: keyof Project, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    console.log('DEBUG: handleChange chamado', { field, value, currentFormData: formData });
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value
+      };
+      console.log('DEBUG: Novo formData após handleChange', newData);
+      return newData;
+    });
   };
 
+  // Expor métodos via ref
+  useImperativeHandle(ref, () => ({
+    submitForm: handleSubmit,
+    getFormData: () => formData
+  }));
+
   return (
-    <form onSubmit={handleSubmit} className="form-container">
+    <div className="form-container">
       {error && (
         <div className="form-message form-message-error">
           {error}
@@ -318,14 +372,21 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
             </label>
             <select
               value={formData.agent || ''}
-              onChange={(e) => handleChange('agent', e.target.value || null)}
+              onChange={(e) => {
+                console.log('DEBUG: Select onChange disparado', { 
+                  value: e.target.value,
+                  selectedIndex: e.target.selectedIndex,
+                  options: e.target.options
+                });
+                handleChange('agent', e.target.value || null);
+              }}
               className="form-select"
             >
               <option value="">Selecione um agente...</option>
               {localAgents.length > 0 ? (
-                localAgents.map((agentId) => (
-                  <option key={agentId} value={agentId}>
-                    {agentId}
+                localAgents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
                   </option>
                 ))
               ) : (
@@ -365,18 +426,8 @@ const ProjectForm: React.FC<ProjectFormProps> = ({
         </div>
       </div>
 
-      {/* Botões de Ação */}
-      <div className="form-actions">
-        <button
-          type="submit"
-          disabled={loading}
-          className="form-button form-button-primary"
-        >
-          {loading ? 'Salvando...' : (project ? 'Atualizar Projeto' : 'Criar Projeto')}
-        </button>
-      </div>
-    </form>
+    </div>
   );
-};
+});
 
 export default ProjectForm;
