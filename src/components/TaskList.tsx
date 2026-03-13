@@ -271,173 +271,232 @@ const TaskList: React.FC<TaskListProps> = ({
           </div>
         </div>
 
-      {/* Filtros e Controles */}
-      <div style={{
-        backgroundColor: '#f8f9fa',
-        padding: '20px',
-        borderRadius: '12px',
-        marginBottom: '24px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-      }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '20px', alignItems: 'flex-start' }}>
-          {/* Barra de Pesquisa */}
-          <div style={{ flex: '1', minWidth: '300px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-              <FaSearch size={14} color="#666" />
-              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Pesquisar
-              </label>
+      {/* Filtros e Controles - Apenas quando não está criando tarefa */}
+      {!isCreatingTask && (
+        <div style={{
+          backgroundColor: '#f8f9fa',
+          padding: '20px',
+          borderRadius: '12px',
+          marginBottom: '24px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+        }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '20px', alignItems: 'flex-start' }}>
+            {/* Barra de Pesquisa */}
+            <div style={{ flex: '1', minWidth: '300px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
+                <FaSearch size={14} color="#666" />
+                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                  Pesquisar
+                </label>
+              </div>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  placeholder="Digite para pesquisar tarefas..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 12px 12px 40px',
+                    border: '1px solid #ddd',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                    height: '44px',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <FaSearch style={{
+                  position: 'absolute',
+                  left: '12px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: '#666',
+                  pointerEvents: 'none'
+                }} />
+              </div>
             </div>
-            <div style={{ position: 'relative' }}>
-              <input
-                type="text"
-                placeholder="Digite para pesquisar tarefas..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+
+            {/* Filtro de Status */}
+            <div style={{ minWidth: '200px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
+                <FaFilter size={14} color="#666" />
+                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                  Status
+                </label>
+              </div>
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
                 style={{
                   width: '100%',
-                  padding: '12px 12px 12px 40px',
+                  padding: '12px',
                   border: '1px solid #ddd',
                   borderRadius: '8px',
                   fontSize: '14px',
+                  backgroundColor: '#fff',
                   outline: 'none',
-                  transition: 'border-color 0.2s',
                   height: '44px',
                   boxSizing: 'border-box'
                 }}
-              />
-              <FaSearch style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#666',
-                pointerEvents: 'none'
-              }} />
+              >
+                <option value="">Todos os status</option>
+                {statuses.map(status => (
+                  <option key={status.id} value={status.id}>
+                    {status.name} ({getTaskCountByStatus(status.id)})
+                  </option>
+                ))}
+              </select>
             </div>
-          </div>
 
-          {/* Filtro de Status */}
-          <div style={{ minWidth: '200px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-              <FaFilter size={14} color="#666" />
-              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Status
-              </label>
-            </div>
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                outline: 'none',
-                height: '44px',
-                boxSizing: 'border-box'
-              }}
-            >
-              <option value="">Todos os status</option>
-              {statuses.map(status => (
-                <option key={status.id} value={status.id}>
-                  {status.name} ({getTaskCountByStatus(status.id)})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Filtro de Prioridade */}
-          <div style={{ minWidth: '200px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-              <FaFlag size={14} color="#666" />
-              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Prioridade
-              </label>
-            </div>
-            <select
-              value={selectedPriority}
-              onChange={(e) => setSelectedPriority(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #ddd',
-                borderRadius: '8px',
-                fontSize: '14px',
-                backgroundColor: '#fff',
-                outline: 'none',
-                height: '44px',
-                boxSizing: 'border-box'
-              }}
-            >
-              <option value="">Todas as prioridades</option>
-              {priorities.map(priority => (
-                <option key={priority.id} value={priority.id}>
-                  {priority.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Mostrar Tarefas Completas */}
-          <div style={{ minWidth: '200px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-              <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {/* Espaço reservado para ícone alinhado */}
+            {/* Filtro de Prioridade */}
+            <div style={{ minWidth: '200px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
+                <FaFlag size={14} color="#666" />
+                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                  Prioridade
+                </label>
               </div>
-              <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
-                Filtro
-              </label>
-            </div>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '10px',
-              height: '44px',
-              padding: '0 12px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              backgroundColor: '#fff',
-              boxSizing: 'border-box'
-            }}>
-              <input
-                type="checkbox"
-                id="showCompleted"
-                checked={showCompleted}
-                onChange={(e) => handleToggleShowCompleted(e.target.checked)}
-                style={{ 
-                  transform: 'scale(1.2)', 
-                  cursor: 'pointer',
-                  margin: 0
+              <select
+                value={selectedPriority}
+                onChange={(e) => setSelectedPriority(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  outline: 'none',
+                  height: '44px',
+                  boxSizing: 'border-box'
                 }}
-              />
-              <label htmlFor="showCompleted" style={{ 
-                fontSize: '14px', 
-                color: '#333', 
-                cursor: 'pointer',
-                flex: 1,
-                margin: 0
+              >
+                <option value="">Todas as prioridades</option>
+                {priorities.map(priority => (
+                  <option key={priority.id} value={priority.id}>
+                    {priority.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Mostrar Tarefas Completas */}
+            <div style={{ minWidth: '200px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
+                <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {/* Espaço reservado para ícone alinhado */}
+                </div>
+                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                  Filtro
+                </label>
+              </div>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                height: '44px',
+                padding: '0 12px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                backgroundColor: '#fff',
+                boxSizing: 'border-box'
               }}>
-                Mostrar completas
-              </label>
+                <input
+                  type="checkbox"
+                  id="showCompleted"
+                  checked={showCompleted}
+                  onChange={(e) => handleToggleShowCompleted(e.target.checked)}
+                  style={{
+                    transform: 'scale(1.2)',
+                    cursor: 'pointer',
+                    margin: 0
+                  }}
+                />
+                <label htmlFor="showCompleted" style={{
+                  fontSize: '14px',
+                  color: '#333',
+                  cursor: 'pointer',
+                  flex: 1,
+                  margin: 0
+                }}>
+                  Mostrar completas
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* Ordenação */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <FaSortAmountDown size={16} color="#666" />
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  backgroundColor: '#fff',
+                  outline: 'none'
+                }}
+              >
+                <option value="deadline">Ordenar por Prazo</option>
+                <option value="priority">Ordenar por Prioridade</option>
+                <option value="title">Ordenar por Título</option>
+              </select>
+            </div>
+
+            {/* Contadores */}
+            <div style={{ display: 'flex', gap: '24px' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: '#333' }}>
+                  {tasks.length}
+                </div>
+                <div style={{ fontSize: '12px', color: '#666' }}>Total de Tarefas</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: '#06D6A0' }}>
+                  {tasks.filter(t => t.isCompleted).length}
+                </div>
+                <div style={{ fontSize: '12px', color: '#666' }}>Concluídas</div>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: '#FF6B6B' }}>
+                  {tasks.filter(t => {
+                    if (t.isCompleted) return false;
+                    const deadlineDate = safeParseDate(t.deadline || '');
+                    return deadlineDate && deadlineDate < new Date();
+                  }).length}
+                </div>
+                <div style={{ fontSize: '12px', color: '#666' }}>Atrasadas</div>
+              </div>
             </div>
           </div>
         </div>
+      )}
 
-        {/* Formulário de Nova Tarefa */}
-        {isCreatingTask && (
-          <div style={{
-            backgroundColor: '#fff',
-            padding: '20px',
-            borderRadius: '8px',
-            marginTop: '20px',
-            border: '1px solid #e0e0e0'
-          }}>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
-              <h2 style={{ fontSize: '24px', color: '#8B0000', margin: 0 }}>Criar Nova Tarefa</h2>
-            </div>
+      {/* Formulário de Nova Tarefa */}
+      {isCreatingTask && (
+        <div style={{
+          backgroundColor: '#fff',
+          padding: '20px',
+          borderRadius: '8px',
+          marginBottom: '24px',
+          border: '2px solid #4ECDC4',
+          boxShadow: '0 4px 12px rgba(78, 205, 196, 0.15)'
+        }}>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
+            <h2 style={{ fontSize: '24px', color: '#4ECDC4', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <FaPlus size={24} />
+              Criar Nova Tarefa
+            </h2>
+            <p style={{ fontSize: '14px', color: '#666', margin: '8px 0 0 36px' }}>
+              Preencha os campos abaixo para adicionar uma nova tarefa ao projeto
+            </p>
+          </div>
             
             {/* Exibição de erro */}
             {error && (
@@ -472,10 +531,13 @@ const TaskList: React.FC<TaskListProps> = ({
                   placeholder="Digite o título da tarefa"
                   style={{
                     width: '100%',
-                    padding: '10px',
-                    border: '1px solid #ddd',
-                    borderRadius: '6px',
-                    fontSize: '14px'
+                    padding: '12px',
+                    border: '2px solid #4ECDC4',
+                    borderRadius: '8px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    backgroundColor: '#f0f9f8',
+                    color: '#2a7c74'
                   }}
                 />
               </div>
@@ -727,13 +789,23 @@ const TaskList: React.FC<TaskListProps> = ({
               <button
                 onClick={() => setIsCreatingTask(false)}
                 style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#f8f9fa',
-                  color: '#333',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  cursor: 'pointer'
+                  padding: '12px 24px',
+                  backgroundColor: '#fff',
+                  color: '#666',
+                  border: '2px solid #ddd',
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#999';
+                  e.currentTarget.style.color = '#333';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = '#ddd';
+                  e.currentTarget.style.color = '#666';
                 }}
               >
                 Cancelar
@@ -742,15 +814,31 @@ const TaskList: React.FC<TaskListProps> = ({
                 onClick={handleCreateTask}
                 disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.deadline || !newTaskData.agent}
                 style={{
-                  padding: '10px 20px',
+                  padding: '12px 24px',
                   backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? '#4ECDC4' : '#ccc',
                   color: '#fff',
                   border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? 'pointer' : 'not-allowed'
+                  borderRadius: '8px',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  cursor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? 'pointer' : 'not-allowed',
+                  transition: 'all 0.2s',
+                  boxShadow: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? '0 4px 12px rgba(78, 205, 196, 0.3)' : 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) {
+                    e.currentTarget.style.backgroundColor = '#3db8af';
+                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(78, 205, 196, 0.4)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) {
+                    e.currentTarget.style.backgroundColor = '#4ECDC4';
+                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(78, 205, 196, 0.3)';
+                  }
                 }}
               >
+                <FaPlus style={{ marginRight: '8px' }} />
                 Criar Tarefa
                 {(!newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.agent) && ' (carregando...)'}
               </button>
@@ -885,47 +973,43 @@ const TaskList: React.FC<TaskListProps> = ({
             ))}
           </div>
         )}
-      </div>
-      {/* Back to Top Button */}
-      
-    
-      {/* Back to Top Button */}
-      {showBackToTop && (
-        <button
-          onClick={scrollToTop}
-          style={{
-            position: 'fixed',
-            bottom: '30px',
-            right: '30px',
-            width: '50px',
-            height: '50px',
-            borderRadius: '50%',
-            backgroundColor: '#4ECDC4',
-            color: '#fff',
-            border: 'none',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '20px',
-            zIndex: 1000,
-            transition: 'all 0.3s ease'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#3db8af';
-            e.currentTarget.style.transform = 'scale(1.1)';
-            e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#4ECDC4';
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-          }}
-        >
-          <FaArrowUp />
-        </button>
-      )}
+        {/* Back to Top Button */}
+        {showBackToTop && (
+          <button
+            onClick={scrollToTop}
+            style={{
+              position: 'fixed',
+              bottom: '30px',
+              right: '30px',
+              width: '50px',
+              height: '50px',
+              borderRadius: '50%',
+              backgroundColor: '#4ECDC4',
+              color: '#fff',
+              border: 'none',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              zIndex: 1000,
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#3db8af';
+              e.currentTarget.style.transform = 'scale(1.1)';
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#4ECDC4';
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            }}
+          >
+            <FaArrowUp />
+          </button>
+        )}
       </div>
     </div>
   );
