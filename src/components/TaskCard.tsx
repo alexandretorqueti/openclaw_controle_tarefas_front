@@ -412,22 +412,22 @@ if (compact) {
         }
       }}
       style={{
-        border: `1px solid ${isOverdue ? '#FF6B6B' : '#e0e0e0'}`,
+        border: `1px solid ${isOverdue ? 'var(--danger-color)' : 'var(--border-color)'}`,
         borderRadius: '12px',
         padding: '20px',
-        backgroundColor: '#ffffff',
+        backgroundColor: 'var(--bg-card)',
         cursor: 'pointer',
         transition: 'all 0.2s ease',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         position: 'relative',
         borderLeft: `4px solid ${status?.colorCode || '#666'}`
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+        e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
         e.currentTarget.style.transform = 'translateY(-2px)';
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
+        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
         e.currentTarget.style.transform = 'translateY(0)';
       }}
     >
@@ -489,7 +489,7 @@ if (compact) {
           <h3 style={{
             fontSize: '18px',
             fontWeight: 700,
-            color: '#333',
+            color: 'var(--text-primary)',
             margin: 0,
             textDecoration: task.isCompleted ? 'line-through' : 'none',
             opacity: task.isCompleted ? 0.7 : 1,
@@ -515,7 +515,7 @@ if (compact) {
         {project && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <FaProjectDiagram size={14} color="#666" />
-            <span style={{ fontSize: '14px', color: '#666', fontWeight: 500 }}>
+            <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: 500 }}>
               {project.name}
             </span>
           </div>
@@ -523,7 +523,7 @@ if (compact) {
 
         <p style={{
           fontSize: '14px',
-          color: '#666',
+          color: 'var(--text-secondary)',
           lineHeight: 1.6,
           marginBottom: '16px'
         }}>
@@ -543,7 +543,7 @@ if (compact) {
       }}>
         {/* Status */}
         <div>
-          <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Status</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Status</div>
           {onUpdateTask ? (
             <select
               value={task.statusId}
@@ -551,10 +551,11 @@ if (compact) {
               disabled={isUpdating}
               style={{
                 padding: '8px 12px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-primary)',
                 width: '100%',
                 cursor: 'pointer'
               }}
@@ -573,7 +574,7 @@ if (compact) {
                 borderRadius: '50%',
                 backgroundColor: status?.colorCode || '#666'
               }} />
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                 {status?.name || 'Desconhecido'}
               </span>
             </div>
@@ -582,7 +583,7 @@ if (compact) {
 
         {/* Priority */}
         <div>
-          <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Prioridade</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Prioridade</div>
           {onUpdateTask ? (
             <select
               value={task.priorityId}
@@ -590,10 +591,11 @@ if (compact) {
               disabled={isUpdating}
               style={{
                 padding: '8px 12px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-primary)',
                 width: '100%',
                 cursor: 'pointer'
               }}
@@ -605,7 +607,7 @@ if (compact) {
               ))}
             </select>
           ) : (
-            <span style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+            <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
               {priority?.name || 'Desconhecida'}
             </span>
           )}
@@ -613,13 +615,13 @@ if (compact) {
 
         {/* Deadline */}
         <div>
-          <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Prazo</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Prazo</div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <FaCalendarAlt size={14} color={isOverdue ? '#FF6B6B' : '#666'} />
+            <FaCalendarAlt size={14} color={isOverdue ? 'var(--danger-color)' : 'var(--text-secondary)'} />
             <span style={{
               fontSize: '14px',
               fontWeight: 500,
-              color: isOverdue ? '#FF6B6B' : '#333'
+              color: isOverdue ? 'var(--danger-color)' : 'var(--text-primary)'
             }}>
               {formattedDeadline}
               {isOverdue && ' (Atrasado)'}
@@ -629,7 +631,7 @@ if (compact) {
 
         {/* Assigned to */}
         <div>
-          <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Atribuído a</div>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Atribuído a</div>
           {onUpdateTask ? (
             <select
               value={task.assignedToId || ''}
@@ -637,10 +639,11 @@ if (compact) {
               disabled={isUpdating}
               style={{
                 padding: '8px 12px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-primary)',
                 width: '100%',
                 cursor: 'pointer'
               }}
@@ -678,7 +681,7 @@ if (compact) {
                   <FaUser size={12} color="#1976d2" />
                 </div>
               )}
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                 {assignedUser?.name || 'Não atribuído'}
               </span>
             </div>
@@ -692,9 +695,9 @@ if (compact) {
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingTop: '16px',
-        borderTop: '1px solid #e0e0e0'
+        borderTop: '1px solid var(--border-color)'
       }}>
-        <div style={{ fontSize: '12px', color: '#666' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
           Criado por: {creator?.name || 'Desconhecido'} • 
           {safeFormatDate(task.createdAt, " dd/MM/yyyy") || 'Data inválida'}
         </div>

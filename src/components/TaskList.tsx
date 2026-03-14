@@ -314,7 +314,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   left: '12px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   pointerEvents: 'none'
                 }} />
               </div>
@@ -323,8 +323,8 @@ const TaskList: React.FC<TaskListProps> = ({
             {/* Filtro de Status */}
             <div style={{ minWidth: '200px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-                <FaFilter size={14} color="#666" />
-                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                <FaFilter size={14} color="var(--text-secondary)" />
+                <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                   Status
                 </label>
               </div>
@@ -392,7 +392,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 <div style={{ width: '14px', height: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {/* Espaço reservado para ícone alinhado */}
                 </div>
-                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                   Filtro
                 </label>
               </div>
@@ -402,9 +402,9 @@ const TaskList: React.FC<TaskListProps> = ({
                 gap: '10px',
                 height: '44px',
                 padding: '0 12px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '8px',
-                backgroundColor: '#fff',
+                backgroundColor: 'var(--bg-input)',
                 boxSizing: 'border-box'
               }}>
                 <input
@@ -456,26 +456,26 @@ const TaskList: React.FC<TaskListProps> = ({
             {/* Contadores */}
             <div style={{ display: 'flex', gap: '24px' }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: '#333' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)' }}>
                   {tasks.length}
                 </div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Total de Tarefas</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total de Tarefas</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: '#06D6A0' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--success-color)' }}>
                   {tasks.filter(t => t.isCompleted).length}
                 </div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Concluídas</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Concluídas</div>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: '#FF6B6B' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--danger-color)' }}>
                   {tasks.filter(t => {
                     if (t.isCompleted) return false;
                     const deadlineDate = safeParseDate(t.deadline || '');
                     return deadlineDate && deadlineDate < new Date();
                   }).length}
                 </div>
-                <div style={{ fontSize: '12px', color: '#666' }}>Atrasadas</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Atrasadas</div>
               </div>
             </div>
           </div>
