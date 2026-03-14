@@ -165,7 +165,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           borderBottom: '1px solid #e0e0e0',
           display: 'flex',
           alignItems: 'center',
@@ -194,7 +194,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
               </h2>
               <p style={{
                 fontSize: '14px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0'
               }}>
                 Atualize suas informações pessoais
@@ -337,7 +337,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: '#333',
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: 'var(--bg-input)'',
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
@@ -380,7 +380,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: '#333',
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: 'var(--bg-input)'',
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
@@ -422,7 +422,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: '#333',
-                  backgroundColor: '#f8f9fa',
+                  backgroundColor: 'var(--bg-input)'',
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
@@ -461,7 +461,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   transition: 'all 0.2s'
                 }}

@@ -519,7 +519,7 @@ const AgentManager: React.FC = () => {
             onClick={loadAgents}
             style={{
               padding: "10px 16px",
-              backgroundColor: "#f8f9fa",
+              backgroundColor: 'var(--bg-input)'",
               color: "#333",
               border: "1px solid #e0e0e0",
               borderRadius: "8px",
@@ -581,7 +581,7 @@ const AgentManager: React.FC = () => {
           flexWrap: "wrap",
           alignItems: "end",
           padding: "16px",
-          backgroundColor: "#f8f9fa",
+          backgroundColor: 'var(--bg-input)'",
           borderRadius: "12px",
           border: "1px solid #e0e0e0",
         }}
@@ -722,7 +722,7 @@ const AgentManager: React.FC = () => {
             <thead>
               <tr
                 style={{
-                  backgroundColor: "#f8f9fa",
+                  backgroundColor: 'var(--bg-input)'",
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
@@ -1134,7 +1134,7 @@ const AgentManager: React.FC = () => {
                 style={{
                   padding: "10px 16px",
                   color: "#333",
-                  backgroundColor: "#f8f9fa",
+                  backgroundColor: 'var(--bg-input)'",
                   border: "1px solid #e0e0e0",
                   borderRadius: "8px",
                   cursor: "pointer",
@@ -1525,7 +1525,7 @@ const AgentManager: React.FC = () => {
                   onClick={() => fileInputRef.current?.click()}
                   style={{
                     padding: "10px 16px",
-                    backgroundColor: "#f8f9fa",
+                    backgroundColor: 'var(--bg-input)'",
                     color: "#333",
                     border: "1px solid #e0e0e0",
                     borderRadius: "8px",
@@ -1566,7 +1566,7 @@ const AgentManager: React.FC = () => {
                 style={{
                   padding: "10px 16px",
                   color: "#333",
-                  backgroundColor: "#f8f9fa",
+                  backgroundColor: 'var(--bg-input)'",
                   border: "1px solid #e0e0e0",
                   borderRadius: "8px",
                   cursor: "pointer",

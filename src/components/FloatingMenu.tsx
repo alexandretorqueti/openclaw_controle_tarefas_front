@@ -69,7 +69,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
           {/* Cabeçalho do menu */}
           <div style={{
             padding: '16px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             borderBottom: '1px solid #e0e0e0',
             display: 'flex',
             alignItems: 'center',
@@ -97,7 +97,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
               </h3>
               <p style={{
                 fontSize: '12px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0'
               }}>
                 Gerencie status, prioridades e usuários
@@ -154,7 +154,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 </div>
                 <div style={{
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   Gerencie os status das tarefas
                 </div>
@@ -221,7 +221,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 </div>
                 <div style={{
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   Gerencie os níveis de prioridade
                 </div>
@@ -288,7 +288,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 </div>
                 <div style={{
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   Gerencie os usuários do sistema
                 </div>
@@ -355,7 +355,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
                 </div>
                 <div style={{
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   Consulte a próxima tarefa de um usuário
                 </div>
@@ -422,7 +422,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
               </div>
               <div style={{
                 fontSize: '12px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 Gerencie personas e regras por domínio
               </div>
@@ -440,7 +440,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
           {/* Rodapé do menu */}
           <div style={{
             padding: '12px 16px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             borderTop: '1px solid #e0e0e0',
             fontSize: '11px',
             color: '#999',

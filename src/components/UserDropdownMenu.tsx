@@ -39,7 +39,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           alignItems: 'center',
           gap: '12px',
           padding: '8px 12px',
-          backgroundColor: isOpen ? '#f8f9fa' : 'transparent',
+          backgroundColor: 'var(--bg-input)'' : 'transparent',
           borderRadius: '8px',
           cursor: 'pointer',
           transition: 'all 0.2s',
@@ -83,7 +83,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           </span>
           <span style={{ 
             fontSize: '12px', 
-            color: '#666',
+            color: 'var(--text-secondary)',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis'
@@ -120,7 +120,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           {/* Cabeçalho do menu */}
           <div style={{
             padding: '16px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             borderBottom: '1px solid #e0e0e0',
             display: 'flex',
             alignItems: 'center',
@@ -154,7 +154,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
               </h3>
               <p style={{
                 fontSize: '12px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
@@ -237,7 +237,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           {/* Rodapé do menu */}
           <div style={{
             padding: '12px 16px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             borderTop: '1px solid #e0e0e0',
             fontSize: '11px',
             color: '#999',

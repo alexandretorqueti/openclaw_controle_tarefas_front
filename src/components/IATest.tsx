@@ -77,7 +77,7 @@ const IATest: React.FC = () => {
         </div>
       )}
 
-      <div style={{ marginTop: '20px', fontSize: '12px', color: '#666' }}>
+      <div style={{ marginTop: '20px', fontSize: '12px', color: 'var(--text-secondary)' }}>
         <strong>Detalhes técnicos:</strong>
         <ul>
           <li>Endpoint testado: GET /api/ia-test</li>

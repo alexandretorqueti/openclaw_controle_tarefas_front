@@ -370,7 +370,7 @@ if (compact) {
               {assignedUser && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <FaUser size={10} color="#666" />
-                  <span style={{ fontSize: '11px', color: '#666' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                     {assignedUser.name.split(' ')[0]}
                   </span>
                 </div>

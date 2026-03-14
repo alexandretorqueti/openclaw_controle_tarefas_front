@@ -141,7 +141,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
       key={task.id}
       className="task-card"
       style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: '12px',
         padding: '20px',
         marginBottom: '16px',
@@ -157,14 +157,14 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <FaSync size={14} color="#4ECDC4" />
-            <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', margin: 0 }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
               {task.title}
             </h3>
             {task.project && (
               <span style={{
                 fontSize: '12px',
-                backgroundColor: '#f0f0f0',
-                color: '#666',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-secondary)',
                 padding: '2px 8px',
                 borderRadius: '12px'
               }}>
@@ -176,7 +176,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FaClock size={12} color="#666" />
-              <span style={{ fontSize: '14px', color: '#666' }}>
+              <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                 {getRecurrenceDescription(task)}
               </span>
             </div>
@@ -184,7 +184,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             {task.lastExecutedAt && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaHistory size={12} color="#666" />
-                <span style={{ fontSize: '14px', color: '#666' }}>
+                <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                   Última execução: {safeFormatDate(task.lastExecutedAt, 'dd/MM/yyyy HH:mm')}
                 </span>
               </div>
@@ -250,7 +250,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
       {task.description && (
         <p style={{ 
           fontSize: '14px', 
-          color: '#666', 
+          color: 'var(--text-secondary)', 
           marginTop: '12px',
           lineHeight: 1.5
         }}>
@@ -269,11 +269,11 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
         marginBottom: '24px'
       }}>
         <div>
-          <h2 style={{ fontSize: '24px', fontWeight: 700, color: '#333', marginBottom: '8px' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
             <FaSync style={{ marginRight: '12px', color: '#4ECDC4' }} />
             Tarefas Recorrentes
           </h2>
-          <p style={{ fontSize: '14px', color: '#666' }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
             Gerencie tarefas que se repetem automaticamente
           </p>
         </div>
@@ -285,7 +285,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             style={{
               padding: '10px 20px',
               backgroundColor: executingAll ? '#ccc' : '#FFD166',
-              color: '#333',
+              color: 'var(--text-primary)',
               border: 'none',
               borderRadius: '8px',
               fontSize: '14px',
@@ -381,7 +381,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             borderRadius: '50%',
             margin: '0 auto 16px'
           }} />
-          <p style={{ color: '#666' }}>Carregando tarefas...</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Carregando tarefas...</p>
         </div>
       ) : activeTab === 'due' ? (
         <>
@@ -389,14 +389,14 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             <div style={{ 
               textAlign: 'center', 
               padding: '40px',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'var(--bg-input)',
               borderRadius: '12px'
             }}>
               <FaCheckCircle size={48} color="#4ECDC4" style={{ marginBottom: '16px' }} />
-              <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
                 Nenhuma tarefa pendente!
               </h3>
-              <p style={{ color: '#666' }}>
+              <p style={{ color: 'var(--text-secondary)' }}>
                 Todas as tarefas recorrentes estão em dia.
               </p>
             </div>
@@ -432,20 +432,20 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             <div style={{ 
               textAlign: 'center', 
               padding: '40px',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'var(--bg-input)',
               borderRadius: '12px'
             }}>
               <FaSync size={48} color="#666" style={{ marginBottom: '16px' }} />
-              <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
                 Nenhuma tarefa recorrente
               </h3>
-              <p style={{ color: '#666' }}>
+              <p style={{ color: 'var(--text-secondary)' }}>
                 Crie uma tarefa e marque-a como recorrente para vê-la aqui.
               </p>
             </div>
           ) : (
             <div>
-              <p style={{ color: '#666', marginBottom: '16px' }}>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '16px' }}>
                 Mostrando {allRecurringTasks.length} tarefa(s) recorrente(s)
               </p>
               {allRecurringTasks.map(task => renderTaskCard(task, false))}

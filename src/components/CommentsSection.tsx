@@ -175,7 +175,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
         marginBottom: '16px',
         marginLeft: isReply ? '32px' : '0',
         padding: '16px',
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-card)',
         borderRadius: '8px',
         border: '1px solid #e9ecef',
         position: 'relative'
@@ -208,10 +208,10 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
               </div>
             )}
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#333' }}>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {comment.user?.name || 'Usuário desconhecido'}
               </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                 {formatDate(comment.createdAt)}
                 {comment.createdAt !== comment.updatedAt && ' (editado)'}
               </div>
@@ -229,8 +229,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                   }}
                   style={{
                     padding: '6px 10px',
-                    backgroundColor: '#f8f9fa',
-                    color: '#333',
+                    backgroundColor: 'var(--bg-input)',
+                    color: 'var(--text-primary)',
                     border: '1px solid #ddd',
                     borderRadius: '4px',
                     fontSize: '12px',
@@ -248,7 +248,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 onClick={() => handleDeleteComment(comment.id)}
                 style={{
                   padding: '6px 10px',
-                  backgroundColor: '#fff5f5',
+                  backgroundColor: 'rgba(231, 76, 60, 0.1)',
                   color: '#e53e3e',
                   border: '1px solid #fed7d7',
                   borderRadius: '4px',
@@ -309,8 +309,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 }}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: '#f8f9fa',
-                  color: '#333',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
                   border: '1px solid #ddd',
                   borderRadius: '6px',
                   fontSize: '14px',
@@ -328,7 +328,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
         ) : (
           <div style={{ 
             fontSize: '14px', 
-            color: '#333', 
+            color: 'var(--text-primary)', 
             lineHeight: 1.6,
             marginBottom: '12px'
           }}>
@@ -346,8 +346,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
               }}
               style={{
                 padding: '6px 12px',
-                backgroundColor: '#f8f9fa',
-                color: '#666',
+                backgroundColor: 'var(--bg-input)',
+                color: 'var(--text-secondary)',
                 border: '1px solid #ddd',
                 borderRadius: '4px',
                 fontSize: '12px',
@@ -367,8 +367,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 onClick={() => toggleReplies(comment.id)}
                 style={{
                   padding: '6px 12px',
-                  backgroundColor: '#f8f9fa',
-                  color: '#666',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-secondary)',
                   border: '1px solid #ddd',
                   borderRadius: '4px',
                   fontSize: '12px',
@@ -430,8 +430,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 }}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: '#f8f9fa',
-                  color: '#333',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
                   border: '1px solid #ddd',
                   borderRadius: '6px',
                   fontSize: '14px',
@@ -460,7 +460,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
         Carregando comentários...
       </div>
     );
@@ -468,7 +468,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
 
   return (
     <div style={{ padding: '24px' }}>
-      <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <FaComment size={18} />
         Comentários ({comments.length})
       </h3>
@@ -531,12 +531,12 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
         </div>
       ) : (
         <div style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)',
           padding: '20px',
           borderRadius: '8px',
           textAlign: 'center',
           marginBottom: '24px',
-          color: '#666'
+          color: 'var(--text-secondary)'
         }}>
           Faça login para adicionar comentários.
         </div>
@@ -545,11 +545,11 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
       {/* Comments list */}
       {comments.length === 0 ? (
         <div style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)',
           padding: '40px',
           borderRadius: '8px',
           textAlign: 'center',
-          color: '#666'
+          color: 'var(--text-secondary)'
         }}>
           <FaComment size={32} style={{ marginBottom: '12px', opacity: 0.5 }} />
           <div style={{ fontSize: '16px', marginBottom: '8px' }}>Nenhum comentário ainda</div>

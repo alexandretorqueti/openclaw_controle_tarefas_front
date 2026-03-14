@@ -291,7 +291,7 @@ const LogsViewer: React.FC<LogsViewerProps> = ({ onBack }) => {
                   color: color
                 }}
               >
-                <span style={{ color: '#666', marginRight: '8px' }}>
+                <span style={{ color: 'var(--text-secondary)', marginRight: '8px' }}>
                   [{String(index + 1).padStart(4, '0')}]
                 </span>
                 <span style={{ marginRight: '8px' }}>{icon}</span>
@@ -308,7 +308,7 @@ const LogsViewer: React.FC<LogsViewerProps> = ({ onBack }) => {
         padding: '8px 20px',
         borderTop: '1px solid #333',
         fontSize: '11px',
-        color: '#666',
+        color: 'var(--text-secondary)',
         display: 'flex',
         justifyContent: 'space-between'
       }}>

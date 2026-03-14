@@ -255,7 +255,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           borderBottom: '1px solid #e0e0e0',
           display: 'flex',
           justifyContent: 'space-between',
@@ -284,7 +284,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               </h2>
               <p style={{
                 fontSize: '14px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0'
               }}>
                 Cadastre e gerencie os usuários do sistema
@@ -348,8 +348,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               </h3>
               <span style={{
                 fontSize: '14px',
-                color: '#666',
-                backgroundColor: '#f8f9fa',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--bg-input)'',
                 padding: '4px 12px',
                 borderRadius: '20px'
               }}>
@@ -361,7 +361,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 Carregando usuários...
               </div>
@@ -395,9 +395,9 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaUser size={48} color="#ddd" style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhum usuário cadastrado</p>
@@ -472,7 +472,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       </div>
                       <div style={{
                         fontSize: '14px',
-                        color: '#666',
+                        color: 'var(--text-secondary)',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '4px',
@@ -551,7 +551,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             overflowY: 'auto'
           }}>
             <h3 style={{
@@ -565,10 +565,10 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
             {isEditing && editingId && (
               <div style={{
                 fontSize: '14px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 marginBottom: '20px',
                 padding: '12px 16px',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
                 border: '1px solid #e0e0e0',
                 fontFamily: 'monospace',
@@ -692,7 +692,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                 </div>
                 <div style={{
                   fontSize: '12px',
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   marginTop: '4px'
                 }}>
                   Deixe em branco para gerar automaticamente a partir do email
@@ -767,7 +767,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       <div style={{
                         width: '40px',
                         height: '40px',
-                        backgroundColor: formData.role === option.value ? '#fff' : '#f8f9fa',
+                        backgroundColor: 'var(--bg-input)'',
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
@@ -870,8 +870,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     onClick={resetForm}
                     style={{
                       padding: '14px 24px',
-                      backgroundColor: '#f8f9fa',
-                      color: '#666',
+                      backgroundColor: 'var(--bg-input)'',
+                      color: 'var(--text-secondary)',
                       border: '1px solid #ddd',
                       borderRadius: '8px',
                       fontSize: '16px',
@@ -917,7 +917,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               </h4>
               <ul style={{
                 fontSize: '12px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: 0,
                 paddingLeft: '20px',
                 lineHeight: 1.6

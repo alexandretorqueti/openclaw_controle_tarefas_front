@@ -201,7 +201,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           borderBottom: '1px solid #e0e0e0',
           display: 'flex',
           justifyContent: 'space-between',
@@ -230,7 +230,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
               </h2>
               <p style={{
                 fontSize: '14px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0'
               }}>
                 Configure os status disponíveis para as tarefas
@@ -294,8 +294,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
               </h3>
               <span style={{
                 fontSize: '14px',
-                color: '#666',
-                backgroundColor: '#f8f9fa',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--bg-input)'',
                 padding: '4px 12px',
                 borderRadius: '20px'
               }}>
@@ -307,7 +307,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 Carregando status...
               </div>
@@ -341,9 +341,9 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaListAlt size={48} color="#ddd" style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhum status cadastrado</p>
@@ -444,7 +444,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         </div>
                         <div style={{
                           fontSize: '12px',
-                          color: '#666',
+                          color: 'var(--text-secondary)',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '12px'
@@ -508,7 +508,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: '#f8f9fa'
+            backgroundColor: 'var(--bg-input)''
           }}>
             <h3 style={{
               fontSize: '18px',
@@ -606,7 +606,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                 <div style={{ marginTop: '16px' }}>
                   <div style={{
                     fontSize: '12px',
-                    color: '#666',
+                    color: 'var(--text-secondary)',
                     marginBottom: '8px'
                   }}>
                     Cores sugeridas:
@@ -703,7 +703,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       style={{
                         flex: 1,
                         padding: '12px',
-                        backgroundColor: formData.isFinalState ? '#06D6A0' : '#f8f9fa',
+                        backgroundColor: 'var(--bg-input)'',
                         color: formData.isFinalState ? '#fff' : '#333',
                         border: formData.isFinalState ? 'none' : '1px solid #ddd',
                         borderRadius: '8px',
@@ -724,7 +724,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       style={{
                         flex: 1,
                         padding: '12px',
-                        backgroundColor: !formData.isFinalState ? '#FF6B6B' : '#f8f9fa',
+                        backgroundColor: 'var(--bg-input)'',
                         color: !formData.isFinalState ? '#fff' : '#333',
                         border: !formData.isFinalState ? 'none' : '1px solid #ddd',
                         borderRadius: '8px',
@@ -766,7 +766,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                     style={{
                       flex: 1,
                       padding: '12px',
-                      backgroundColor: formData.visibleToAi ? '#4ECDC4' : '#f8f9fa',
+                      backgroundColor: 'var(--bg-input)'',
                       color: formData.visibleToAi ? '#fff' : '#333',
                       border: formData.visibleToAi ? 'none' : '1px solid #ddd',
                       borderRadius: '8px',
@@ -787,7 +787,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                     style={{
                       flex: 1,
                       padding: '12px',
-                      backgroundColor: !formData.visibleToAi ? '#6C757D' : '#f8f9fa',
+                      backgroundColor: 'var(--bg-input)'',
                       color: !formData.visibleToAi ? '#fff' : '#333',
                       border: !formData.visibleToAi ? 'none' : '1px solid #ddd',
                       borderRadius: '8px',
@@ -857,8 +857,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                     onClick={resetForm}
                     style={{
                       padding: '14px 24px',
-                      backgroundColor: '#f8f9fa',
-                      color: '#666',
+                      backgroundColor: 'var(--bg-input)'',
+                      color: 'var(--text-secondary)',
                       border: '1px solid #ddd',
                       borderRadius: '8px',
                       fontSize: '16px',

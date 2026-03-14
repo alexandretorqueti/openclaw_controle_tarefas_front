@@ -187,7 +187,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           borderBottom: '1px solid #e0e0e0',
           display: 'flex',
           justifyContent: 'space-between',
@@ -216,7 +216,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               </h2>
               <p style={{
                 fontSize: '14px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0'
               }}>
                 Configure os níveis de prioridade das tarefas
@@ -280,8 +280,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               </h3>
               <span style={{
                 fontSize: '14px',
-                color: '#666',
-                backgroundColor: '#f8f9fa',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--bg-input)'',
                 padding: '4px 12px',
                 borderRadius: '20px'
               }}>
@@ -293,7 +293,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 Carregando prioridades...
               </div>
@@ -327,9 +327,9 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaFlag size={48} color="#ddd" style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhuma prioridade cadastrada</p>
@@ -415,7 +415,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                           </div>
                           <div style={{
                             fontSize: '12px',
-                            color: '#666'
+                            color: 'var(--text-secondary)'
                           }}>
                             {priority.weight >= 6 && 'Prioridade máxima - ação imediata necessária'}
                             {priority.weight === 5 && 'Prioridade muito alta - atenção urgente'}
@@ -475,7 +475,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: '#f8f9fa'
+            backgroundColor: 'var(--bg-input)''
           }}>
             <h3 style={{
               fontSize: '18px',
@@ -567,7 +567,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                   justifyContent: 'space-between',
                   marginTop: '8px',
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   <span>Muito Baixa (1)</span>
                   <span>Média (5)</span>
@@ -577,7 +577,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                 <div style={{
                   marginTop: '12px',
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   <strong>Significado dos pesos:</strong>
                   <ul style={{ margin: '8px 0 0 20px', padding: 0 }}>
@@ -642,8 +642,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                     onClick={resetForm}
                     style={{
                       padding: '14px 24px',
-                      backgroundColor: '#f8f9fa',
-                      color: '#666',
+                      backgroundColor: 'var(--bg-input)'',
+                      color: 'var(--text-secondary)',
                       border: '1px solid #ddd',
                       borderRadius: '8px',
                       fontSize: '16px',
@@ -689,7 +689,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               </h4>
               <ul style={{
                 fontSize: '12px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: 0,
                 paddingLeft: '20px',
                 lineHeight: 1.6

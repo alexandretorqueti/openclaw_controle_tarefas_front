@@ -225,7 +225,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           borderBottom: '1px solid #e0e0e0',
           display: 'flex',
           justifyContent: 'space-between',
@@ -254,7 +254,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               </h2>
               <p style={{
                 fontSize: '14px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0'
               }}>
                 Configure personas e regras base para diferentes domínios (DEV, MARKETING, VENDAS, etc.)
@@ -318,8 +318,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               </h3>
               <span style={{
                 fontSize: '14px',
-                color: '#666',
-                backgroundColor: '#f8f9fa',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'var(--bg-input)'',
                 padding: '4px 12px',
                 borderRadius: '20px'
               }}>
@@ -331,7 +331,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 Carregando tipos de projeto...
               </div>
@@ -365,9 +365,9 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaRobot size={48} color="#ddd" style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhum tipo de projeto cadastrado</p>
@@ -440,8 +440,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                           </span>
                           <span style={{
                             fontSize: '12px',
-                            backgroundColor: '#f8f9fa',
-                            color: '#666',
+                            backgroundColor: 'var(--bg-input)'',
+                            color: 'var(--text-secondary)',
                             padding: '2px 8px',
                             borderRadius: '4px'
                           }}>
@@ -450,7 +450,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                         </div>
                         <div style={{
                           fontSize: '12px',
-                          color: '#666',
+                          color: 'var(--text-secondary)',
                           lineHeight: '1.4',
                           maxHeight: '40px',
                           overflow: 'hidden',
@@ -512,7 +512,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             overflowY: 'auto'
           }}>
             <h3 style={{
@@ -555,7 +555,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                 <div style={{
                   marginTop: '8px',
                   fontSize: '12px',
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   display: 'flex',
                   gap: '8px'
                 }}>
@@ -607,7 +607,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                     onClick={suggestPersonaPrompt}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: '#f8f9fa',
+                      backgroundColor: 'var(--bg-input)'',
                       border: '1px solid #ddd',
                       borderRadius: '6px',
                       fontSize: '12px',
@@ -642,7 +642,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                 <div style={{
                   marginTop: '8px',
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   Este texto define "quem a IA é" ao executar tarefas deste tipo.
                 </div>
@@ -668,7 +668,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                     onClick={suggestBaseRules}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: '#f8f9fa',
+                      backgroundColor: 'var(--bg-input)'',
                       border: '1px solid #ddd',
                       borderRadius: '6px',
                       fontSize: '12px',
@@ -702,7 +702,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                 <div style={{
                   marginTop: '8px',
                   fontSize: '12px',
-                  color: '#666'
+                  color: 'var(--text-secondary)'
                 }}>
                   Regras gerais que serão combinadas com regras específicas de cada projeto.
                 </div>
@@ -760,8 +760,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                     onClick={resetForm}
                     style={{
                       padding: '14px 24px',
-                      backgroundColor: '#f8f9fa',
-                      color: '#666',
+                      backgroundColor: 'var(--bg-input)'',
+                      color: 'var(--text-secondary)',
                       border: '1px solid #ddd',
                       borderRadius: '8px',
                       fontSize: '16px',

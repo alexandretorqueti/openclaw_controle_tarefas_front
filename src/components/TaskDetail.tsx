@@ -284,7 +284,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             alignItems: 'center',
             gap: '8px',
             padding: '10px 16px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             border: '1px solid #ddd',
             borderRadius: '8px',
             fontSize: '14px',
@@ -360,7 +360,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     onClick={handleToggleCompletion}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: task.isCompleted ? '#06D6A0' : '#f8f9fa',
+                      backgroundColor: 'var(--bg-input)'',
                       color: task.isCompleted ? '#fff' : '#333',
                       border: `1px solid ${task.isCompleted ? '#06D6A0' : '#ddd'}`,
                       borderRadius: '6px',
@@ -380,7 +380,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               {project && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
                   <FaProjectDiagram size={16} color="#666" />
-                  <span style={{ fontSize: '16px', color: '#666', fontWeight: 500 }}>
+                  <span style={{ fontSize: '16px', color: 'var(--text-secondary)', fontWeight: 500 }}>
                     Projeto: {project.name}
                   </span>
                 </div>
@@ -409,9 +409,9 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                   </h3>
                   <p style={{ 
                     fontSize: '14px', 
-                    color: '#666', 
+                    color: 'var(--text-secondary)', 
                     lineHeight: 1.6,
-                    backgroundColor: '#f8f9fa',
+                    backgroundColor: 'var(--bg-input)'',
                     padding: '16px',
                     borderRadius: '8px'
                   }}>
@@ -468,7 +468,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     onClick={handleCancelEdit}
                     style={{
                       padding: '10px 16px',
-                      backgroundColor: '#f8f9fa',
+                      backgroundColor: 'var(--bg-input)'',
                       color: '#333',
                       border: '1px solid #ddd',
                       borderRadius: '8px',
@@ -741,7 +741,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               )}
             </div>
           ) : (
-            <div style={{ color: '#666', fontStyle: 'italic' }}>
+            <div style={{ color: 'var(--text-secondary)', fontStyle: 'italic' }}>
               Esta tarefa não é recorrente
             </div>
           )}
@@ -812,7 +812,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                   {assignedUser?.name || 'Não atribuído'}
                 </div>
                 {assignedUser && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                     {assignedUser.email}
                   </div>
                 )}
@@ -882,7 +882,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                       : task.agent || 'Não definido';
                   })()}
                 </div>
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Agente para processamento
                 </div>
               </div>
@@ -944,7 +944,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
                   {task.parentTask?.title || 'Nenhuma'}
                 </div>
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   {task.parentTaskId ? `ID: ${task.parentTaskId}` : 'Tarefa independente'}
                 </div>
               </div>
@@ -991,7 +991,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
                 {creator?.name || 'Desconhecido'}
               </div>
-              <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                 {formattedCreatedAt}
               </div>
             </div>
@@ -1034,13 +1034,13 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                   {project?.name || 'Projeto não encontrado'}
                 </div>
                 {project && (
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                     {project.description}
                   </div>
                 )}
                 {project?.regras && (
                   <div style={{ 
-                    backgroundColor: '#f8f9fa', 
+                    backgroundColor: 'var(--bg-input)'', 
                     padding: '12px', 
                     borderRadius: '8px',
                     marginTop: '12px',
@@ -1051,7 +1051,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     </h4>
                     <pre style={{ 
                       fontSize: '12px', 
-                      color: '#666', 
+                      color: 'var(--text-secondary)', 
                       lineHeight: 1.4, 
                       whiteSpace: 'pre-wrap',
                       fontFamily: 'inherit',
@@ -1069,7 +1069,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
       {/* Metadata */}
       <div style={{
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--bg-input)'',
         padding: '20px',
         borderRadius: '12px',
         marginBottom: '32px'
@@ -1079,37 +1079,37 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         </h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           <div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>ID da Tarefa</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>ID da Tarefa</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333', fontFamily: 'monospace' }}>
               {task.id}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Criado em</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Criado em</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
               {safeFormatDate(task.createdAt, "dd/MM/yyyy HH:mm") || 'Data inválida'}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Atualizado em</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Atualizado em</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
               {safeFormatDate(task.updatedAt, "dd/MM/yyyy HH:mm") || 'Data inválida'}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da última execução</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Data da última execução</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
               {safeFormatDate(task.lastExecutedAt, "dd/MM/yyyy HH:mm") || 'Nunca executada'}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Data da próxima execução</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Data da próxima execução</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
               {safeFormatDate(task.nextExecutionAt, "dd/MM/yyyy HH:mm") || 'Não agendada'}
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Posição</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Posição</div>
             <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
               {task.position}
             </div>
@@ -1130,7 +1130,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         <div style={{
           display: 'flex',
           borderBottom: '1px solid #e9ecef',
-          backgroundColor: '#f8f9fa'
+          backgroundColor: 'var(--bg-input)''
         }}>
           <button
             onClick={() => setActiveTab('comments')}
@@ -1231,7 +1231,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
         border: '2px dashed #ddd'
       }}>
-        <div style={{ textAlign: 'center', color: '#666' }}>
+        <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
           <FaPaperclip size={24} style={{ marginBottom: '12px' }} />
           <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>
             Anexos

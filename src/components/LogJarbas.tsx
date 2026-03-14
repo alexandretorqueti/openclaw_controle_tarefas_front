@@ -199,7 +199,7 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
             style={{
               padding: '8px 16px',
               backgroundColor: '#0f0',
-              color: '#000',
+              color: 'var(--text-primary)',
               border: 'none',
               borderRadius: '4px',
               fontSize: '14px',
@@ -291,7 +291,7 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
                   color: color
                 }}
               >
-                <span style={{ color: '#666', marginRight: '8px' }}>
+                <span style={{ color: 'var(--text-secondary)', marginRight: '8px' }}>
                   [{String(index + 1).padStart(4, '0')}]
                 </span>
                 <span style={{ marginRight: '8px' }}>{icon}</span>
@@ -308,7 +308,7 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
         padding: '8px 20px',
         borderTop: '1px solid #333',
         fontSize: '11px',
-        color: '#666',
+        color: 'var(--text-secondary)',
         display: 'flex',
         justifyContent: 'space-between'
       }}>

@@ -564,7 +564,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     {selectedProject.name}
                     <input type="hidden" value={selectedProject.id} />
                   </div>
-                  <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                     Tarefa será criada neste projeto
                   </p>
                 </div>
@@ -694,7 +694,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     <option value="">Carregando agentes...</option>
                   )}
                 </select>
-                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Agente responsável pelo processamento da tarefa
                 </p>
               </div>
@@ -727,7 +727,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     fontSize: '14px'
                   }}
                 />
-                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Data e hora limite para conclusão
                 </p>
               </div>
@@ -763,7 +763,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     ))
                   }
                 </select>
-                <p style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
                   Selecione uma tarefa da qual esta tarefa depende
                 </p>
               </div>
@@ -795,7 +795,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 style={{
                   padding: '12px 24px',
                   backgroundColor: '#fff',
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   border: '2px solid #ddd',
                   borderRadius: '8px',
                   fontSize: '16px',
@@ -878,13 +878,13 @@ const TaskList: React.FC<TaskListProps> = ({
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#333' }}>
                 {tasks.length}
               </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Total de Tarefas</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total de Tarefas</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#06D6A0' }}>
                 {tasks.filter(t => t.isCompleted).length}
               </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Concluídas</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Concluídas</div>
             </div>
             <div style={{ textAlign: 'center' }}>
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#FF6B6B' }}>
@@ -894,7 +894,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   return deadlineDate && deadlineDate < new Date();
                 }).length}
               </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>Atrasadas</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Atrasadas</div>
             </div>
           </div>
         </div>
@@ -914,7 +914,7 @@ const TaskList: React.FC<TaskListProps> = ({
           {!selectedProject && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <FaProjectDiagram size={16} color="#666" />
-              <span style={{ fontSize: '14px', color: '#666' }}>
+              <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                 Mostrando tarefas de {projects.length} projetos
               </span>
             </div>
@@ -925,9 +925,9 @@ const TaskList: React.FC<TaskListProps> = ({
           <div style={{
             textAlign: 'center',
             padding: '48px',
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)'',
             borderRadius: '12px',
-            color: '#666'
+            color: 'var(--text-secondary)'
           }}>
             <p style={{ fontSize: '16px', marginBottom: '8px' }}>
               {searchTerm || selectedStatus || selectedPriority

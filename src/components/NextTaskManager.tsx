@@ -118,7 +118,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           borderBottom: '1px solid #e0e0e0',
           display: 'flex',
           justifyContent: 'space-between',
@@ -147,7 +147,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               </h2>
               <p style={{
                 fontSize: '14px',
-                color: '#666',
+                color: 'var(--text-secondary)',
                 margin: '4px 0 0 0'
               }}>
                 Consulte a próxima tarefa pendente de cada usuário
@@ -207,9 +207,9 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               <div style={{
                 padding: '20px',
                 textAlign: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaSpinner size={24} className="spin" style={{ animation: 'spin 1s linear infinite', marginBottom: '12px' }} />
                 <p>Carregando usuários...</p>
@@ -241,10 +241,10 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
             ) : users.length === 0 ? (
               <div style={{
                 padding: '20px',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
                 textAlign: 'center',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaUser size={32} color="#ddd" style={{ marginBottom: '12px' }} />
                 <p>Nenhum usuário cadastrado</p>
@@ -340,7 +340,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                 <span style={{
                   fontSize: '14px',
                   fontWeight: 400,
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   marginLeft: '8px'
                 }}>
                   (Usuário: {selectedUserNickname})
@@ -352,9 +352,9 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaSpinner size={32} className="spin" style={{ animation: 'spin 1s linear infinite', marginBottom: '16px' }} />
                 <p>Buscando próxima tarefa...</p>
@@ -363,9 +363,9 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: '#f8f9fa',
+                backgroundColor: 'var(--bg-input)'',
                 borderRadius: '8px',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }}>
                 <FaTasks size={48} color="#ddd" style={{ marginBottom: '16px' }} />
                 <p>Selecione um usuário para ver sua próxima tarefa</p>
@@ -455,7 +455,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       <div style={{
                         fontSize: '12px',
                         fontWeight: 600,
-                        color: '#666',
+                        color: 'var(--text-secondary)',
                         marginBottom: '8px',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
@@ -488,7 +488,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       <div style={{
                         fontSize: '12px',
                         fontWeight: 600,
-                        color: '#666',
+                        color: 'var(--text-secondary)',
                         marginBottom: '8px',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
@@ -516,7 +516,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       <div style={{
                         fontSize: '12px',
                         fontWeight: 600,
-                        color: '#666',
+                        color: 'var(--text-secondary)',
                         marginBottom: '8px',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
@@ -544,7 +544,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       <div style={{
                         fontSize: '12px',
                         fontWeight: 600,
-                        color: '#666',
+                        color: 'var(--text-secondary)',
                         marginBottom: '8px',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px'
@@ -590,7 +590,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       </h5>
                       <div style={{
                         fontSize: '13px',
-                        color: '#666',
+                        color: 'var(--text-secondary)',
                         lineHeight: 1.6,
                         whiteSpace: 'pre-wrap',
                         backgroundColor: '#FFF9E6',
@@ -605,7 +605,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
 
                   {/* Informações Adicionais */}
                   <div style={{
-                    backgroundColor: '#f8f9fa',
+                    backgroundColor: 'var(--bg-input)'',
                     padding: '16px',
                     borderRadius: '8px',
                     marginTop: '20px'
@@ -626,7 +626,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
                       gap: '12px',
                       fontSize: '13px',
-                      color: '#666'
+                      color: 'var(--text-secondary)'
                     }}>
                       <div>
                         <strong>ID:</strong> {nextTask.id.substring(0, 8)}...
@@ -689,10 +689,10 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
         {/* Rodapé */}
         <div style={{
           padding: '16px 24px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           borderTop: '1px solid #e0e0e0',
           fontSize: '12px',
-          color: '#666',
+          color: 'var(--text-secondary)',
           textAlign: 'center'
         }}>
           <p style={{ margin: 0 }}>

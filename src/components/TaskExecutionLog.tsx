@@ -175,25 +175,25 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       <div style={{
         marginTop: '16px',
         padding: '16px',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--bg-input)'',
         borderRadius: '8px',
         border: '1px solid #e9ecef'
       }}>
         {/* Request Details */}
         <div style={{ marginBottom: '16px' }}>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FaPlay size={12} />
             Detalhes da Requisição
           </h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             <div>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Endpoint</div>
-              <div style={{ fontSize: '13px', fontWeight: 500, color: '#333', fontFamily: 'monospace' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Endpoint</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
                 {log.endpoint}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Método</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Método</div>
               <div style={{
                 fontSize: '12px',
                 fontWeight: 600,
@@ -207,7 +207,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Status Code</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Status Code</div>
               <div style={{
                 fontSize: '13px',
                 fontWeight: 600,
@@ -217,8 +217,8 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Tempo de Resposta</div>
-              <div style={{ fontSize: '13px', fontWeight: 500, color: '#333' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Tempo de Resposta</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)' }}>
                 {formatDuration(log.responseTime)}
               </div>
             </div>
@@ -228,16 +228,16 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
         {/* Request Data */}
         {(log.requestBody || log.requestQuery || log.requestParams) && (
           <div style={{ marginBottom: '16px' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
               Dados da Requisição
             </h4>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
               {log.requestBody && (
                 <div>
-                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Body</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Body</div>
                   <pre style={{
                     fontSize: '11px',
-                    color: '#333',
+                    color: 'var(--text-primary)',
                     backgroundColor: '#fff',
                     padding: '8px',
                     borderRadius: '6px',
@@ -253,10 +253,10 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               )}
               {log.requestQuery && Object.keys(log.requestQuery).length > 0 && (
                 <div>
-                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Query Params</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Query Params</div>
                   <pre style={{
                     fontSize: '11px',
-                    color: '#333',
+                    color: 'var(--text-primary)',
                     backgroundColor: '#fff',
                     padding: '8px',
                     borderRadius: '6px',
@@ -272,10 +272,10 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               )}
               {log.requestParams && Object.keys(log.requestParams).length > 0 && (
                 <div>
-                  <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Route Params</div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Route Params</div>
                   <pre style={{
                     fontSize: '11px',
-                    color: '#333',
+                    color: 'var(--text-primary)',
                     backgroundColor: '#fff',
                     padding: '8px',
                     borderRadius: '6px',
@@ -296,7 +296,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
         {/* Stack Trace for Errors */}
         {log.stackTrace && (
           <div style={{ marginBottom: '16px' }}>
-            <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FaBug size={12} />
               Stack Trace
             </h4>
@@ -320,26 +320,26 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
         {/* Technical Details */}
         <div>
-          <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+          <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
             Detalhes Técnicos
           </h4>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
             <div>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Correlation ID</div>
-              <div style={{ fontSize: '11px', color: '#333', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Correlation ID</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-primary)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
                 {log.correlationId}
               </div>
             </div>
             <div>
-              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>Client IP</div>
-              <div style={{ fontSize: '13px', fontWeight: 500, color: '#333', fontFamily: 'monospace' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>Client IP</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
                 {log.clientIp}
               </div>
             </div>
             {log.userId && (
               <div>
-                <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>User ID</div>
-                <div style={{ fontSize: '11px', color: '#333', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>User ID</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-primary)', fontFamily: 'monospace', wordBreak: 'break-all' }}>
                   {log.userId}
                 </div>
               </div>
@@ -383,10 +383,10 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               {getLevelIcon(log.level)}
             </div>
             <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#333' }}>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
                 {log.message || 'Log de execução'}
               </div>
-              <div style={{ fontSize: '12px', color: '#666', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
                 <FaClock size={10} />
                 {formatDate(log.timestamp)}
                 {log.errorType && (
@@ -471,10 +471,10 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                 <FaUser size={10} color="#1976d2" />
               </div>
             )}
-            <div style={{ fontSize: '12px', color: '#333' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
               {log.user.name}
               {log.user.email && (
-                <span style={{ color: '#666', marginLeft: '8px' }}>
+                <span style={{ color: 'var(--text-secondary)', marginLeft: '8px' }}>
                   ({log.user.email})
                 </span>
               )}
@@ -487,7 +487,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          color: '#666',
+          color: 'var(--text-secondary)',
           fontSize: '12px',
           marginTop: '8px'
         }}>
@@ -502,7 +502,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
   if (loading) {
     return (
-      <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
         <FaSync size={24} style={{ marginBottom: '12px', animation: 'spin 1s linear infinite' }} />
         <div>Carregando logs de execução...</div>
       </div>
@@ -526,7 +526,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
   return (
     <div style={{ padding: '24px' }}>
-      <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <FaHistory size={18} />
         Log de Execução da Tarefa ({filteredLogs.length})
       </h3>
@@ -553,7 +553,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
         marginBottom: '24px'
       }}>
-        <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <FaFilter size={14} />
           Filtros
         </h4>
@@ -561,7 +561,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '16px' }}>
           {/* Level filter */}
           <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
               Nível
             </label>
             <select
@@ -586,7 +586,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
           {/* Date range filters */}
           <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
               Data inicial
             </label>
             <input
@@ -604,7 +604,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
           </div>
 
           <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
               Data final
             </label>
             <input
@@ -623,7 +623,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
           {/* Search filter */}
           <div>
-            <label style={{ display: 'block', fontSize: '12px', color: '#666', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
               Buscar
             </label>
             <div style={{ position: 'relative' }}>
@@ -645,7 +645,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                 left: '12px',
                 top: '50%',
                 transform: 'translateY(-50%)',
-                color: '#666'
+                color: 'var(--text-secondary)'
               }} />
             </div>
           </div>
@@ -653,7 +653,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
         {/* Action buttons */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontSize: '12px', color: '#666' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
             Mostrando {filteredLogs.length} de {logs.length} logs
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -661,8 +661,8 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               onClick={() => setFilters({ level: 'all', startDate: '', endDate: '', search: '' })}
               style={{
                 padding: '8px 16px',
-                backgroundColor: '#f8f9fa',
-                color: '#333',
+                backgroundColor: 'var(--bg-input)'',
+                color: 'var(--text-primary)',
                 border: '1px solid #ddd',
                 borderRadius: '6px',
                 fontSize: '14px',
@@ -699,11 +699,11 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       {/* Logs list */}
       {filteredLogs.length === 0 ? (
         <div style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)'',
           padding: '40px',
           borderRadius: '8px',
           textAlign: 'center',
-          color: '#666'
+          color: 'var(--text-secondary)'
         }}>
           <FaHistory size={32} style={{ marginBottom: '12px', opacity: 0.5 }} />
           <div style={{ fontSize: '16px', marginBottom: '8px' }}>Nenhum log de execução encontrado</div>

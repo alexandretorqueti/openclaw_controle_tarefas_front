@@ -180,11 +180,11 @@ const Login: React.FC = () => {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#f5f5f5',
+      backgroundColor: 'var(--bg-primary)',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
     }}>
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'var(--bg-card)',
         padding: '48px',
         borderRadius: '16px',
         boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
@@ -209,14 +209,14 @@ const Login: React.FC = () => {
         <h1 style={{
           fontSize: '28px',
           fontWeight: 700,
-          color: '#333',
+          color: 'var(--text-primary)',
           marginBottom: '8px'
         }}>
           Sistema de Gestão
         </h1>
         
         <p style={{
-          color: '#666',
+          color: 'var(--text-secondary)',
           fontSize: '16px',
           marginBottom: '32px',
           lineHeight: 1.5
@@ -237,7 +237,7 @@ const Login: React.FC = () => {
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: activeTab === 'google' ? '#4285F4' : '#f8f9fa',
+              backgroundColor: 'var(--bg-input)'',
               color: activeTab === 'google' ? '#fff' : '#666',
               border: 'none',
               borderRadius: '8px',
@@ -260,7 +260,7 @@ const Login: React.FC = () => {
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: activeTab === 'login' ? '#4ECDC4' : '#f8f9fa',
+              backgroundColor: 'var(--bg-input)'',
               color: activeTab === 'login' ? '#fff' : '#666',
               border: 'none',
               borderRadius: '8px',
@@ -283,7 +283,7 @@ const Login: React.FC = () => {
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: activeTab === 'register' ? '#06D6A0' : '#f8f9fa',
+              backgroundColor: 'var(--bg-input)'',
               color: activeTab === 'register' ? '#fff' : '#666',
               border: 'none',
               borderRadius: '8px',
@@ -343,10 +343,10 @@ const Login: React.FC = () => {
             <div style={{
               marginTop: '24px',
               padding: '16px',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'var(--bg-input)',
               borderRadius: '8px',
               fontSize: '14px',
-              color: '#666',
+              color: 'var(--text-secondary)',
               textAlign: 'left'
             }}>
               <p style={{ marginBottom: '8px' }}>
@@ -371,7 +371,7 @@ const Login: React.FC = () => {
                 marginBottom: '8px',
                 fontSize: '14px',
                 fontWeight: 600,
-                color: '#333'
+                color: 'var(--text-primary)'
               }}>
                 <FaUser style={{ marginRight: '8px' }} />
                 Nickname
@@ -449,7 +449,7 @@ const Login: React.FC = () => {
                 htmlFor="rememberLogin"
                 style={{
                   fontSize: '14px',
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   userSelect: 'none'
                 }}
@@ -500,10 +500,10 @@ const Login: React.FC = () => {
             <div style={{
               marginTop: '24px',
               padding: '16px',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'var(--bg-input)',
               borderRadius: '8px',
               fontSize: '14px',
-              color: '#666',
+              color: 'var(--text-secondary)',
               textAlign: 'left'
             }}>
               <p style={{ marginBottom: '8px' }}>
@@ -529,7 +529,7 @@ const Login: React.FC = () => {
                 marginBottom: '8px',
                 fontSize: '14px',
                 fontWeight: 600,
-                color: '#333'
+                color: 'var(--text-primary)'
               }}>
                 <FaIdCard style={{ marginRight: '8px' }} />
                 Nome Completo *
@@ -557,7 +557,7 @@ const Login: React.FC = () => {
                 marginBottom: '8px',
                 fontSize: '14px',
                 fontWeight: 600,
-                color: '#333'
+                color: 'var(--text-primary)'
               }}>
                 <FaUser style={{ marginRight: '8px' }} />
                 Nickname *
@@ -585,7 +585,7 @@ const Login: React.FC = () => {
                 marginBottom: '8px',
                 fontSize: '14px',
                 fontWeight: 600,
-                color: '#333'
+                color: 'var(--text-primary)'
               }}>
                 <FaEnvelope style={{ marginRight: '8px' }} />
                 Email (opcional)
@@ -677,10 +677,10 @@ const Login: React.FC = () => {
             <div style={{
               marginTop: '24px',
               padding: '16px',
-              backgroundColor: '#f8f9fa',
+              backgroundColor: 'var(--bg-input)',
               borderRadius: '8px',
               fontSize: '14px',
-              color: '#666',
+              color: 'var(--text-secondary)',
               textAlign: 'left'
             }}>
               <p style={{ marginBottom: '8px' }}>

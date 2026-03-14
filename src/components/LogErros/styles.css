@@ -1,6 +1,6 @@
 /* LogErros Container */
 .log-erros-container {
-  background-color: #0a0a0a;
+  background-color: var(--bg-primary);
   color: #fff;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
@@ -8,9 +8,9 @@
 
 /* Header */
 .log-erros-header {
-  background-color: #111;
+  background-color: var(--bg-secondary);
   padding: 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -36,7 +36,7 @@
 }
 
 .header-subtitle {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -48,9 +48,9 @@
 
 .control-button {
   padding: 8px 16px;
-  background-color: #222;
+  background-color: var(--bg-secondary);
   color: #fff;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -61,8 +61,8 @@
 }
 
 .control-button:hover {
-  background-color: #333;
-  border-color: #666;
+  background-color: var(--border-color);
+  border-color: var(--text-secondary);
 }
 
 .control-button:disabled {
@@ -90,7 +90,7 @@
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #888;
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
@@ -102,7 +102,7 @@
 .status-bar {
   background-color: #151515;
   padding: 12px 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   gap: 24px;
   align-items: center;
@@ -116,7 +116,7 @@
 }
 
 .status-label {
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .status-value {
@@ -136,7 +136,7 @@
 .log-filters {
   background-color: #151515;
   padding: 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .filters-header {
@@ -158,7 +158,7 @@
 .filters-toggle {
   background: none;
   border: none;
-  color: #888;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 16px;
   padding: 4px;
@@ -182,7 +182,7 @@
 }
 
 .filter-label {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 14px;
   display: flex;
   align-items: center;
@@ -202,14 +202,14 @@
 }
 
 .date-label {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
 .date-input {
   padding: 8px;
-  background-color: #222;
-  border: 1px solid #444;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   color: #fff;
   font-size: 14px;
@@ -218,8 +218,8 @@
 .filter-select,
 .filter-input {
   padding: 8px;
-  background-color: #222;
-  border: 1px solid #444;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   color: #fff;
   font-size: 14px;
@@ -257,12 +257,12 @@
 }
 
 .filter-button.reset {
-  background-color: #444;
+  background-color: var(--border-color);
   color: #fff;
 }
 
 .filter-button.reset:hover {
-  background-color: #666;
+  background-color: var(--text-secondary);
 }
 
 /* Log List */
@@ -276,14 +276,14 @@
   align-items: center;
   justify-content: center;
   min-height: 300px;
-  color: #888;
+  color: var(--text-secondary);
   gap: 16px;
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #333;
+  border: 3px solid var(--border-color);
   border-top-color: #0f0;
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -294,7 +294,7 @@
   align-items: center;
   justify-content: center;
   min-height: 300px;
-  color: #888;
+  color: var(--text-secondary);
   font-size: 14px;
 }
 
@@ -306,9 +306,9 @@
 /* Log Item */
 .log-item {
   border-left: 4px solid;
-  background-color: #111;
+  background-color: var(--bg-secondary);
   padding: 16px 20px;
-  border-bottom: 1px solid #222;
+  border-bottom: 1px solid var(--bg-secondary);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -329,11 +329,11 @@
 }
 
 .log-separator {
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .log-timestamp {
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .log-item-details {
@@ -349,7 +349,7 @@
 }
 
 .log-response-time {
-  color: #888;
+  color: var(--text-secondary);
 }
 
 .log-message {
@@ -382,12 +382,12 @@
 }
 
 .log-stack-trace {
-  background-color: #0a0a0a;
+  background-color: var(--bg-primary);
   padding: 8px 12px;
   border-radius: 4px;
   margin-top: 8px;
   font-size: 11px;
-  color: #888;
+  color: var(--text-secondary);
   max-height: 120px;
   overflow-y: auto;
   white-space: pre-wrap;
@@ -398,16 +398,16 @@
 .log-user-info {
   margin-top: 8px;
   font-size: 11px;
-  color: #888;
+  color: var(--text-secondary);
 }
 
 /* Footer */
 .log-erros-footer {
-  background-color: #111;
+  background-color: var(--bg-secondary);
   padding: 12px 20px;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--border-color);
   font-size: 12px;
-  color: #888;
+  color: var(--text-secondary);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -444,8 +444,8 @@
 }
 
 .modal-content {
-  background-color: #111;
-  border: 1px solid #333;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   width: 100%;
   max-width: 900px;
@@ -458,7 +458,7 @@
 .modal-header {
   background-color: #151515;
   padding: 20px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -476,7 +476,7 @@
 .modal-close {
   background: none;
   border: none;
-  color: #888;
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: 20px;
   padding: 4px;
@@ -498,7 +498,7 @@
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  color: #888;
+  color: var(--text-secondary);
   gap: 16px;
 }
 
@@ -529,11 +529,11 @@
   padding: 8px 12px;
   background-color: #151515;
   border-radius: 4px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
 }
 
 .detail-label {
-  color: #888;
+  color: var(--text-secondary);
   font-size: 12px;
   min-width: 120px;
 }
@@ -548,7 +548,7 @@
 .copy-button {
   background: none;
   border: none;
-  color: #888;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
   display: flex;
@@ -564,7 +564,7 @@
   background-color: #151515;
   padding: 12px;
   border-radius: 4px;
-  border: 1px solid #333;
+  border: 1px solid var(--border-color);
   color: #fff;
   font-size: 14px;
   line-height: 1.5;
@@ -572,11 +572,11 @@
 
 .detail-stack-trace,
 .detail-code {
-  background-color: #0a0a0a;
+  background-color: var(--bg-primary);
   padding: 12px;
   border-radius: 4px;
-  border: 1px solid #333;
-  color: #888;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.4;
   white-space: pre-wrap;
@@ -589,9 +589,9 @@
 
 .copy-button-large {
   padding: 8px 16px;
-  background-color: #222;
+  background-color: var(--bg-secondary);
   color: #fff;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -602,23 +602,23 @@
 }
 
 .copy-button-large:hover {
-  background-color: #333;
-  border-color: #666;
+  background-color: var(--border-color);
+  border-color: var(--text-secondary);
 }
 
 .modal-footer {
   background-color: #151515;
   padding: 16px 20px;
-  border-top: 1px solid #333;
+  border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
 }
 
 .modal-button {
   padding: 8px 24px;
-  background-color: #222;
+  background-color: var(--bg-secondary);
   color: #fff;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
@@ -626,6 +626,6 @@
 }
 
 .modal-button:hover {
-  background-color: #333;
-  border-color: #666;
+  background-color: var(--border-color);
+  border-color: var(--text-secondary);
 }
