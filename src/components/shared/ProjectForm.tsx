@@ -491,7 +491,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
         <div className="form-grid">
           <div className="form-group form-grid-full">
             <label className="form-label">
-              Agente Padrão
+              Arquiteto contratado
             </label>
             <select
               value={formData.agent || ''}
