@@ -254,13 +254,13 @@ if (compact) {
         className="task-card-compact"
         onClick={() => onTaskClick(task)}
         style={{
-          border: '1px solid #e0e0e0',
+          border: '1px solid var(--border-color)',
           borderRadius: '8px',
           padding: '12px',
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--bg-card)',
           cursor: 'pointer',
           transition: 'all 0.2s ease',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
           position: 'relative'
         }}
         onMouseEnter={(e) => {
@@ -275,9 +275,9 @@ if (compact) {
         {/* Exibição de erro */}
         {error && (
           <div style={{
-            backgroundColor: '#FFE5E5',
-            border: '1px solid #FF6B6B',
-            color: '#D32F2F',
+            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+            border: '1px solid var(--danger-color)',
+            color: 'var(--danger-color)',
             padding: '8px',
             borderRadius: '4px',
             marginBottom: '8px',
@@ -325,7 +325,7 @@ if (compact) {
               <h3 style={{
                 fontSize: '14px',
                 fontWeight: 600,
-                color: '#333',
+                color: 'var(--text-primary)',
                 margin: 0,
                 textDecoration: task.isCompleted ? 'line-through' : 'none',
                 opacity: task.isCompleted ? 0.7 : 1
@@ -336,7 +336,7 @@ if (compact) {
 
             <p style={{
               fontSize: '12px',
-              color: '#666',
+              color: 'var(--text-secondary)',
               marginBottom: '8px',
               display: '-webkit-box',
               WebkitLineClamp: 2,
@@ -350,7 +350,7 @@ if (compact) {
               {project && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <FaProjectDiagram size={10} color="#666" />
-                  <span style={{ fontSize: '11px', color: '#666' }}>
+                  <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                     {project.name}
                   </span>
                 </div>
@@ -360,7 +360,7 @@ if (compact) {
                 <FaCalendarAlt size={10} color={isOverdue ? '#FF6B6B' : '#666'} />
                 <span style={{
                   fontSize: '11px',
-                  color: isOverdue ? '#FF6B6B' : '#666',
+                  color: isOverdue ? 'var(--danger-color)' : 'var(--text-secondary)',
                   fontWeight: isOverdue ? 600 : 400
                 }}>
                   {formattedDeadline}
@@ -434,9 +434,9 @@ if (compact) {
       {/* Exibição de erro */}
       {error && (
         <div style={{
-          backgroundColor: '#FFE5E5',
-          border: '1px solid #FF6B6B',
-          color: '#D32F2F',
+          backgroundColor: 'rgba(231, 76, 60, 0.1)',
+          border: '1px solid var(--danger-color)',
+          color: 'var(--danger-color)',
           padding: '10px',
           borderRadius: '6px',
           marginBottom: '12px',
@@ -538,7 +538,7 @@ if (compact) {
         gap: '16px',
         marginBottom: '20px',
         padding: '16px',
-        backgroundColor: '#f8f9fa',
+        backgroundColor: 'var(--bg-input)',
         borderRadius: '8px'
       }}>
         {/* Status */}
