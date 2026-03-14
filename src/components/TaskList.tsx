@@ -241,10 +241,10 @@ const TaskList: React.FC<TaskListProps> = ({
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#333', margin: 0 }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
               {selectedProject ? `Tarefas do Projeto: ${selectedProject.name}` : 'Todas as Tarefas'}
             </h2>
-            <p style={{ fontSize: '14px', color: '#666', margin: '8px 0 0' }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '8px 0 0' }}>
               {selectedProject 
                 ? selectedProject.description
                 : 'Gerencie todas as tarefas de todos os projetos em um único lugar'}
@@ -274,18 +274,18 @@ const TaskList: React.FC<TaskListProps> = ({
       {/* Filtros e Controles - Apenas quando não está criando tarefa */}
       {!isCreatingTask && (
         <div style={{
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-input)',
           padding: '20px',
           borderRadius: '12px',
           marginBottom: '24px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
         }}>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '20px', alignItems: 'flex-start' }}>
             {/* Barra de Pesquisa */}
             <div style={{ flex: '1', minWidth: '300px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-                <FaSearch size={14} color="#666" />
-                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                <FaSearch size={14} color="var(--text-secondary)" />
+                <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                   Pesquisar
                 </label>
               </div>
@@ -298,13 +298,15 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '12px 12px 12px 40px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '8px',
                     fontSize: '14px',
                     outline: 'none',
                     transition: 'border-color 0.2s',
                     height: '44px',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    backgroundColor: 'var(--bg-input)',
+                    color: 'var(--text-primary)'
                   }}
                 />
                 <FaSearch style={{
@@ -332,10 +334,11 @@ const TaskList: React.FC<TaskListProps> = ({
                 style={{
                   width: '100%',
                   padding: '12px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '14px',
-                  backgroundColor: '#fff',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
                   outline: 'none',
                   height: '44px',
                   boxSizing: 'border-box'
@@ -353,8 +356,8 @@ const TaskList: React.FC<TaskListProps> = ({
             {/* Filtro de Prioridade */}
             <div style={{ minWidth: '200px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', height: '20px' }}>
-                <FaFlag size={14} color="#666" />
-                <label style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                <FaFlag size={14} color="var(--text-secondary)" />
+                <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                   Prioridade
                 </label>
               </div>
@@ -364,10 +367,11 @@ const TaskList: React.FC<TaskListProps> = ({
                 style={{
                   width: '100%',
                   padding: '12px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '14px',
-                  backgroundColor: '#fff',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
                   outline: 'none',
                   height: '44px',
                   boxSizing: 'border-box'
@@ -481,19 +485,19 @@ const TaskList: React.FC<TaskListProps> = ({
       {/* Formulário de Nova Tarefa */}
       {isCreatingTask && (
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'var(--bg-card)',
           padding: '20px',
           borderRadius: '8px',
           marginBottom: '24px',
           border: '2px solid #4ECDC4',
           boxShadow: '0 4px 12px rgba(78, 205, 196, 0.15)'
         }}>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>
             <h2 style={{ fontSize: '24px', color: '#4ECDC4', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
               <FaPlus size={24} />
               Criar Nova Tarefa
             </h2>
-            <p style={{ fontSize: '14px', color: '#666', margin: '8px 0 0 36px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '8px 0 0 36px' }}>
               Preencha os campos abaixo para adicionar uma nova tarefa ao projeto
             </p>
           </div>
