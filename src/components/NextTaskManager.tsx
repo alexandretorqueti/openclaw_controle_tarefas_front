@@ -118,8 +118,8 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: 'var(--bg-input)'',
-          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: 'var(--bg-input)',
+          borderBottom: '1px solid var(--border-color)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
@@ -161,7 +161,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               width: '40px',
               height: '40px',
               backgroundColor: 'transparent',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-color)',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -207,7 +207,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               <div style={{
                 padding: '20px',
                 textAlign: 'center',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
@@ -241,7 +241,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
             ) : users.length === 0 ? (
               <div style={{
                 padding: '20px',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
                 textAlign: 'center',
                 color: 'var(--text-secondary)'
@@ -352,7 +352,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
@@ -363,7 +363,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
@@ -390,7 +390,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
             ) : (
               <div style={{
                 backgroundColor: '#fff',
-                border: '1px solid #e0e0e0',
+                border: '1px solid var(--border-color)',
                 borderRadius: '12px',
                 overflow: 'hidden',
                 boxShadow: '0 4px 12px rgba(0,0,0,0.05)'
@@ -605,7 +605,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
 
                   {/* Informações Adicionais */}
                   <div style={{
-                    backgroundColor: 'var(--bg-input)'',
+                    backgroundColor: 'var(--bg-input)',
                     padding: '16px',
                     borderRadius: '8px',
                     marginTop: '20px'
@@ -689,7 +689,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
         {/* Rodapé */}
         <div style={{
           padding: '16px 24px',
-          backgroundColor: 'var(--bg-input)'',
+          backgroundColor: 'var(--bg-input)',
           borderTop: '1px solid #e0e0e0',
           fontSize: '12px',
           color: 'var(--text-secondary)',

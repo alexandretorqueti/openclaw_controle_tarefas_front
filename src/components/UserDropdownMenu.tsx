@@ -39,7 +39,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           alignItems: 'center',
           gap: '12px',
           padding: '8px 12px',
-          backgroundColor: 'var(--bg-input)'' : 'transparent',
+          backgroundColor: 'var(--bg-input)' : 'transparent',
           borderRadius: '8px',
           cursor: 'pointer',
           transition: 'all 0.2s',
@@ -114,14 +114,14 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           minWidth: '220px',
           zIndex: 1000,
           overflow: 'hidden',
-          border: '1px solid #e0e0e0',
+          border: '1px solid var(--border-color)',
           animation: 'fadeIn 0.2s ease-out'
         }}>
           {/* Cabeçalho do menu */}
           <div style={{
             padding: '16px',
-            backgroundColor: 'var(--bg-input)'',
-            borderBottom: '1px solid #e0e0e0',
+            backgroundColor: 'var(--bg-input)',
+            borderBottom: '1px solid var(--border-color)',
             display: 'flex',
             alignItems: 'center',
             gap: '12px'
@@ -237,7 +237,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           {/* Rodapé do menu */}
           <div style={{
             padding: '12px 16px',
-            backgroundColor: 'var(--bg-input)'',
+            backgroundColor: 'var(--bg-input)',
             borderTop: '1px solid #e0e0e0',
             fontSize: '11px',
             color: '#999',

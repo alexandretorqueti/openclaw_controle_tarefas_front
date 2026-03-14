@@ -175,7 +175,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       <div style={{
         marginTop: '16px',
         padding: '16px',
-        backgroundColor: 'var(--bg-input)'',
+        backgroundColor: 'var(--bg-input)',
         borderRadius: '8px',
         border: '1px solid #e9ecef'
       }}>
@@ -570,7 +570,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
                 backgroundColor: '#fff'
@@ -596,7 +596,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -614,7 +614,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -635,7 +635,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                 style={{
                   width: '100%',
                   padding: '10px 10px 10px 36px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '6px',
                   fontSize: '14px'
                 }}
@@ -661,9 +661,9 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               onClick={() => setFilters({ level: 'all', startDate: '', endDate: '', search: '' })}
               style={{
                 padding: '8px 16px',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 color: 'var(--text-primary)',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
                 cursor: 'pointer',
@@ -699,7 +699,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       {/* Logs list */}
       {filteredLogs.length === 0 ? (
         <div style={{
-          backgroundColor: 'var(--bg-input)'',
+          backgroundColor: 'var(--bg-input)',
           padding: '40px',
           borderRadius: '8px',
           textAlign: 'center',

@@ -255,8 +255,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: 'var(--bg-input)'',
-          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: 'var(--bg-input)',
+          borderBottom: '1px solid var(--border-color)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
@@ -298,7 +298,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               width: '40px',
               height: '40px',
               backgroundColor: 'transparent',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-color)',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -349,7 +349,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               <span style={{
                 fontSize: '14px',
                 color: 'var(--text-secondary)',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 padding: '4px 12px',
                 borderRadius: '20px'
               }}>
@@ -395,7 +395,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
@@ -413,7 +413,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     style={{
                       padding: '16px',
                       backgroundColor: '#fff',
-                      border: '1px solid #e0e0e0',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '8px',
                       display: 'flex',
                       alignItems: 'center',
@@ -551,7 +551,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: 'var(--bg-input)'',
+            backgroundColor: 'var(--bg-input)',
             overflowY: 'auto'
           }}>
             <h3 style={{
@@ -568,9 +568,9 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                 color: 'var(--text-secondary)',
                 marginBottom: '20px',
                 padding: '12px 16px',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
-                border: '1px solid #e0e0e0',
+                border: '1px solid var(--border-color)',
                 fontFamily: 'monospace',
                 wordBreak: 'break-all'
               }}>
@@ -682,7 +682,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     style={{
                       width: '100%',
                       padding: '12px 16px 12px 40px',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '8px',
                       fontSize: '16px',
                       boxSizing: 'border-box',
@@ -767,7 +767,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       <div style={{
                         width: '40px',
                         height: '40px',
-                        backgroundColor: 'var(--bg-input)'',
+                        backgroundColor: 'var(--bg-input)',
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
@@ -870,9 +870,9 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     onClick={resetForm}
                     style={{
                       padding: '14px 24px',
-                      backgroundColor: 'var(--bg-input)'',
+                      backgroundColor: 'var(--bg-input)',
                       color: 'var(--text-secondary)',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '8px',
                       fontSize: '16px',
                       fontWeight: 600,
@@ -905,7 +905,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               padding: '16px',
               backgroundColor: '#fff',
               borderRadius: '8px',
-              border: '1px solid #e0e0e0'
+              border: '1px solid var(--border-color)'
             }}>
               <h4 style={{
                 fontSize: '14px',

@@ -65,7 +65,7 @@ const IATest: React.FC = () => {
           marginTop: '20px', 
           padding: '15px', 
           backgroundColor: 'white', 
-          border: '1px solid #ddd',
+          border: '1px solid var(--border-color)',
           borderRadius: '4px',
           fontFamily: 'monospace',
           fontSize: '14px',

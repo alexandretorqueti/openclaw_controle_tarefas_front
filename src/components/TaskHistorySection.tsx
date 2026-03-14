@@ -133,7 +133,7 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
           alignItems: 'center', 
           gap: '16px',
           padding: '12px',
-          backgroundColor: 'var(--bg-input)'',
+          backgroundColor: 'var(--bg-input)',
           borderRadius: '6px',
           marginBottom: '12px'
         }}>
@@ -219,7 +219,7 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
       {/* History list */}
       {history.length === 0 ? (
         <div style={{
-          backgroundColor: 'var(--bg-input)'',
+          backgroundColor: 'var(--bg-input)',
           padding: '40px',
           borderRadius: '8px',
           textAlign: 'center',

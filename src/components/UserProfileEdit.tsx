@@ -165,8 +165,8 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: 'var(--bg-input)'',
-          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: 'var(--bg-input)',
+          borderBottom: '1px solid var(--border-color)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between'
@@ -209,7 +209,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
               height: '36px',
               borderRadius: '50%',
               backgroundColor: 'transparent',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-color)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -333,11 +333,11 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: '#333',
-                  backgroundColor: 'var(--bg-input)'',
+                  backgroundColor: 'var(--bg-input)',
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
@@ -376,11 +376,11 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: '#333',
-                  backgroundColor: 'var(--bg-input)'',
+                  backgroundColor: 'var(--bg-input)',
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
@@ -418,11 +418,11 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 style={{
                   width: '100%',
                   padding: '12px 16px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '14px',
                   color: '#333',
-                  backgroundColor: 'var(--bg-input)'',
+                  backgroundColor: 'var(--bg-input)',
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
@@ -457,7 +457,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   flex: 1,
                   padding: '14px 20px',
                   backgroundColor: 'transparent',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: 500,

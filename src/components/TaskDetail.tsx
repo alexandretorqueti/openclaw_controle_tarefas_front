@@ -284,8 +284,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             alignItems: 'center',
             gap: '8px',
             padding: '10px 16px',
-            backgroundColor: 'var(--bg-input)'',
-            border: '1px solid #ddd',
+            backgroundColor: 'var(--bg-input)',
+            border: '1px solid var(--border-color)',
             borderRadius: '8px',
             fontSize: '14px',
             cursor: 'pointer',
@@ -338,7 +338,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     fontSize: '24px',
                     fontWeight: 700,
                     color: '#333',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     padding: '8px 12px',
                     width: '100%',
@@ -360,7 +360,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     onClick={handleToggleCompletion}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: 'var(--bg-input)'',
+                      backgroundColor: 'var(--bg-input)',
                       color: task.isCompleted ? '#fff' : '#333',
                       border: `1px solid ${task.isCompleted ? '#06D6A0' : '#ddd'}`,
                       borderRadius: '6px',
@@ -394,7 +394,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                   style={{
                     width: '100%',
                     padding: '12px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '8px',
                     fontSize: '14px',
                     resize: 'vertical',
@@ -411,7 +411,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     fontSize: '14px', 
                     color: 'var(--text-secondary)', 
                     lineHeight: 1.6,
-                    backgroundColor: 'var(--bg-input)'',
+                    backgroundColor: 'var(--bg-input)',
                     padding: '16px',
                     borderRadius: '8px'
                   }}>
@@ -468,9 +468,9 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     onClick={handleCancelEdit}
                     style={{
                       padding: '10px 16px',
-                      backgroundColor: 'var(--bg-input)'',
+                      backgroundColor: 'var(--bg-input)',
                       color: '#333',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '8px',
                       fontSize: '14px',
                       cursor: 'pointer',
@@ -532,7 +532,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -575,7 +575,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -637,7 +637,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -769,7 +769,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -844,7 +844,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
                 backgroundColor: '#fff'
@@ -912,7 +912,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -1015,7 +1015,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               style={{
                 width: '100%',
                 padding: '10px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px'
               }}
@@ -1040,7 +1040,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 )}
                 {project?.regras && (
                   <div style={{ 
-                    backgroundColor: 'var(--bg-input)'', 
+                    backgroundColor: 'var(--bg-input)', 
                     padding: '12px', 
                     borderRadius: '8px',
                     marginTop: '12px',
@@ -1069,7 +1069,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
       {/* Metadata */}
       <div style={{
-        backgroundColor: 'var(--bg-input)'',
+        backgroundColor: 'var(--bg-input)',
         padding: '20px',
         borderRadius: '12px',
         marginBottom: '32px'
@@ -1130,7 +1130,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         <div style={{
           display: 'flex',
           borderBottom: '1px solid #e9ecef',
-          backgroundColor: 'var(--bg-input)''
+          backgroundColor: 'var(--bg-input)'
         }}>
           <button
             onClick={() => setActiveTab('comments')}

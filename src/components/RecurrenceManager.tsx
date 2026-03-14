@@ -314,7 +314,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
       {/* Tabs */}
       <div style={{ 
         display: 'flex', 
-        borderBottom: '1px solid #e0e0e0',
+        borderBottom: '1px solid var(--border-color)',
         marginBottom: '24px'
       }}>
         <button

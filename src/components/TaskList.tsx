@@ -440,7 +440,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 onChange={(e) => setSortBy(e.target.value as any)}
                 style={{
                   padding: '8px 12px',
-                  border: '1px solid #ddd',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '6px',
                   fontSize: '14px',
                   backgroundColor: '#fff',
@@ -579,7 +579,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     style={{
                       width: '100%',
                       padding: '10px',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '6px',
                       fontSize: '14px'
                     }}
@@ -604,7 +604,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px'
                   }}
@@ -627,7 +627,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px'
                   }}
@@ -650,7 +650,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px'
                   }}
@@ -678,7 +678,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px',
                     backgroundColor: '#fff'
@@ -722,7 +722,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px'
                   }}
@@ -748,7 +748,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px'
                   }}
@@ -780,7 +780,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px',
                     resize: 'vertical'
@@ -859,7 +859,7 @@ const TaskList: React.FC<TaskListProps> = ({
               onChange={(e) => setSortBy(e.target.value as any)}
               style={{
                 padding: '8px 12px',
-                border: '1px solid #ddd',
+                border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
                 backgroundColor: '#fff',
@@ -925,7 +925,7 @@ const TaskList: React.FC<TaskListProps> = ({
           <div style={{
             textAlign: 'center',
             padding: '48px',
-            backgroundColor: 'var(--bg-input)'',
+            backgroundColor: 'var(--bg-input)',
             borderRadius: '12px',
             color: 'var(--text-secondary)'
           }}>

@@ -225,8 +225,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: 'var(--bg-input)'',
-          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: 'var(--bg-input)',
+          borderBottom: '1px solid var(--border-color)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
@@ -268,7 +268,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               width: '40px',
               height: '40px',
               backgroundColor: 'transparent',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-color)',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -319,7 +319,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               <span style={{
                 fontSize: '14px',
                 color: 'var(--text-secondary)',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 padding: '4px 12px',
                 borderRadius: '20px'
               }}>
@@ -365,7 +365,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
@@ -389,7 +389,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                       style={{
                         padding: '16px',
                         backgroundColor: '#fff',
-                        border: '1px solid #e0e0e0',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
@@ -440,7 +440,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                           </span>
                           <span style={{
                             fontSize: '12px',
-                            backgroundColor: 'var(--bg-input)'',
+                            backgroundColor: 'var(--bg-input)',
                             color: 'var(--text-secondary)',
                             padding: '2px 8px',
                             borderRadius: '4px'
@@ -512,7 +512,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: 'var(--bg-input)'',
+            backgroundColor: 'var(--bg-input)',
             overflowY: 'auto'
           }}>
             <h3 style={{
@@ -572,7 +572,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                       style={{
                         padding: '4px 8px',
                         backgroundColor: '#fff',
-                        border: '1px solid #ddd',
+                        border: '1px solid var(--border-color)',
                         borderRadius: '4px',
                         fontSize: '11px',
                         cursor: 'pointer',
@@ -607,8 +607,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                     onClick={suggestPersonaPrompt}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: 'var(--bg-input)'',
-                      border: '1px solid #ddd',
+                      backgroundColor: 'var(--bg-input)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '6px',
                       fontSize: '12px',
                       cursor: 'pointer',
@@ -668,8 +668,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                     onClick={suggestBaseRules}
                     style={{
                       padding: '6px 12px',
-                      backgroundColor: 'var(--bg-input)'',
-                      border: '1px solid #ddd',
+                      backgroundColor: 'var(--bg-input)',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '6px',
                       fontSize: '12px',
                       cursor: 'pointer',
@@ -690,7 +690,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    border: '1px solid #ddd',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '8px',
                     fontSize: '14px',
                     boxSizing: 'border-box',
@@ -760,9 +760,9 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                     onClick={resetForm}
                     style={{
                       padding: '14px 24px',
-                      backgroundColor: 'var(--bg-input)'',
+                      backgroundColor: 'var(--bg-input)',
                       color: 'var(--text-secondary)',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '8px',
                       fontSize: '16px',
                       fontWeight: 600,

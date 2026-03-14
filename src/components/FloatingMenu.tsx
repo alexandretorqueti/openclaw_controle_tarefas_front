@@ -61,7 +61,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
             minWidth: '220px',
             zIndex: 1000,
             overflow: 'hidden',
-            border: '1px solid #e0e0e0'
+            border: '1px solid var(--border-color)'
           }}
           onMouseEnter={() => setIsOpen(true)}
           onMouseLeave={() => setIsOpen(false)}
@@ -69,8 +69,8 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
           {/* Cabeçalho do menu */}
           <div style={{
             padding: '16px',
-            backgroundColor: 'var(--bg-input)'',
-            borderBottom: '1px solid #e0e0e0',
+            backgroundColor: 'var(--bg-input)',
+            borderBottom: '1px solid var(--border-color)',
             display: 'flex',
             alignItems: 'center',
             gap: '12px'
@@ -440,7 +440,7 @@ const FloatingMenu: React.FC<FloatingMenuProps> = ({ onOpenStatus, onOpenPriorit
           {/* Rodapé do menu */}
           <div style={{
             padding: '12px 16px',
-            backgroundColor: 'var(--bg-input)'',
+            backgroundColor: 'var(--bg-input)',
             borderTop: '1px solid #e0e0e0',
             fontSize: '11px',
             color: '#999',

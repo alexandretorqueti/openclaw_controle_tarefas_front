@@ -487,7 +487,7 @@ const AgentManager: React.FC = () => {
             style={{
               fontSize: "24px",
               fontWeight: 600,
-              color: "#333",
+              color: "var(--text-primary)",
               margin: 0,
               display: "flex",
               alignItems: "center",
@@ -519,9 +519,9 @@ const AgentManager: React.FC = () => {
             onClick={loadAgents}
             style={{
               padding: "10px 16px",
-              backgroundColor: 'var(--bg-input)'",
-              color: "#333",
-              border: "1px solid #e0e0e0",
+              backgroundColor: 'var(--bg-input)',
+              color: "var(--text-primary)",
+              border: "1px solid var(--border-color)",
               borderRadius: "8px",
               display: "flex",
               alignItems: "center",
@@ -581,9 +581,9 @@ const AgentManager: React.FC = () => {
           flexWrap: "wrap",
           alignItems: "end",
           padding: "16px",
-          backgroundColor: 'var(--bg-input)'",
+          backgroundColor: 'var(--bg-input)',
           borderRadius: "12px",
-          border: "1px solid #e0e0e0",
+          border: "1px solid var(--border-color)",
         }}
       >
         <div
@@ -666,7 +666,7 @@ const AgentManager: React.FC = () => {
         style={{
           backgroundColor: "#fff",
           borderRadius: "12px",
-          border: "1px solid #e0e0e0",
+          border: "1px solid var(--border-color)",
           overflow: "auto",
         }}
       >
@@ -722,7 +722,7 @@ const AgentManager: React.FC = () => {
             <thead>
               <tr
                 style={{
-                  backgroundColor: 'var(--bg-input)'",
+                  backgroundColor: 'var(--bg-input)',
                   borderBottom: "1px solid #e0e0e0",
                 }}
               >
@@ -801,7 +801,7 @@ const AgentManager: React.FC = () => {
                           style={{
                             fontSize: "14px",
                             fontWeight: 500,
-                            color: "#333",
+                            color: "var(--text-primary)",
                           }}
                         >
                           {agent.identity ? agent.identity.name : "Sem nome"}
@@ -1003,7 +1003,7 @@ const AgentManager: React.FC = () => {
                 style={{
                   fontSize: "18px",
                   fontWeight: 600,
-                  color: "#333",
+                  color: "var(--text-primary)",
                 }}
               >
                 Criar Novo Agente
@@ -1041,7 +1041,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1054,7 +1054,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1079,7 +1079,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1092,7 +1092,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1133,9 +1133,9 @@ const AgentManager: React.FC = () => {
                 onClick={() => setShowCreateModal(false)}
                 style={{
                   padding: "10px 16px",
-                  color: "#333",
-                  backgroundColor: 'var(--bg-input)'",
-                  border: "1px solid #e0e0e0",
+                  color: "var(--text-primary)",
+                  backgroundColor: 'var(--bg-input)',
+                  border: "1px solid var(--border-color)",
                   borderRadius: "8px",
                   cursor: "pointer",
                   transition: "all 0.2s",
@@ -1230,7 +1230,7 @@ const AgentManager: React.FC = () => {
                 style={{
                   fontSize: "18px",
                   fontWeight: 600,
-                  color: "#333",
+                  color: "var(--text-primary)",
                 }}
               >
                 Editar Agente
@@ -1279,7 +1279,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1292,7 +1292,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1318,7 +1318,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1331,7 +1331,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1348,7 +1348,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1360,7 +1360,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1383,7 +1383,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1396,7 +1396,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1412,7 +1412,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1434,7 +1434,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1456,7 +1456,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1478,7 +1478,7 @@ const AgentManager: React.FC = () => {
                   style={{
                     width: "100%",
                     padding: "10px 12px",
-                    border: "1px solid #e0e0e0",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     fontSize: "14px",
                     outline: "none",
@@ -1502,7 +1502,7 @@ const AgentManager: React.FC = () => {
                     display: "block",
                     fontSize: "14px",
                     fontWeight: 500,
-                    color: "#333",
+                    color: "var(--text-primary)",
                     marginBottom: "8px",
                   }}
                 >
@@ -1525,9 +1525,9 @@ const AgentManager: React.FC = () => {
                   onClick={() => fileInputRef.current?.click()}
                   style={{
                     padding: "10px 16px",
-                    backgroundColor: 'var(--bg-input)'",
-                    color: "#333",
-                    border: "1px solid #e0e0e0",
+                    backgroundColor: 'var(--bg-input)',
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border-color)",
                     borderRadius: "8px",
                     cursor: "pointer",
                     width: "100%",
@@ -1565,9 +1565,9 @@ const AgentManager: React.FC = () => {
                 }}
                 style={{
                   padding: "10px 16px",
-                  color: "#333",
-                  backgroundColor: 'var(--bg-input)'",
-                  border: "1px solid #e0e0e0",
+                  color: "var(--text-primary)",
+                  backgroundColor: 'var(--bg-input)',
+                  border: "1px solid var(--border-color)",
                   borderRadius: "8px",
                   cursor: "pointer",
                   transition: "all 0.2s",
@@ -1668,7 +1668,7 @@ const AgentManager: React.FC = () => {
                 style={{
                   fontSize: "14px",
                   fontWeight: 500,
-                  color: "#333",
+                  color: "var(--text-primary)",
                   marginBottom: processingToast.steps ? "8px" : "0",
                 }}
               >

@@ -229,7 +229,7 @@ const Login: React.FC = () => {
           display: 'flex',
           gap: '8px',
           marginBottom: '24px',
-          borderBottom: '1px solid #e0e0e0',
+          borderBottom: '1px solid var(--border-color)',
           paddingBottom: '16px'
         }}>
           <button
@@ -237,7 +237,7 @@ const Login: React.FC = () => {
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: 'var(--bg-input)'',
+              backgroundColor: 'var(--bg-input)',
               color: activeTab === 'google' ? '#fff' : '#666',
               border: 'none',
               borderRadius: '8px',
@@ -260,7 +260,7 @@ const Login: React.FC = () => {
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: 'var(--bg-input)'',
+              backgroundColor: 'var(--bg-input)',
               color: activeTab === 'login' ? '#fff' : '#666',
               border: 'none',
               borderRadius: '8px',
@@ -283,7 +283,7 @@ const Login: React.FC = () => {
             style={{
               flex: 1,
               padding: '12px',
-              backgroundColor: 'var(--bg-input)'',
+              backgroundColor: 'var(--bg-input)',
               color: activeTab === 'register' ? '#fff' : '#666',
               border: 'none',
               borderRadius: '8px',
@@ -598,7 +598,7 @@ const Login: React.FC = () => {
                 style={{
                   width: '100%',
                   padding: '14px',
-                  border: '1px solid #e0e0e0',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '16px',
                   marginBottom: '16px',

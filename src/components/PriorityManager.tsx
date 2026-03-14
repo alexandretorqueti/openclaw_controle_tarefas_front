@@ -187,8 +187,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
         {/* Cabeçalho */}
         <div style={{
           padding: '24px',
-          backgroundColor: 'var(--bg-input)'',
-          borderBottom: '1px solid #e0e0e0',
+          backgroundColor: 'var(--bg-input)',
+          borderBottom: '1px solid var(--border-color)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
@@ -230,7 +230,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               width: '40px',
               height: '40px',
               backgroundColor: 'transparent',
-              border: '1px solid #ddd',
+              border: '1px solid var(--border-color)',
               borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
@@ -281,7 +281,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               <span style={{
                 fontSize: '14px',
                 color: 'var(--text-secondary)',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 padding: '4px 12px',
                 borderRadius: '20px'
               }}>
@@ -327,7 +327,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: 'var(--bg-input)'',
+                backgroundColor: 'var(--bg-input)',
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
@@ -475,7 +475,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
           <div style={{
             flex: 1,
             padding: '24px',
-            backgroundColor: 'var(--bg-input)''
+            backgroundColor: 'var(--bg-input)'
           }}>
             <h3 style={{
               fontSize: '18px',
@@ -642,9 +642,9 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                     onClick={resetForm}
                     style={{
                       padding: '14px 24px',
-                      backgroundColor: 'var(--bg-input)'',
+                      backgroundColor: 'var(--bg-input)',
                       color: 'var(--text-secondary)',
-                      border: '1px solid #ddd',
+                      border: '1px solid var(--border-color)',
                       borderRadius: '8px',
                       fontSize: '16px',
                       fontWeight: 600,
@@ -677,7 +677,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               padding: '16px',
               backgroundColor: '#fff',
               borderRadius: '8px',
-              border: '1px solid #e0e0e0'
+              border: '1px solid var(--border-color)'
             }}>
               <h4 style={{
                 fontSize: '14px',
