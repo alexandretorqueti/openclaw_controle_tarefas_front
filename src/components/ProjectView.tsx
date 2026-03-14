@@ -143,17 +143,17 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
             width: '40px',
             height: '40px',
             borderRadius: '8px',
-            backgroundColor: '#f0f9ff',
+            backgroundColor: 'var(--bg-input)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#2563eb',
+            color: 'var(--accent-color)',
           }}>
             <FaFolder size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 600, color: '#333' }}>{project.name}</div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
+            <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{project.name}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
               {project.tasks?.length || 0} tarefas
             </div>
           </div>
@@ -167,7 +167,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
         const description = project.description;
         const displayText = !description || description.trim() === '' ? 'Sem descrição' : description;
         return (
-          <div style={{ color: '#666', fontSize: '14px' }}>
+          <div style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
             {displayText}
           </div>
         );
@@ -182,8 +182,8 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
           alignItems: 'center',
           padding: '4px 12px',
           borderRadius: '20px',
-          backgroundColor: project.status ? '#dcfce7' : '#fee2e2',
-          color: project.status ? '#166534' : '#991b1b',
+          backgroundColor: project.status ? 'rgba(46, 204, 113, 0.2)' : 'rgba(231, 76, 60, 0.2)',
+          color: project.status ? 'var(--success-color)' : 'var(--danger-color)',
           fontSize: '12px',
           fontWeight: 500,
         }}>
@@ -200,8 +200,8 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
           alignItems: 'center',
           padding: '4px 12px',
           borderRadius: '20px',
-          backgroundColor: project.agent ? '#dbeafe' : '#f3f4f6',
-          color: project.agent ? '#1e40af' : '#6b7280',
+          backgroundColor: project.agent ? 'rgba(74, 144, 226, 0.2)' : 'var(--bg-input)',
+          color: project.agent ? 'var(--accent-color)' : 'var(--text-secondary)',
           fontSize: '12px',
           fontWeight: 500,
         }}>
@@ -401,7 +401,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
         size="sm"
       >
         <div style={{ textAlign: 'center', padding: '20px 0' }}>
-          <p style={{ color: '#666', marginBottom: '24px' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
             Todas as tarefas associadas a este projeto serão mantidas, mas o projeto será removido permanentemente.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
