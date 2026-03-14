@@ -288,8 +288,8 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: '24px', fontWeight: 600, color: '#333', margin: 0 }}>Projetos</h2>
-            <p style={{ fontSize: '14px', color: '#666', margin: '8px 0 0' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Projetos</h2>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '8px 0 0' }}>
               Gerencie seus projetos e visualize as tarefas associadas
             </p>
           </div>
