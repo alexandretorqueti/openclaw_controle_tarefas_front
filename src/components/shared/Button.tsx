@@ -36,18 +36,18 @@ const Button: React.FC<ButtonProps> = ({
 
   const variantStyles = {
     primary: {
-      backgroundColor: '#4ECDC4',
+      backgroundColor: 'var(--accent-color)',
       color: '#fff',
       border: 'none',
-      hoverBackgroundColor: '#3DB8AC',
-      activeBackgroundColor: '#2CA89C',
+      hoverBackgroundColor: 'var(--accent-hover)',
+      activeBackgroundColor: 'var(--accent-color)',
     },
     secondary: {
-      backgroundColor: '#6c757d',
-      color: '#fff',
+      backgroundColor: 'var(--bg-secondary)',
+      color: 'var(--text-primary)',
       border: 'none',
-      hoverBackgroundColor: '#5a6268',
-      activeBackgroundColor: '#494f54',
+      hoverBackgroundColor: 'var(--bg-input)',
+      activeBackgroundColor: 'var(--border-color)',
     },
     outline: {
       backgroundColor: 'transparent',

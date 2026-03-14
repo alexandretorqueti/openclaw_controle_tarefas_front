@@ -9,10 +9,10 @@
 
 /* Seções do formulário */
 .form-section {
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 24px;
-  background-color: #fff;
+  background-color: var(--bg-card);
 }
 
 .form-section-header {
@@ -26,11 +26,11 @@
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  background-color: #f0f9ff;
+  background-color: var(--bg-input);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2563eb;
+  color: var(--accent-color);
 }
 
 .form-section-title {
