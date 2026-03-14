@@ -36,11 +36,15 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
     repositoryUrl: '',
     pastaBase: '',
     agent: '',
+    modeloAuxiliar: '',
+    modeloAuxiliarCustom: '',
     frontendBuildCmd: '',
     backendBuildCmd: '',
   });
 
   const [localAgents, setLocalAgents] = useState<Agent[]>(agents);
+  const [availableModels, setAvailableModels] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState<boolean>(false);
 
   // Carregar agentes se não fornecidos
   useEffect(() => {
@@ -68,6 +72,88 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
     }
   }, [agents]);
 
+  // Carregar modelos disponíveis da API
+  useEffect(() => {
+    const loadModels = async () => {
+      try {
+        setLoadingModels(true);
+        console.log('DEBUG: Carregando modelos da API...');
+        const response = await fetch('http://localhost:3001/api/models');
+        if (response.ok) {
+          const data = await response.json();
+          const modelsList = data.models || [];
+          console.log('DEBUG: Modelos carregados:', modelsList.length, modelsList.slice(0, 5));
+          setAvailableModels(modelsList);
+        } else {
+          console.error('DEBUG: Erro na resposta ao carregar modelos:', response.status);
+          // Fallback para lista fixa se API falhar
+          setAvailableModels([
+            'deepseek/deepseek-chat',
+            'gpt-4o',
+            'gpt-4-turbo',
+            'claude-3-opus',
+            'claude-3-sonnet',
+            'claude-3-haiku',
+            'gemini-1.5-pro',
+            'gemini-1.5-flash',
+            'llama-3.1-70b',
+            'llama-3.2-3b',
+            'mistral-large',
+            'mixtral-8x7b',
+            'phi-4',
+            'codellama'
+          ]);
+        }
+      } catch (error) {
+        console.error('DEBUG: Erro ao carregar modelos:', error);
+        // Fallback para lista fixa
+        setAvailableModels([
+          'deepseek/deepseek-chat',
+          'gpt-4o',
+          'gpt-4-turbo',
+          'claude-3-opus',
+          'claude-3-sonnet',
+          'claude-3-haiku',
+          'gemini-1.5-pro',
+          'gemini-1.5-flash',
+          'llama-3.1-70b',
+          'llama-3.2-3b',
+          'mistral-large',
+          'mixtral-8x7b',
+          'phi-4',
+          'codellama'
+        ]);
+      } finally {
+        setLoadingModels(false);
+      }
+    };
+
+    loadModels();
+  }, []);
+
+  // Recarregar formulário quando modelos terminarem de carregar
+  useEffect(() => {
+    if (project && !loadingModels && availableModels.length > 0) {
+      console.log('DEBUG: Modelos carregados, recalculando modeloAuxiliar...');
+      
+      // Determinar se o modelo auxiliar é um valor da lista ou custom
+      const modeloAuxiliarValue = project.modeloAuxiliar || '';
+      const isInList = availableModels.includes(modeloAuxiliarValue);
+      
+      console.log('DEBUG: Recalculando modelo auxiliar:', {
+        modeloAuxiliarValue,
+        isInList,
+        availableModels: availableModels.slice(0, 5)
+      });
+      
+      setFormData(prev => ({
+        ...prev,
+        modeloAuxiliar: isInList ? modeloAuxiliarValue : (modeloAuxiliarValue ? 'custom' : ''),
+        modeloAuxiliarCustom: !isInList ? modeloAuxiliarValue : '',
+      }));
+    }
+  }, [loadingModels, availableModels, project]);
+
   // Preencher formulário se projeto fornecido
   useEffect(() => {
     if (project) {
@@ -75,8 +161,28 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
         project,
         agent: project.agent,
         name: project.name,
-        description: project.description
+        description: project.description,
+        modeloAuxiliar: project.modeloAuxiliar,
+        availableModelsLength: availableModels.length,
+        loadingModels
       });
+      
+      // Se ainda estiver carregando modelos, não preencher o campo modeloAuxiliar ainda
+      if (loadingModels) {
+        console.log('DEBUG: Ainda carregando modelos, aguardando...');
+        return;
+      }
+      
+      // Determinar se o modelo auxiliar é um valor da lista ou custom
+      const modeloAuxiliarValue = project.modeloAuxiliar || '';
+      const isInList = availableModels.includes(modeloAuxiliarValue);
+      
+      console.log('DEBUG: Modelo auxiliar lógica:', {
+        modeloAuxiliarValue,
+        isInList,
+        availableModels: availableModels.slice(0, 5)
+      });
+      
       setFormData({
         name: project.name || '',
         description: project.description || '',
@@ -90,13 +196,15 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
         repositoryUrl: project.repositoryUrl || '',
         pastaBase: project.pastaBase || '',
         agent: project.agent || '',
+        modeloAuxiliar: isInList ? modeloAuxiliarValue : (modeloAuxiliarValue ? 'custom' : ''),
+        modeloAuxiliarCustom: !isInList ? modeloAuxiliarValue : '',
         frontendBuildCmd: project.frontendBuildCmd || '',
         backendBuildCmd: project.backendBuildCmd || '',
       });
     } else {
       console.log('DEBUG: ProjectForm em modo criação (project é null)');
     }
-  }, [project]);
+  }, [project, availableModels, loadingModels]);
 
   const handleSubmit = async () => {
     console.log('DEBUG: ProjectForm handleSubmit CHAMADO, formData:', formData);
@@ -135,6 +243,21 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
     if (submitData.repositoryUrl !== undefined) cleanedData.repositoryUrl = submitData.repositoryUrl;
     if (submitData.pastaBase !== undefined) cleanedData.pastaBase = submitData.pastaBase;
     if (submitData.agent !== undefined) cleanedData.agent = submitData.agent;
+    
+    // Lógica especial para modelo auxiliar
+    if (submitData.modeloAuxiliar !== undefined) {
+      if (submitData.modeloAuxiliar === 'custom' && submitData.modeloAuxiliarCustom) {
+        // Se selecionou "custom" e preencheu campo personalizado
+        cleanedData.modeloAuxiliar = submitData.modeloAuxiliarCustom;
+      } else if (submitData.modeloAuxiliar && submitData.modeloAuxiliar !== 'custom') {
+        // Se selecionou um modelo da lista (não custom)
+        cleanedData.modeloAuxiliar = submitData.modeloAuxiliar;
+      } else {
+        // Vazio ou custom sem valor personalizado
+        cleanedData.modeloAuxiliar = null;
+      }
+    }
+    
     if (submitData.frontendBuildCmd !== undefined) cleanedData.frontendBuildCmd = submitData.frontendBuildCmd;
     if (submitData.backendBuildCmd !== undefined) cleanedData.backendBuildCmd = submitData.backendBuildCmd;
 
@@ -386,7 +509,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
               {localAgents.length > 0 ? (
                 localAgents.map((agent) => (
                   <option key={agent.id} value={agent.id}>
-                    {agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
+                    {agent.identity?.name || agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
                   </option>
                 ))
               ) : (
@@ -396,6 +519,49 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
             <p className="form-help">
               Agente padrão para tarefas deste projeto
             </p>
+          </div>
+
+          <div className="form-group form-grid-full">
+            <label className="form-label">
+              Modelo Auxiliar
+            </label>
+            <select
+              value={formData.modeloAuxiliar || ''}
+              onChange={(e) => handleChange('modeloAuxiliar', e.target.value || null)}
+              className="form-select"
+              disabled={loadingModels}
+            >
+              <option value="">{loadingModels ? 'Carregando modelos...' : 'Selecione um modelo (opcional)...'}</option>
+              {availableModels.map((model) => (
+                <option key={model} value={model}>
+                  {model}
+                </option>
+              ))}
+              <option value="custom">Personalizado (digite abaixo)</option>
+            </select>
+            <p className="form-help">
+              Modelo auxiliar para tarefas específicas. Deixe vazio para usar o padrão do sistema.
+            </p>
+            
+            {/* Campo para modelo personalizado (aparece apenas se "custom" selecionado) */}
+            {formData.modeloAuxiliar === 'custom' && (
+              <div className="form-group" style={{ marginTop: '10px' }}>
+                <label className="form-label">
+                  Nome do Modelo Personalizado
+                </label>
+                <input
+                  type="text"
+                  value={formData.modeloAuxiliarCustom || ''}
+                  onChange={(e) => handleChange('modeloAuxiliarCustom', e.target.value)}
+                  className="form-input"
+                  placeholder="Ex: meu-modelo-local, provider/modelo"
+                  maxLength={100}
+                />
+                <p className="form-help">
+                  Digite o nome completo do modelo (provedor/modelo)
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="form-group form-grid-full">

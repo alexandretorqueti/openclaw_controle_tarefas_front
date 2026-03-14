@@ -853,7 +853,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               {agents.length > 0 ? (
                 agents.map((agent, index) => (
                   <option key={index} value={agent.id}>
-                    {agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
+                    {agent.identity?.name || agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
                   </option>
                 ))
               ) : (
@@ -878,7 +878,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                   {(() => {
                     const agentObj = agents.find(a => a.id === task.agent);
                     return agentObj 
-                      ? `${agentObj.id}${agentObj.identity?.model ? ` (${agentObj.identity.model})` : ''}`
+                      ? `${agentObj.identity?.name || agentObj.id}${agentObj.identity?.model ? ` (${agentObj.identity.model})` : ''}`
                       : task.agent || 'Não definido';
                   })()}
                 </div>

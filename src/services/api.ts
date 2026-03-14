@@ -16,6 +16,7 @@ interface ProjectData {
   pastaBase?: string;
   frontendBuildCmd?: string;
   backendBuildCmd?: string;
+  createdById?: string; // Campo opcional para compatibilidade com backend
 }
 
 interface UpdateProjectData {
@@ -202,9 +203,11 @@ class ApiService {
     }
 
     // Convert request body to snake_case if present and not FormData
+    console.log('[DEBUG api.ts] Body antes snake_case:', config.body);
     if (config.body && typeof config.body === 'string' && !skipJsonProcessing) {
       try {
-        const parsedBody = JSON.parse(config.body);
+        console.log('[DEBUG api.ts createComment] parsedBody:', parsedBody);
+      const parsedBody = JSON.parse(config.body);
         
         // Remove campos undefined para evitar problemas, mantendo booleanos (false)
         const cleanedBody = Object.fromEntries(
@@ -212,6 +215,7 @@ class ApiService {
         );
         
         const snakeCaseBody = convertToSnakeCase(cleanedBody);
+    console.log('[DEBUG api.ts] Body depois snake_case:', JSON.stringify(snakeCaseBody));
         config.body = JSON.stringify(snakeCaseBody);
       } catch (error) {
         // If body is not valid JSON, leave it as is
@@ -488,6 +492,7 @@ class ApiService {
   }
 
   async createComment(data: any) {
+    console.log('[DEBUG api.ts createComment] Enviando data:', data);
     return this.request('/comments', {
       method: 'POST',
       body: JSON.stringify(data),

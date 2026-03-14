@@ -198,7 +198,13 @@ const AppContent: React.FC = () => {
 
   const handleCreateProject = async (projectData: any) => {
     try {
-      const newProject = await apiService.createProject(projectData);
+      // Adicionar createdById se houver usuário logado
+      const projectDataWithUser = { ...projectData };
+      if (user && user.id) {
+        projectDataWithUser.createdById = user.id;
+      }
+      
+      const newProject = await apiService.createProject(projectDataWithUser);
       // @ts-expect-error newProject is unknown
       setProjects([...projects, newProject]);
       return newProject;

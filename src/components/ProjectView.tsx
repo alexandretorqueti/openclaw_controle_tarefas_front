@@ -40,22 +40,6 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [disableRowClick, setDisableRowClick] = useState(false);
-  const initialFormData: Partial<Project> = {
-    name: '',
-    description: '',
-    regras: '',
-    status: true,
-    ativo: true,
-    frontendPath: '',
-    pastaBase: '',
-    frontendPort: 0,
-    backendPath: '',
-    backendPort: 0,
-    repositoryUrl: '',
-    frontendBuildCmd: '',
-    backendBuildCmd: '',
-  };
-  const [formData, setFormData] = useState<Partial<Project>>(initialFormData);
   const [agents, setAgents] = useState<Agent[]>([]);
   const projectFormRef = useRef<any>(null);
 
@@ -79,17 +63,24 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
 
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('DEBUG: handleCreateProject called');
     if (!onCreateProject) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await onCreateProject(formData);
-      setIsCreateModalOpen(false);
-      resetForm();
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar projeto');
-    } finally {
-      setLoading(false);
+    
+    // Usar o ref do ProjectForm para obter os dados
+    if (projectFormRef.current) {
+      setLoading(true);
+      setError(null);
+      try {
+        await projectFormRef.current.submitForm();
+      } catch (err: any) {
+        console.error('DEBUG: Error from ProjectForm submit in create', err);
+        setError(err.message || 'Erro ao criar projeto');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      console.error('DEBUG: projectFormRef.current is null in handleCreateProject');
+      setError('Erro interno: formulário não disponível');
     }
   };
 
@@ -136,7 +127,6 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
   };
 
   const resetForm = () => {
-    setFormData(initialFormData);
     setSelectedProject(null);
     setError(null);
   };
@@ -254,7 +244,6 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
                 backendBuildCmd: project.backendBuildCmd || '',
               };
               
-              setFormData({ ...initialFormData, ...projectFields });
               setIsEditModalOpen(true);
               
               // Desabilitar clique na linha temporariamente

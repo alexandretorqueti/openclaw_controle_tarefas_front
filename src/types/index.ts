@@ -37,6 +37,8 @@ export interface Project {
   backendPort?: number;
   repositoryUrl?: string;
   pastaBase?: string; // Campo pasta base (não obrigatório)
+  agent?: string; // Agente padrão para tarefas do projeto
+  modeloAuxiliar?: string; // Modelo auxiliar para o projeto
   frontendBuildCmd?: string; // Comando de build do frontend
   backendBuildCmd?: string; // Comando de build do backend
 }

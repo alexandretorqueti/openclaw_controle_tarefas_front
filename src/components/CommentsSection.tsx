@@ -57,6 +57,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
   };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
+    console.log('[DEBUG CommentsSection] taskId:', taskId, 'newComment:', newComment);
     e.preventDefault();
     if (!newComment.trim() || !currentUser) return;
 
