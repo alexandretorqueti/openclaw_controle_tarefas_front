@@ -8,7 +8,8 @@ export interface AgentIdentity {
 export interface Agent {
   id: string;
   identity: AgentIdentity;
-  bindings: string[];
+  bindings: number;  // Número de bindings (0, 1, 2...)
+  bindingsList: string[];  // Lista de bindings ativos
   workspace?: string;
   createdAt?: string;
   updatedAt?: string;

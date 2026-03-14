@@ -45,17 +45,18 @@ class ErrorBoundary extends Component<
           padding: '40px',
           textAlign: 'center',
           fontFamily: 'Arial, sans-serif',
-          color: '#333'
+          color: 'var(--text-primary)'
         }}>
           <h1 style={{ color: '#FF6B6B' }}>⚠️ Erro no Componente</h1>
           <p>Ocorreu um erro ao renderizar este componente.</p>
           <p style={{
-            backgroundColor: '#f8f9fa',
+            backgroundColor: 'var(--bg-input)',
             padding: '15px',
             borderRadius: '8px',
             marginTop: '20px',
             fontFamily: 'monospace',
-            fontSize: '12px'
+            fontSize: '12px',
+            color: 'var(--text-primary)'
           }}>
             {this.state.error?.message || 'Erro desconhecido'}
           </p>
@@ -532,7 +533,7 @@ const App: React.FC = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f5f5f5'
+        backgroundColor: 'var(--bg-primary)'
       }}>
         <FaSpinner size={48} style={{ animation: 'spin 1s linear infinite', color: '#4ECDC4' }} />
       </div>

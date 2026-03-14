@@ -32,18 +32,18 @@ const Card: React.FC<CardProps> = ({
 
   const variantStyles = {
     default: {
-      backgroundColor: '#fff',
-      border: '1px solid #e0e0e0',
-      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+      backgroundColor: 'var(--bg-card)',
+      border: '1px solid var(--border-color)',
+      boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
     },
     outline: {
       backgroundColor: 'transparent',
-      border: '1px solid #e0e0e0',
+      border: '1px solid var(--border-color)',
       boxShadow: 'none',
     },
     filled: {
-      backgroundColor: '#f8f9fa',
-      border: '1px solid #e0e0e0',
+      backgroundColor: 'var(--bg-input)',
+      border: '1px solid var(--border-color)',
       boxShadow: 'none',
     },
   };
@@ -86,7 +86,7 @@ const Card: React.FC<CardProps> = ({
                   width: '40px',
                   height: '40px',
                   borderRadius: '8px',
-                  backgroundColor: '#f0f9f8',
+                  backgroundColor: 'var(--bg-input)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -103,7 +103,7 @@ const Card: React.FC<CardProps> = ({
                   style={{
                     fontSize: '18px',
                     fontWeight: 600,
-                    color: '#333',
+                    color: 'var(--text-primary)',
                     margin: 0,
                     lineHeight: 1.4,
                   }}
@@ -115,7 +115,7 @@ const Card: React.FC<CardProps> = ({
                 <p
                   style={{
                     fontSize: '14px',
-                    color: '#666',
+                    color: 'var(--text-secondary)',
                     margin: '4px 0 0',
                     lineHeight: 1.5,
                   }}

@@ -69,16 +69,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   return (
     <div style={{
       minHeight: '100vh',
-      backgroundColor: '#f5f5f5',
+      backgroundColor: 'var(--bg-primary)',
+      color: 'var(--text-primary)',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       display: 'flex',
       flexDirection: 'column'
     }}>
       {/* Header */}
       <header style={{
-        backgroundColor: '#f8fafc',
-        borderBottom: '1px solid #e2e8f0',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+        backgroundColor: 'var(--bg-secondary)',
+        borderBottom: '1px solid var(--border-color)',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
         position: 'sticky',
         top: 0,
         zIndex: 100,
@@ -104,7 +105,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           }}
           aria-label="Toggle menu"
         >
-          <FaBars size={20} color="#333" />
+          <FaBars size={20} color="var(--text-primary)" />
         </button>
 
         {/* Logo */}
@@ -123,7 +124,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           <h1 style={{
             fontSize: '18px',
             fontWeight: 600,
-            color: '#1e293b',
+            color: 'var(--text-primary)',
             letterSpacing: '-0.3px',
             margin: 0
           }}>
@@ -143,8 +144,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               onClick={() => onViewChange(view.id)}
               style={{
                 padding: '10px 16px',
-                backgroundColor: currentView === view.id ? '#2563eb' : 'transparent',
-                color: currentView === view.id ? '#fff' : '#555',
+                backgroundColor: currentView === view.id ? 'var(--accent-color)' : 'transparent',
+                color: currentView === view.id ? '#fff' : 'var(--text-secondary)',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -177,10 +178,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 backgroundPosition: 'center'
               }} />
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <span style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                   {user.name}
                 </span>
-                <span style={{ fontSize: '12px', color: '#666' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
                   {user.email}
                 </span>
               </div>
@@ -191,8 +192,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             style={{
               padding: '8px 16px',
               backgroundColor: 'transparent',
-              color: '#666',
-              border: '1px solid #e0e0e0',
+              color: 'var(--text-secondary)',
+              border: '1px solid var(--border-color)',
               borderRadius: '6px',
               fontSize: '14px',
               cursor: 'pointer',
@@ -211,8 +212,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Sidebar - Desktop */}
         <aside style={{
-          backgroundColor: '#fff',
-          borderRight: '1px solid #e0e0e0',
+          backgroundColor: 'var(--bg-secondary)',
+          borderRight: '1px solid var(--border-color)',
           width: sidebarOpen ? '280px' : '80px',
           transition: 'width 0.3s ease',
           overflow: 'hidden',
@@ -232,8 +233,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               style={{
-                backgroundColor: '#f5f5f5',
-                border: '1px solid #e0e0e0',
+                backgroundColor: 'var(--bg-input)',
+                border: '1px solid var(--border-color)',
                 cursor: 'pointer',
                 padding: '8px',
                 borderRadius: '6px',
@@ -243,14 +244,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 transition: 'all 0.2s'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = '#e0e0e0';
+                e.currentTarget.style.backgroundColor = 'var(--border-color)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = '#f5f5f5';
+                e.currentTarget.style.backgroundColor = 'var(--bg-input)';
               }}
               aria-label={sidebarOpen ? 'Fechar menu lateral' : 'Abrir menu lateral'}
             >
-              {sidebarOpen ? <FaChevronLeft size={16} color="#666" /> : <FaChevronRight size={16} color="#666" />}
+              {sidebarOpen ? <FaChevronLeft size={16} color="var(--text-secondary)" /> : <FaChevronRight size={16} color="var(--text-secondary)" />}
             </button>
           </div>
 
@@ -259,7 +260,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             <h3 style={{
               fontSize: '12px',
               fontWeight: 600,
-              color: '#666',
+              color: 'var(--text-secondary)',
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
               marginBottom: '12px',
@@ -286,13 +287,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   gap: '12px',
                   marginBottom: '4px',
                   transition: 'all 0.2s',
-                  color: '#555',
+                  color: 'var(--text-primary)',
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f5f5f5';
+                  e.currentTarget.style.backgroundColor = 'var(--bg-input)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
@@ -339,8 +340,8 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           left: 0,
           bottom: 0,
           width: '280px',
-          backgroundColor: '#fff',
-          borderRight: '1px solid #e0e0e0',
+          backgroundColor: 'var(--bg-secondary)',
+          borderRight: '1px solid var(--border-color)',
           transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
           transition: 'transform 0.3s ease',
           zIndex: 1000,
@@ -353,7 +354,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             <h3 style={{
               fontSize: '12px',
               fontWeight: 600,
-              color: '#666',
+              color: 'var(--text-secondary)',
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
               marginBottom: '12px',
@@ -371,7 +372,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 style={{
                   width: '100%',
                   padding: '12px',
-                  backgroundColor: currentView === view.id ? '#f0f9f8' : 'transparent',
+                  backgroundColor: currentView === view.id ? 'var(--bg-input)' : 'transparent',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -380,7 +381,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   gap: '12px',
                   marginBottom: '4px',
                   transition: 'all 0.2s',
-                  color: currentView === view.id ? '#2563eb' : '#555',
+                  color: currentView === view.id ? 'var(--accent-color)' : 'var(--text-primary)',
                   textDecoration: 'none'
                 }}
               >
@@ -394,7 +395,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             <h3 style={{
               fontSize: '12px',
               fontWeight: 600,
-              color: '#666',
+              color: 'var(--text-secondary)',
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
               marginTop: '24px',
@@ -422,7 +423,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   gap: '12px',
                   marginBottom: '4px',
                   transition: 'all 0.2s',
-                  color: '#555',
+                  color: 'var(--text-primary)',
                   textDecoration: 'none'
                 }}
               >
