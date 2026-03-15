@@ -1,20 +1,7 @@
-:root {
-  --bg-primary: #0a0a0a;           /* Mais escuro: quase preto puro */
-  --bg-secondary: #121212;         /* Mais escuro: anterior era --bg-primary */
-  --bg-card: #1a1a1a;             /* Mais escuro: cinza muito escuro */
-  --bg-input: #222222;            /* Mais escuro: cinza escuro */
-  --text-primary: #f0f0f0;        /* Texto mais claro para melhor contraste */
-  --text-secondary: #cccccc;      /* Texto secundário mais claro */
-  --border-color: #333333;        /* Bordas mais escuras */
-  --accent-color: #4a90e2;
-  --accent-hover: #357ae8;
-  --danger-color: #e74c3c;
-  --success-color: #2ecc71;
-}
+/* Variáveis CSS já definidas no index.html para garantir carregamento imediato */
+/* Estilos globais adicionais */
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 

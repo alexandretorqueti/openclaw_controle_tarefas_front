@@ -6,15 +6,68 @@
   <title>Sistema de Gestão de Tarefas</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { 
-      margin: 0; 
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      background-color: #f5f5f5;
+    
+    /* Garantir que as variáveis CSS sejam definidas imediatamente */
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #121212;
+      --bg-card: #1a1a1a;
+      --bg-input: #222222;
+      --text-primary: #f0f0f0;
+      --text-secondary: #cccccc;
+      --border-color: #333333;
+      --accent-color: #4a90e2;
+      --accent-hover: #357ae8;
+      --danger-color: #e74c3c;
+      --success-color: #2ecc71;
+    }
+    
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+    }
+    
+    #root {
+      min-height: 100vh;
     }
   </style>
 </head>
 <body>
   <div id="root"></div>
   <script type="module" src="/src/index.tsx"></script>
+  <script>
+    // Teste de variáveis CSS (apenas em desenvolvimento)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          console.log('🔍 Verificando variáveis CSS...');
+          const root = document.documentElement;
+          const style = getComputedStyle(root);
+          
+          const variables = [
+            '--bg-primary',
+            '--bg-secondary',
+            '--bg-card',
+            '--bg-input',
+            '--text-primary',
+            '--text-secondary',
+            '--border-color',
+            '--accent-color',
+            '--accent-hover',
+            '--danger-color',
+            '--success-color'
+          ];
+          
+          variables.forEach(variable => {
+            const value = style.getPropertyValue(variable);
+            console.log(`${variable}: ${value ? '✅ ' + value.trim() : '❌ NÃO DEFINIDA'}`);
+          });
+        }, 1000);
+      });
+    }
+  </script>
 </body>
 </html>

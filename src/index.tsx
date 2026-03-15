@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
+import './index.css'; // Importar CSS global com variáveis
 
 // Capturar erros globais
 window.addEventListener('error', (event) => {
