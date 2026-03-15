@@ -94,6 +94,13 @@ export interface Task {
   lastExecutedAt?: string | null;
   nextExecutionAt?: string | null;
   
+  // Campos para conteúdo dos arquivos gerados
+  arquitetosPromptContent?: string | null;
+  arquitetosAnalysisContent?: string | null;
+  arquitetosTerminalContent?: string | null;
+  programadorTerminalContent?: string | null;
+  programadorReportContent?: string | null;
+  
   // Optional relations (from API includes)
   project?: {
     id: string;

@@ -22,8 +22,9 @@ import {
   FaTimes,
   FaSync,
   FaHistory,
-  FaClock
-, FaArrowUp} from 'react-icons/fa';
+  FaClock,
+  FaArrowUp,
+  FaFileAlt} from 'react-icons/fa';
 import RecurrenceConfig from './RecurrenceConfig';
 import CommentsSection from './CommentsSection';
 import TaskHistorySection from './TaskHistorySection';
@@ -1219,6 +1220,28 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             <FaClock size={14} />
             Log de Execução
           </button>
+          <button
+            onClick={() => setActiveTab('generatedFiles')}
+            style={{
+              flex: 1,
+              padding: '16px 24px',
+              backgroundColor: activeTab === 'generatedFiles' ? '#fff' : 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'generatedFiles' ? '3px solid #4ECDC4' : '3px solid transparent',
+              color: activeTab === 'generatedFiles' ? '#333' : '#666',
+              fontWeight: activeTab === 'generatedFiles' ? 600 : 500,
+              fontSize: '14px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              transition: 'all 0.2s'
+            }}
+          >
+            <FaFileAlt size={14} />
+            Arquivos Gerados
+          </button>
         </div>
 
         {/* Tab Content */}
@@ -1240,6 +1263,148 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               taskId={task.id} 
               currentUser={currentUser}
             />
+          )}
+          {activeTab === 'generatedFiles' && (
+            <div style={{ padding: '24px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 600, color: '#333', marginBottom: '24px' }}>
+                Conteúdo dos Arquivos Gerados
+              </h3>
+              
+              {/* Prompt do Arquiteto */}
+              {task.arquitetosPromptContent && (
+                <div style={{ marginBottom: '32px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaFileAlt size={14} />
+                    Prompt do Arquiteto
+                  </h4>
+                  <pre style={{
+                    backgroundColor: '#f8f9fa',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    whiteSpace: 'pre-wrap',
+                    wordWrap: 'break-word',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    fontFamily: 'monospace'
+                  }}>
+                    {task.arquitetosPromptContent}
+                  </pre>
+                </div>
+              )}
+              
+              {/* Análise do Arquiteto */}
+              {task.arquitetosAnalysisContent && (
+                <div style={{ marginBottom: '32px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaFileAlt size={14} />
+                    Análise do Arquiteto
+                  </h4>
+                  <pre style={{
+                    backgroundColor: '#f8f9fa',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    whiteSpace: 'pre-wrap',
+                    wordWrap: 'break-word',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    fontFamily: 'monospace'
+                  }}>
+                    {task.arquitetosAnalysisContent}
+                  </pre>
+                </div>
+              )}
+              
+              {/* Terminal do Arquiteto */}
+              {task.arquitetosTerminalContent && (
+                <div style={{ marginBottom: '32px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaFileAlt size={14} />
+                    Terminal do Arquiteto
+                  </h4>
+                  <pre style={{
+                    backgroundColor: '#1e1e1e',
+                    color: '#e0e0e0',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid #333',
+                    fontSize: '12px',
+                    lineHeight: '1.5',
+                    whiteSpace: 'pre-wrap',
+                    wordWrap: 'break-word',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    fontFamily: 'monospace'
+                  }}>
+                    {task.arquitetosTerminalContent}
+                  </pre>
+                </div>
+              )}
+              
+              {/* Terminal do Programador */}
+              {task.programadorTerminalContent && (
+                <div style={{ marginBottom: '32px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaFileAlt size={14} />
+                    Terminal do Programador
+                  </h4>
+                  <pre style={{
+                    backgroundColor: '#1e1e1e',
+                    color: '#e0e0e0',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid #333',
+                    fontSize: '12px',
+                    lineHeight: '1.5',
+                    whiteSpace: 'pre-wrap',
+                    wordWrap: 'break-word',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    fontFamily: 'monospace'
+                  }}>
+                    {task.programadorTerminalContent}
+                  </pre>
+                </div>
+              )}
+              
+              {/* Relatório do Programador */}
+              {task.programadorReportContent && (
+                <div style={{ marginBottom: '32px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <FaFileAlt size={14} />
+                    Relatório do Programador
+                  </h4>
+                  <pre style={{
+                    backgroundColor: '#f8f9fa',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid #e9ecef',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    whiteSpace: 'pre-wrap',
+                    wordWrap: 'break-word',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    fontFamily: 'monospace'
+                  }}>
+                    {task.programadorReportContent}
+                  </pre>
+                </div>
+              )}
+              
+              {!task.arquitetosPromptContent && !task.arquitetosAnalysisContent && !task.arquitetosTerminalContent && !task.programadorTerminalContent && !task.programadorReportContent && (
+                <div style={{ textAlign: 'center', padding: '48px 24px', color: '#666' }}>
+                  <FaFileAlt size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
+                  <p style={{ fontSize: '16px', marginBottom: '8px' }}>Nenhum arquivo gerado disponível</p>
+                  <p style={{ fontSize: '14px', opacity: 0.7 }}>Os arquivos serão exibidos aqui após a execução da tarefa pelo monitor</p>
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>
