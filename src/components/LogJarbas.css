@@ -1,0 +1,209 @@
+/* LogJarbas.css - Estilos migrados do LogJarbas.tsx */
+
+.log-jarbas-container {
+  background-color: #000;
+  color: #0f0;
+  font-family: 'monospace';
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #333;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+}
+
+.log-jarbas-header {
+  background-color: #111;
+  padding: 16px 20px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-jarbas-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.log-jarbas-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f0;
+}
+
+.log-jarbas-status-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.log-jarbas-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff6b6b;
+}
+
+.log-jarbas-timestamp {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #888;
+}
+
+.log-jarbas-controls {
+  background-color: #111;
+  padding: 12px 20px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.log-jarbas-controls-left {
+  display: flex;
+  gap: 8px;
+}
+
+.log-jarbas-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: monospace;
+  font-weight: bold;
+  transition: opacity 0.2s;
+}
+
+.log-jarbas-btn-refresh {
+  background-color: #0f0;
+  color: var(--text-primary);
+}
+
+.log-jarbas-btn-refresh:disabled {
+  opacity: 0.7;
+}
+
+.log-jarbas-btn-download {
+  background-color: transparent;
+  color: #0f0;
+  border: 1px solid #0f0;
+}
+
+.log-jarbas-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.log-jarbas-auto-refresh {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.log-jarbas-auto-refresh input {
+  cursor: pointer;
+}
+
+.log-jarbas-logs-stats {
+  font-size: 12px;
+  color: #888;
+}
+
+.log-jarbas-logs-container {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #000;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.log-jarbas-empty {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+}
+
+.log-jarbas-empty-icon {
+  margin-bottom: 20px;
+  opacity: 0.5;
+}
+
+.log-jarbas-empty-title {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.log-jarbas-log-line {
+  margin-bottom: 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--bg-secondary);
+}
+
+.log-jarbas-footer {
+  background-color: #111;
+  padding: 8px 20px;
+  border-top: 1px solid #333;
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+}
+
+.log-jarbas-footer-left {
+  font-family: monospace;
+}
+
+.log-jarbas-footer-right {
+  font-family: monospace;
+}
+
+.log-jarbas-log-line {
+  margin-bottom: 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--bg-secondary);
+}
+
+.log-jarbas-log-line-index {
+  color: var(--text-secondary);
+  margin-right: 8px;
+}
+
+.log-jarbas-log-line-icon {
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.log-jarbas-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background-color: #000;
+  color: #0f0;
+  font-family: monospace;
+  padding: 20px;
+}

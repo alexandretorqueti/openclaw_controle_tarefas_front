@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
+import './LogJarbas.css';
 import { FaSync, FaDownload, FaClock, FaTerminal, FaExclamationTriangle } from 'react-icons/fa';
 import apiService from '../services/api';
 
@@ -122,61 +123,34 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
 
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        minHeight: '400px',
-        backgroundColor: '#000',
-        color: '#0f0',
-        fontFamily: 'monospace',
-        padding: '20px'
-      }}>
-        <FaTerminal size={48} style={{ marginBottom: '20px', opacity: 0.7 }} />
-        <div style={{ fontSize: '16px', marginBottom: '10px' }}>Carregando logs do sistema...</div>
-        <div style={{ fontSize: '12px', color: '#888' }}>Conectando ao servidor de logs...</div>
+      <div className="log-jarbas-loading">
+        <FaTerminal size={48} className="log-jarbas-empty-icon" />
+        <div className="log-jarbas-empty-title">Carregando logs do sistema...</div>
+        <div>Conectando ao servidor de logs...</div>
       </div>
     );
   }
 
   return (
-    <div style={{
-      backgroundColor: '#000',
-      color: '#0f0',
-      fontFamily: 'monospace',
-      borderRadius: '8px',
-      overflow: 'hidden',
-      border: '1px solid #333',
-      minHeight: '500px',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <div className="log-jarbas-container">
       {/* Header */}
-      <div style={{
-        backgroundColor: '#111',
-        padding: '16px 20px',
-        borderBottom: '1px solid #333',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="log-jarbas-header">
+        <div className="log-jarbas-title-group">
           <FaTerminal size={20} color="#0f0" />
-          <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 600, color: '#0f0' }}>
+          <h2 className="log-jarbas-title">
             Logs do Sistema - Monitor Jarbas
           </h2>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div className="log-jarbas-status-group">
           {error && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#ff6b6b' }}>
+            <div className="log-jarbas-error">
               <FaExclamationTriangle size={14} />
-              <span style={{ fontSize: '12px' }}>{error}</span>
+              <span>{error}</span>
             </div>
           )}
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#888' }}>
+          <div className="log-jarbas-timestamp">
             <FaClock size={12} />
             <span>Última atualização: {formatDate(lastUpdated)}</span>
           </div>
@@ -184,33 +158,12 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
       </div>
 
       {/* Controls */}
-      <div style={{
-        backgroundColor: '#111',
-        padding: '12px 20px',
-        borderBottom: '1px solid #333',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
+      <div className="log-jarbas-controls">
         <div style={{ display: 'flex', gap: '8px' }}>
           <button
             onClick={fetchLogs}
             disabled={isRefreshing}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#0f0',
-              color: 'var(--text-primary)',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontFamily: 'monospace',
-              fontWeight: 'bold',
-              opacity: isRefreshing ? 0.7 : 1
-            }}
+            className="log-jarbas-btn log-jarbas-btn-refresh"
           >
             <FaSync size={14} className={isRefreshing ? 'spin' : ''} />
             {isRefreshing ? 'Atualizando...' : 'Atualizar Agora'}
@@ -218,19 +171,7 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
           
           <button
             onClick={downloadLogs}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: 'transparent',
-              color: '#0f0',
-              border: '1px solid #0f0',
-              borderRadius: '4px',
-              fontSize: '14px',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              fontFamily: 'monospace'
-            }}
+            className="log-jarbas-btn log-jarbas-btn-download"
           >
             <FaDownload size={14} />
             Download Logs
@@ -238,12 +179,11 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+          <label className="log-jarbas-auto-refresh">
             <input
               type="checkbox"
               checked={autoRefresh}
               onChange={(e) => setAutoRefresh(e.target.checked)}
-              style={{ cursor: 'pointer' }}
             />
             <span>Atualização automática (3 min)</span>
           </label>
@@ -257,22 +197,13 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
       {/* Logs Container */}
       <div
         ref={logsContainerRef}
-        style={{
-          flex: 1,
-          padding: '20px',
-          overflowY: 'auto',
-          backgroundColor: '#000',
-          fontSize: '13px',
-          lineHeight: '1.5',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word'
-        }}
+        className="log-jarbas-logs-container"
       >
         {logs.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#888' }}>
-            <FaTerminal size={48} style={{ marginBottom: '20px', opacity: 0.5 }} />
-            <div style={{ fontSize: '16px', marginBottom: '10px' }}>Nenhum log disponível</div>
-            <div style={{ fontSize: '12px' }}>
+          <div className="log-jarbas-empty">
+            <FaTerminal size={48} className="log-jarbas-empty-icon" />
+            <div className="log-jarbas-empty-title">Nenhum log disponível</div>
+            <div>
               {error 
                 ? 'Erro ao conectar ao servidor de logs'
                 : 'O arquivo de logs está vazio ou não existe'}
@@ -284,12 +215,8 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
             return (
               <div
                 key={index}
-                style={{
-                  marginBottom: '4px',
-                  padding: '4px 0',
-                  borderBottom: '1px solid var(--bg-secondary)',
-                  color: color
-                }}
+                className="log-jarbas-log-line"
+                style={{ color: color }}
               >
                 <span style={{ color: 'var(--text-secondary)', marginRight: '8px' }}>
                   [{String(index + 1).padStart(4, '0')}]
@@ -303,19 +230,11 @@ const LogJarbas: React.FC<LogJarbasProps> = ({ onBack }) => {
       </div>
 
       {/* Footer */}
-      <div style={{
-        backgroundColor: '#111',
-        padding: '8px 20px',
-        borderTop: '1px solid #333',
-        fontSize: '11px',
-        color: 'var(--text-secondary)',
-        display: 'flex',
-        justifyContent: 'space-between'
-      }}>
-        <div>
+      <div className="log-jarbas-footer">
+        <div className="log-jarbas-footer-left">
           Sistema de Monitoramento Jarbas • Arquivo: /home/alexandrebragatorqueti/projetos/jarbas-monitor.log
         </div>
-        <div>
+        <div className="log-jarbas-footer-right">
           {autoRefresh ? '🔄 Atualização automática ativa' : '⏸️ Atualização manual'}
         </div>
       </div>

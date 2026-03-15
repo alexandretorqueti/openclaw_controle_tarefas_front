@@ -10,7 +10,7 @@ import UserManager from './components/UserManager';
 import ProjectTypeManager from './components/ProjectTypeManager';
 import NextTaskManager from './components/NextTaskManager';
 import RecurrenceManager from './components/RecurrenceManager';
-import LogsViewer from './components/LogsViewer';
+import LogJarbas from './components/LogJarbas';
 import LogErros from './components/LogErros';
 import AgentManager from './components/AgentManager';
 import UserProfileEdit from './components/UserProfileEdit';
@@ -413,7 +413,7 @@ const AppContent: React.FC = () => {
 
       case 'logs':
         return (
-          <LogsViewer />
+          <LogJarbas />
         );
 
       case 'error-logs':
