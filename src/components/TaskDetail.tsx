@@ -112,6 +112,27 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     loadAgents();
   }, []);
 
+  // Set default agent based on project's programadorContratado when project changes
+  React.useEffect(() => {
+    if (project && project.programadorContratado && !task.agent) {
+      // If project has a programadorContratado and task doesn't have an agent yet
+      // Set it as the default agent
+      setEditedTask(prev => ({
+        ...prev,
+        agent: project.programadorContratado
+      }));
+    } else if (!task.agent && typeof window !== 'undefined') {
+      // Fallback to last used agent from localStorage if no programadorContratado
+      const lastUsedAgent = localStorage.getItem('lastUsedAgent');
+      if (lastUsedAgent) {
+        setEditedTask(prev => ({
+          ...prev,
+          agent: lastUsedAgent
+        }));
+      }
+    }
+  }, [project, task.agent]);
+
   const handleSave = async () => {
     if (!onUpdateTask) return;
     

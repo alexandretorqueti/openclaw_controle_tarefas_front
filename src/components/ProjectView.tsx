@@ -193,7 +193,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
     },
     {
       key: 'agent',
-      header: 'Agente',
+      header: 'Arquiteto contratado',
       render: (project) => (
         <div style={{
           display: 'inline-flex',
@@ -208,6 +208,32 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
           {project.agent || 'Não definido'}
         </div>
       ),
+    },
+    {
+      key: 'programadorContratado',
+      header: 'Programador Contratado',
+      render: (project) => {
+        // Encontrar o agente pelo ID para mostrar o nome
+        const programador = agents.find(a => a.id === project.programadorContratado);
+        const displayName = programador ? 
+          `${programador.identity?.name || programador.id}${programador.identity?.model ? ` (${programador.identity.model})` : ''}` : 
+          (project.programadorContratado || 'Não definido');
+        
+        return (
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '4px 12px',
+            borderRadius: '20px',
+            backgroundColor: project.programadorContratado ? 'rgba(74, 144, 226, 0.2)' : 'var(--bg-input)',
+            color: project.programadorContratado ? 'var(--accent-color)' : 'var(--text-secondary)',
+            fontSize: '12px',
+            fontWeight: 500,
+          }}>
+            {displayName}
+          </div>
+        );
+      },
     },
     {
       key: 'actions',

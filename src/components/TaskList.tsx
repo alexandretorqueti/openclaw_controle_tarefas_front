@@ -110,19 +110,27 @@ const TaskList: React.FC<TaskListProps> = ({
         ...prev,
         projectId: selectedProject.id
       }));
+
+      // Set agent to project's programadorContratado if it exists
+      if (selectedProject.programadorContratado) {
+        setNewTaskData(prev => ({
+          ...prev,
+          agent: selectedProject.programadorContratado
+        }));
+      }
     }
   }, [selectedProject]);
 
-  // Load last used agent from localStorage
+  // Load last used agent from localStorage (fallback if no programadorContratado)
   React.useEffect(() => {
     const lastModel = localStorage.getItem('lastUsedAgent');
-    if (lastModel) {
+    if (lastModel && (!selectedProject || !selectedProject.programadorContratado)) {
       setNewTaskData(prev => ({
         ...prev,
         agent: lastModel
       }));
     }
-  }, []);
+  }, [selectedProject]);
 
   const shouldFilterByCompletion = !onToggleShowCompleted;
   const filteredTasks = tasks.filter(task => {

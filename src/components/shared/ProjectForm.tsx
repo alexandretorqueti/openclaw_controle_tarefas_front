@@ -36,6 +36,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
     repositoryUrl: '',
     pastaBase: '',
     agent: '',
+    programadorContratado: '',
     modeloAuxiliar: '',
     modeloAuxiliarCustom: '',
     frontendBuildCmd: '',
@@ -196,6 +197,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
         repositoryUrl: project.repositoryUrl || '',
         pastaBase: project.pastaBase || '',
         agent: project.agent || '',
+        programadorContratado: project.programadorContratado || '',
         modeloAuxiliar: isInList ? modeloAuxiliarValue : (modeloAuxiliarValue ? 'custom' : ''),
         modeloAuxiliarCustom: !isInList ? modeloAuxiliarValue : '',
         frontendBuildCmd: project.frontendBuildCmd || '',
@@ -221,6 +223,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
       repositoryUrl: formData.repositoryUrl || null,
       pastaBase: formData.pastaBase || null,
       agent: formData.agent || null,
+      programadorContratado: formData.programadorContratado || null,
       frontendBuildCmd: formData.frontendBuildCmd || null,
       backendBuildCmd: formData.backendBuildCmd || null,
     };
@@ -243,6 +246,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
     if (submitData.repositoryUrl !== undefined) cleanedData.repositoryUrl = submitData.repositoryUrl;
     if (submitData.pastaBase !== undefined) cleanedData.pastaBase = submitData.pastaBase;
     if (submitData.agent !== undefined) cleanedData.agent = submitData.agent;
+    if (submitData.programadorContratado !== undefined) cleanedData.programadorContratado = submitData.programadorContratado;
     
     // Lógica especial para modelo auxiliar
     if (submitData.modeloAuxiliar !== undefined) {
@@ -518,6 +522,38 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
             </select>
             <p className="form-help">
               Agente padrão para tarefas deste projeto
+            </p>
+          </div>
+
+          <div className="form-group form-grid-full">
+            <label className="form-label">
+              Programador Contratado
+            </label>
+            <select
+              value={formData.programadorContratado || ''}
+              onChange={(e) => {
+                console.log('DEBUG: Select onChange disparado para programadorContratado', { 
+                  value: e.target.value,
+                  selectedIndex: e.target.selectedIndex,
+                  options: e.target.options
+                });
+                handleChange('programadorContratado', e.target.value || null);
+              }}
+              className="form-select"
+            >
+              <option value="">Selecione um programador...</option>
+              {localAgents.length > 0 ? (
+                localAgents.map((agent) => (
+                  <option key={agent.id} value={agent.id}>
+                    {agent.identity?.name || agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
+                  </option>
+                ))
+              ) : (
+                <option value="">Carregando agentes...</option>
+              )}
+            </select>
+            <p className="form-help">
+              Programador padrão para novas tarefas deste projeto
             </p>
           </div>
 
