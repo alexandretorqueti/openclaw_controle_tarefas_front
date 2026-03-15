@@ -6,6 +6,7 @@ import Card from './shared/Card';
 import Button from './shared/Button';
 import FormModal from './shared/FormModal';
 import ProjectForm from './shared/ProjectForm';
+import './ProjectView.css';
 import { FaFolder, FaTasks, FaUsers, FaCalendarAlt, FaPlus, FaEdit, FaTrash, FaArrowLeft, FaCodeBranch, FaServer, FaTerminal, FaDatabase } from 'react-icons/fa';
 
 interface ProjectViewProps {
@@ -138,22 +139,13 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
       key: 'name',
       header: 'Nome',
       render: (project) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '8px',
-            backgroundColor: 'var(--bg-input)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--accent-color)',
-          }}>
+        <div className="project-view-row">
+          <div className="project-view-icon-container">
             <FaFolder size={20} />
           </div>
           <div>
-            <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{project.name}</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+            <div className="project-view-name">{project.name}</div>
+            <div className="project-view-task-count">
               {project.tasks?.length || 0} tarefas
             </div>
           </div>
@@ -167,7 +159,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
         const description = project.description;
         const displayText = !description || description.trim() === '' ? 'Sem descrição' : description;
         return (
-          <div style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+          <div className="project-view-description">
             {displayText}
           </div>
         );
@@ -177,16 +169,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
       key: 'status',
       header: 'Status',
       render: (project) => (
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: '4px 12px',
-          borderRadius: '20px',
-          backgroundColor: project.status ? 'rgba(46, 204, 113, 0.2)' : 'rgba(231, 76, 60, 0.2)',
-          color: project.status ? 'var(--success-color)' : 'var(--danger-color)',
-          fontSize: '12px',
-          fontWeight: 500,
-        }}>
+        <div className={`project-view-status-badge project-view-status-${project.status ? 'active' : 'inactive'}`}>
           {project.status ? 'Ativo' : 'Inativo'}
         </div>
       ),
@@ -195,16 +178,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
       key: 'agent',
       header: 'Arquiteto contratado',
       render: (project) => (
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          padding: '4px 12px',
-          borderRadius: '20px',
-          backgroundColor: project.agent ? 'rgba(74, 144, 226, 0.2)' : 'var(--bg-input)',
-          color: project.agent ? 'var(--accent-color)' : 'var(--text-secondary)',
-          fontSize: '12px',
-          fontWeight: 500,
-        }}>
+        <div className={`project-view-agent-badge project-view-agent-${project.agent ? 'assigned' : 'unassigned'}`}>
           {project.agent || 'Não definido'}
         </div>
       ),
@@ -220,16 +194,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
           (project.programadorContratado || 'Não definido');
         
         return (
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            padding: '4px 12px',
-            borderRadius: '20px',
-            backgroundColor: project.programadorContratado ? 'rgba(74, 144, 226, 0.2)' : 'var(--bg-input)',
-            color: project.programadorContratado ? 'var(--accent-color)' : 'var(--text-secondary)',
-            fontSize: '12px',
-            fontWeight: 500,
-          }}>
+          <div className={`project-view-agent-badge project-view-agent-${project.programadorContratado ? 'assigned' : 'unassigned'}`}>
             {displayName}
           </div>
         );
@@ -240,7 +205,7 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
       header: 'Ações',
       align: 'center',
       render: (project) => (
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="project-view-actions">
           <Button
             className="prevent-row-click"
             variant="outline"
@@ -311,11 +276,11 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
 
   return (
     <>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="project-view-title-section">
+        <div className="project-view-header-row">
           <div>
-            <h2 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>Projetos</h2>
-            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '8px 0 0' }}>
+            <h2 className="project-view-main-title">Projetos</h2>
+            <p className="project-view-subtitle">
               Gerencie seus projetos e visualize as tarefas associadas
             </p>
           </div>
@@ -426,11 +391,11 @@ const ProjectViewNew: React.FC<ProjectViewProps> = ({
         hideFooter
         size="sm"
       >
-        <div style={{ textAlign: 'center', padding: '20px 0' }}>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '24px' }}>
+        <div className="project-view-empty">
+          <p className="project-view-empty-text">
             Todas as tarefas associadas a este projeto serão mantidas, mas o projeto será removido permanentemente.
           </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <div className="project-view-actions">
             <Button
               variant="ghost"
               onClick={() => setIsDeleteConfirmOpen(false)}

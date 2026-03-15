@@ -581,7 +581,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
             
             {/* Campo para modelo personalizado (aparece apenas se "custom" selecionado) */}
             {formData.modeloAuxiliar === 'custom' && (
-              <div className="form-group" style={{ marginTop: '10px' }}>
+              <div className="form-group margin-top-10">
                 <label className="form-label">
                   Nome do Modelo Personalizado
                 </label>
