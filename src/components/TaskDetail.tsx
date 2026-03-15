@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState } from 'react';
+import './TaskDetail.css';
 import api from '../services/api';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
 import { format } from 'date-fns';
@@ -296,25 +297,13 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   }, [isEditing]);
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}>
+    <div className="task-detail-container">
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
         <button
           onClick={onBack}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 16px',
-            backgroundColor: 'var(--bg-input)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '8px',
-            fontSize: '14px',
-            cursor: 'pointer',
-            marginBottom: '20px',
-            transition: 'background-color 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
+          className="back-button margin-bottom-20"
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3f6183'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
         >
           <FaArrowLeft size={14} />
@@ -342,13 +331,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           </div>
         )}
 
-        <div style={{
-          backgroundColor: 'white',
-          padding: '24px',
-          borderRadius: '12px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-          marginBottom: '24px'
-        }}>
+        <div className="card-white">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div style={{ flex: 1 }}>
               {isEditing ? (
@@ -538,12 +521,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         marginBottom: '32px'
       }}>
         {/* Status Card */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-        }}>
+        <div className="card-section">
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
             Status
           </h3>
@@ -622,13 +600,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         </div>
 
         {/* Deadline Card */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          border: isOverdue ? '1px solid var(--danger-color)' : 'none'
-        }}>
+        <div className="card-section-overdue">
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
             Prazo
             {isOverdue && (
@@ -682,13 +654,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         </div>
 
         {/* Recurrence Card */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          border: task.isRecurring ? '1px solid var(--accent-color)' : 'none'
-        }}>
+        <div className="card-section-recurring">
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FaSync size={14} />
             Recorrência
@@ -770,12 +736,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         </div>
 
         {/* Assigned To Card */}
-        <div style={{
-          backgroundColor: 'white',
-          padding: '20px',
-          borderRadius: '12px',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-        }}>
+        <div className="card-section">
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
             Atribuído a
           </h3>
@@ -1141,13 +1102,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
       
       {/* Tabs for Comments, History, and Execution Logs */}
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        marginBottom: '32px',
-        overflow: 'hidden'
-      }}>
+      <div className="card-table">
         {/* Tab Navigation */}
         <div style={{
           display: 'flex',
@@ -1410,13 +1365,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       </div>
     
 
-      <div style={{
-        backgroundColor: 'white',
-        padding: '20px',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        border: '2px dashed var(--border-color)'
-      }}>
+      <div className="card-dashed">
         <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
           <FaPaperclip size={24} style={{ marginBottom: '12px' }} />
           <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>
