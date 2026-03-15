@@ -196,14 +196,14 @@ const Login: React.FC = () => {
         <div style={{
           width: '80px',
           height: '80px',
-          backgroundColor: '#4ECDC4',
+          backgroundColor: 'var(--accent-color)',
           borderRadius: '20px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 24px'
         }}>
-          <FaTasks size={36} color="#fff" />
+          <FaTasks size={36} color="white" />
         </div>
 
         <h1 style={{
@@ -238,7 +238,7 @@ const Login: React.FC = () => {
               flex: 1,
               padding: '12px',
               backgroundColor: 'var(--bg-input)',
-              color: activeTab === 'google' ? '#fff' : '#666',
+              color: activeTab === 'google' ? 'white' : 'var(--text-secondary)',
               border: 'none',
               borderRadius: '8px',
               fontSize: '14px',
@@ -261,7 +261,7 @@ const Login: React.FC = () => {
               flex: 1,
               padding: '12px',
               backgroundColor: 'var(--bg-input)',
-              color: activeTab === 'login' ? '#fff' : '#666',
+              color: activeTab === 'login' ? 'white' : 'var(--text-secondary)',
               border: 'none',
               borderRadius: '8px',
               fontSize: '14px',
@@ -284,7 +284,7 @@ const Login: React.FC = () => {
               flex: 1,
               padding: '12px',
               backgroundColor: 'var(--bg-input)',
-              color: activeTab === 'register' ? '#fff' : '#666',
+              color: activeTab === 'register' ? 'white' : 'var(--text-secondary)',
               border: 'none',
               borderRadius: '8px',
               fontSize: '14px',
@@ -311,8 +311,8 @@ const Login: React.FC = () => {
               style={{
                 width: '100%',
                 padding: '16px',
-                backgroundColor: '#4285F4',
-                color: '#fff',
+                backgroundColor: 'var(--accent-color)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '10px',
                 fontSize: '16px',
@@ -326,10 +326,10 @@ const Login: React.FC = () => {
                 opacity: isLoading ? 0.7 : 1
               }}
               onMouseEnter={(e) => {
-                if (!isLoading) e.currentTarget.style.backgroundColor = '#3367D6';
+                if (!isLoading) e.currentTarget.style.backgroundColor = 'var(--accent-hover)';
               }}
               onMouseLeave={(e) => {
-                if (!isLoading) e.currentTarget.style.backgroundColor = '#4285F4';
+                if (!isLoading) e.currentTarget.style.backgroundColor = 'var(--accent-color)';
               }}
             >
               {isLoading ? (
@@ -387,7 +387,7 @@ const Login: React.FC = () => {
                 style={{
                   width: '100%',
                   padding: '14px',
-                  border: `1px solid ${error ? '#FF6B6B' : '#e0e0e0'}`,
+                  border: `1px solid ${error ? 'var(--danger-color)' : 'var(--text-primary)'}`,
                   borderRadius: '8px',
                   fontSize: '16px',
                   transition: 'all 0.2s',
@@ -403,11 +403,11 @@ const Login: React.FC = () => {
                 <div style={{
                   marginTop: '8px',
                   padding: '8px 12px',
-                  backgroundColor: '#FFE5E5',
-                  border: '1px solid #FF6B6B',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--danger-color)',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  color: '#FF6B6B'
+                  color: 'var(--danger-color)'
                 }}>
                   {error}
                 </div>
@@ -416,11 +416,11 @@ const Login: React.FC = () => {
                 <div style={{
                   marginTop: '8px',
                   padding: '8px 12px',
-                  backgroundColor: '#E5FFE5',
-                  border: '1px solid #06D6A0',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--success-color)',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  color: '#06D6A0'
+                  color: 'var(--success-color)'
                 }}>
                   {success}
                 </div>
@@ -464,8 +464,8 @@ const Login: React.FC = () => {
               style={{
                 width: '100%',
                 padding: '16px',
-                backgroundColor: '#4ECDC4',
-                color: '#fff',
+                backgroundColor: 'var(--accent-color)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '10px',
                 fontSize: '16px',
@@ -480,12 +480,12 @@ const Login: React.FC = () => {
               }}
               onMouseEnter={(e) => {
                 if (!isLoadingAction && loginNickname.trim()) {
-                  e.currentTarget.style.backgroundColor = '#3DB8AC';
+                  e.currentTarget.style.backgroundColor = 'var(--accent-color)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isLoadingAction && loginNickname.trim()) {
-                  e.currentTarget.style.backgroundColor = '#4ECDC4';
+                  e.currentTarget.style.backgroundColor = 'var(--accent-color)';
                 }
               }}
             >
@@ -542,7 +542,7 @@ const Login: React.FC = () => {
                 style={{
                   width: '100%',
                   padding: '14px',
-                  border: `1px solid ${error && !registerData.name.trim() ? '#FF6B6B' : '#e0e0e0'}`,
+                  border: `1px solid ${error && !registerData.name.trim() ? 'var(--danger-color)' : 'var(--text-primary)'}`,
                   borderRadius: '8px',
                   fontSize: '16px',
                   marginBottom: '16px',
@@ -570,7 +570,7 @@ const Login: React.FC = () => {
                 style={{
                   width: '100%',
                   padding: '14px',
-                  border: `1px solid ${error && !registerData.nickname.trim() ? '#FF6B6B' : '#e0e0e0'}`,
+                  border: `1px solid ${error && !registerData.nickname.trim() ? 'var(--danger-color)' : 'var(--text-primary)'}`,
                   borderRadius: '8px',
                   fontSize: '16px',
                   marginBottom: '16px',
@@ -611,11 +611,11 @@ const Login: React.FC = () => {
                 <div style={{
                   marginTop: '8px',
                   padding: '8px 12px',
-                  backgroundColor: '#FFE5E5',
-                  border: '1px solid #FF6B6B',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--danger-color)',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  color: '#FF6B6B'
+                  color: 'var(--danger-color)'
                 }}>
                   {error}
                 </div>
@@ -624,11 +624,11 @@ const Login: React.FC = () => {
                 <div style={{
                   marginTop: '8px',
                   padding: '8px 12px',
-                  backgroundColor: '#E5FFE5',
-                  border: '1px solid #06D6A0',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--success-color)',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  color: '#06D6A0'
+                  color: 'var(--success-color)'
                 }}>
                   {success}
                 </div>
@@ -641,8 +641,8 @@ const Login: React.FC = () => {
               style={{
                 width: '100%',
                 padding: '16px',
-                backgroundColor: '#06D6A0',
-                color: '#fff',
+                backgroundColor: 'var(--success-color)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '10px',
                 fontSize: '16px',
@@ -657,12 +657,12 @@ const Login: React.FC = () => {
               }}
               onMouseEnter={(e) => {
                 if (!isLoadingAction && registerData.name.trim() && registerData.nickname.trim()) {
-                  e.currentTarget.style.backgroundColor = '#05C592';
+                  e.currentTarget.style.backgroundColor = 'var(--success-color)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isLoadingAction && registerData.name.trim() && registerData.nickname.trim()) {
-                  e.currentTarget.style.backgroundColor = '#06D6A0';
+                  e.currentTarget.style.backgroundColor = 'var(--success-color)';
                 }
               }}
             >
@@ -697,9 +697,9 @@ const Login: React.FC = () => {
         <div style={{
           marginTop: '32px',
           paddingTop: '16px',
-          borderTop: '1px solid #e0e0e0',
+          borderTop: '1px solid var(--text-primary)',
           fontSize: '12px',
-          color: '#999'
+          color: 'var(--text-secondary)'
         }}>
           <p style={{ margin: 0 }}>
             Backend: {getBackendUrl().replace('/api', '')} • Frontend: http://{window.location.hostname}:{window.location.port || (window.location.protocol === 'https:' ? '443' : '80')}

@@ -5,32 +5,32 @@ export const getLogStyle = (log: ErrorLog) => {
   switch (log.level) {
     case 'ERROR':
       return {
-        color: '#ff4444',
-        bgColor: '#1a0a0a',
+        color: 'var(--danger-color)',
+        bgColor: 'var(--bg-primary)',
         icon: <FaExclamationTriangle />
       };
     case 'WARN':
       return {
-        color: '#ffaa00',
-        bgColor: '#1a140a',
+        color: 'var(--text-secondary)',
+        bgColor: 'var(--bg-card)',
         icon: <FaExclamationCircle />
       };
     case 'INFO':
       return {
-        color: '#44aaff',
-        bgColor: '#0a0f1a',
+        color: 'var(--accent-color)',
+        bgColor: 'var(--bg-secondary)',
         icon: <FaInfoCircle />
       };
     case 'DEBUG':
       return {
-        color: '#44ff44',
-        bgColor: '#0a1a0a',
+        color: 'var(--success-color)',
+        bgColor: 'var(--bg-secondary)',
         icon: <FaBug />
       };
     default:
       return {
         color: '#888',
-        bgColor: '#0a0a0a',
+        bgColor: 'var(--bg-primary)',
         icon: <FaInfoCircle />
       };
   }

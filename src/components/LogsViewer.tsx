@@ -287,7 +287,7 @@ const LogsViewer: React.FC<LogsViewerProps> = ({ onBack }) => {
                 style={{
                   marginBottom: '4px',
                   padding: '4px 0',
-                  borderBottom: '1px solid #222',
+                  borderBottom: '1px solid var(--bg-secondary)',
                   color: color
                 }}
               >

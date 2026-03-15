@@ -43,7 +43,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           borderRadius: '8px',
           cursor: 'pointer',
           transition: 'all 0.2s',
-          border: isOpen ? '1px solid #e0e0e0' : '1px solid transparent',
+          border: isOpen ? '1px solid var(--text-primary)' : '1px solid transparent',
           minWidth: '200px'
         }}
         onClick={toggleDropdown}
@@ -55,7 +55,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           height: '36px',
           borderRadius: '50%',
           overflow: 'hidden',
-          backgroundColor: '#e3f2fd',
+          backgroundColor: 'var(--bg-card)',
           flexShrink: 0
         }}>
           <img
@@ -94,7 +94,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
         
         <FaChevronDown 
           size={12} 
-          color="#666" 
+          color="var(--text-secondary)" 
           style={{ 
             transition: 'transform 0.2s',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
@@ -108,7 +108,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           position: 'absolute',
           top: 'calc(100% + 8px)',
           right: 0,
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           borderRadius: '12px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.15)',
           minWidth: '220px',
@@ -131,7 +131,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
               height: '40px',
               borderRadius: '50%',
               overflow: 'hidden',
-              backgroundColor: '#e3f2fd',
+              backgroundColor: 'var(--bg-card)',
               flexShrink: 0
             }}>
               <img
@@ -186,7 +186,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
                 textAlign: 'left',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
               <div style={{
@@ -195,7 +195,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
                 justifyContent: 'center',
                 alignItems: 'center'
               }}>
-                <FaEdit size={14} color="#4ECDC4" />
+                <FaEdit size={14} color="var(--accent-color)" />
               </div>
               <span>Alterar cadastro</span>
             </button>
@@ -215,11 +215,11 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
                 gap: '12px',
                 cursor: 'pointer',
                 fontSize: '14px',
-                color: '#FF6B6B',
+                color: 'var(--danger-color)',
                 textAlign: 'left',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
               <div style={{
@@ -228,7 +228,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
                 justifyContent: 'center',
                 alignItems: 'center'
               }}>
-                <FaSignOutAlt size={14} color="#FF6B6B" />
+                <FaSignOutAlt size={14} color="var(--danger-color)" />
               </div>
               <span>Sair</span>
             </button>
@@ -238,9 +238,9 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           <div style={{
             padding: '12px 16px',
             backgroundColor: 'var(--bg-input)',
-            borderTop: '1px solid #e0e0e0',
+            borderTop: '1px solid var(--text-primary)',
             fontSize: '11px',
-            color: '#999',
+            color: 'var(--text-secondary)',
             textAlign: 'center'
           }}>
             Sistema de Gestão v1.0

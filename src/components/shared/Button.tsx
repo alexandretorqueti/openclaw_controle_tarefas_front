@@ -37,7 +37,7 @@ const Button: React.FC<ButtonProps> = ({
   const variantStyles = {
     primary: {
       backgroundColor: 'var(--accent-color)',
-      color: '#fff',
+      color: 'white',
       border: 'none',
       hoverBackgroundColor: 'var(--accent-hover)',
       activeBackgroundColor: 'var(--accent-color)',
@@ -65,10 +65,10 @@ const Button: React.FC<ButtonProps> = ({
     },
     danger: {
       backgroundColor: 'var(--danger-color)',
-      color: '#fff',
+      color: 'white',
       border: 'none',
-      hoverBackgroundColor: '#e03e2e',
-      activeBackgroundColor: '#c92c1c',
+      hoverBackgroundColor: 'var(--danger-color)',
+      activeBackgroundColor: 'var(--danger-color)',
     },
   };
 

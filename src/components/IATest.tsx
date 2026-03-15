@@ -33,9 +33,9 @@ const IATest: React.FC = () => {
     <div style={{ 
       padding: '20px', 
       margin: '20px', 
-      border: '1px solid #ccc', 
+      border: '1px solid var(--text-secondary)', 
       borderRadius: '8px',
-      backgroundColor: '#f9f9f9'
+      backgroundColor: 'var(--bg-card)'
     }}>
       <h3>Teste de Processamento IA</h3>
       <p>
@@ -49,7 +49,7 @@ const IATest: React.FC = () => {
           disabled={loading}
           style={{
             padding: '10px 20px',
-            backgroundColor: loading ? '#ccc' : '#007bff',
+            backgroundColor: loading ? 'var(--text-secondary)' : '#007bff',
             color: 'white',
             border: 'none',
             borderRadius: '4px',

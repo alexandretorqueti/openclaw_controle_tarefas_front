@@ -441,7 +441,7 @@ const AgentManager: React.FC = () => {
             width: "32px",
             height: "32px",
             borderRadius: "50%",
-            backgroundColor: "#f0f0f0",
+            backgroundColor: "var(--text-primary)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -454,7 +454,7 @@ const AgentManager: React.FC = () => {
     }
 
     return (
-      <FaUserCircle style={{ width: "32px", height: "32px", color: "#999" }} />
+      <FaUserCircle style={{ width: "32px", height: "32px", color: "var(--text-secondary)" }} />
     );
   };
 
@@ -498,18 +498,18 @@ const AgentManager: React.FC = () => {
               style={{
                 width: "40px",
                 height: "40px",
-                backgroundColor: "#4ECDC4",
+                backgroundColor: "var(--accent-color)",
                 borderRadius: "10px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              <FaRobot size={20} color="#fff" />
+              <FaRobot size={20} color="white" />
             </div>
             Gerenciamento de Agentes OpenClaw
           </h2>
-          <p style={{ fontSize: "14px", color: "#666", margin: "8px 0 0" }}>
+          <p style={{ fontSize: "14px", color: "var(--text-secondary)", margin: "8px 0 0" }}>
             Gerencie agentes através da CLI do OpenClaw
           </p>
         </div>
@@ -532,11 +532,11 @@ const AgentManager: React.FC = () => {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = "#e9ecef";
-              e.currentTarget.style.borderColor = "#ced4da";
+              e.currentTarget.style.borderColor = "var(--border-color)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#f8f9fa";
-              e.currentTarget.style.borderColor = "#e0e0e0";
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+              e.currentTarget.style.borderColor = "var(--text-primary)";
             }}
             disabled={loading}
           >
@@ -550,8 +550,8 @@ const AgentManager: React.FC = () => {
             onClick={() => setShowCreateModal(true)}
             style={{
               padding: "10px 16px",
-              backgroundColor: "#4ECDC4",
-              color: "#fff",
+              backgroundColor: "var(--accent-color)",
+              color: "white",
               border: "none",
               borderRadius: "8px",
               display: "flex",
@@ -561,10 +561,10 @@ const AgentManager: React.FC = () => {
               transition: "all 0.2s",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#3dbcb4";
+              e.currentTarget.style.backgroundColor = "var(--accent-hover)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#4ECDC4";
+              e.currentTarget.style.backgroundColor = "var(--accent-color)";
             }}
           >
             <FaPlus />
@@ -595,7 +595,7 @@ const AgentManager: React.FC = () => {
             minWidth: "200px",
           }}
         >
-          <FaSearch size={16} color="#666" />
+          <FaSearch size={16} color="var(--text-secondary)" />
           <input
             placeholder="Filtrar por nome..."
             value={searchName}
@@ -603,7 +603,7 @@ const AgentManager: React.FC = () => {
             style={{
               flex: 1,
               padding: "8px 12px",
-              border: "1px solid #ddd",
+              border: "1px solid var(--border-color)",
               borderRadius: "6px",
               fontSize: "14px",
               outline: "none",
@@ -612,7 +612,7 @@ const AgentManager: React.FC = () => {
           {searchName && (
             <FaTimesCircle
               size={16}
-              color="#999"
+              color="var(--text-secondary)"
               style={{ cursor: "pointer" }}
               onClick={() => setSearchName("")}
             />
@@ -627,7 +627,7 @@ const AgentManager: React.FC = () => {
             minWidth: "200px",
           }}
         >
-          <FaSearch size={16} color="#666" />
+          <FaSearch size={16} color="var(--text-secondary)" />
           <input
             placeholder="Filtrar por modelo..."
             value={searchModel}
@@ -635,7 +635,7 @@ const AgentManager: React.FC = () => {
             style={{
               flex: 1,
               padding: "8px 12px",
-              border: "1px solid #ddd",
+              border: "1px solid var(--border-color)",
               borderRadius: "6px",
               fontSize: "14px",
               outline: "none",
@@ -644,7 +644,7 @@ const AgentManager: React.FC = () => {
           {searchModel && (
             <FaTimesCircle
               size={16}
-              color="#999"
+              color="var(--text-secondary)"
               style={{ cursor: "pointer" }}
               onClick={() => setSearchModel("")}
             />
@@ -653,7 +653,7 @@ const AgentManager: React.FC = () => {
         <div
           style={{
             fontSize: "14px",
-            color: "#666",
+            color: "var(--text-secondary)",
             whiteSpace: "nowrap",
             fontWeight: 500,
           }}
@@ -664,7 +664,7 @@ const AgentManager: React.FC = () => {
 
       <div
         style={{
-          backgroundColor: "#fff",
+          backgroundColor: "white",
           borderRadius: "12px",
           border: "1px solid var(--border-color)",
           overflow: "auto",
@@ -675,7 +675,7 @@ const AgentManager: React.FC = () => {
             style={{
               padding: "48px",
               textAlign: "center",
-              color: "#666",
+              color: "var(--text-secondary)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
@@ -686,7 +686,7 @@ const AgentManager: React.FC = () => {
               style={{
                 animation: "spin 1s linear infinite",
                 fontSize: "32px",
-                color: "#4ECDC4",
+                color: "var(--accent-color)",
               }}
             />
             <span style={{ fontSize: "16px" }}>Carregando agentes...</span>
@@ -696,11 +696,11 @@ const AgentManager: React.FC = () => {
             style={{
               padding: "48px",
               textAlign: "center",
-              color: "#666",
+              color: "var(--text-secondary)",
             }}
           >
             <FaRobot
-              style={{ fontSize: "48px", margin: "0 auto 16px", color: "#ddd" }}
+              style={{ fontSize: "48px", margin: "0 auto 16px", color: 'var(--border-color)' }}
             />
             <p style={{ fontSize: "18px", margin: "0 0 8px" }}>
               Nenhum agente encontrado
@@ -723,7 +723,7 @@ const AgentManager: React.FC = () => {
               <tr
                 style={{
                   backgroundColor: 'var(--bg-input)',
-                  borderBottom: "1px solid #e0e0e0",
+                  borderBottom: "1px solid var(--text-primary)",
                 }}
               >
                 <th
@@ -732,7 +732,7 @@ const AgentManager: React.FC = () => {
                     textAlign: "left",
                     fontSize: "12px",
                     fontWeight: 500,
-                    color: "#666",
+                    color: "var(--text-secondary)",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
@@ -745,7 +745,7 @@ const AgentManager: React.FC = () => {
                     textAlign: "left",
                     fontSize: "12px",
                     fontWeight: 500,
-                    color: "#666",
+                    color: "var(--text-secondary)",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
@@ -758,7 +758,7 @@ const AgentManager: React.FC = () => {
                     textAlign: "left",
                     fontSize: "12px",
                     fontWeight: 500,
-                    color: "#666",
+                    color: "var(--text-secondary)",
                     textTransform: "uppercase",
                     letterSpacing: "0.05em",
                   }}
@@ -769,21 +769,21 @@ const AgentManager: React.FC = () => {
             </thead>
             <tbody
               style={{
-                backgroundColor: "#fff",
+                backgroundColor: "white",
               }}
             >
               {filteredAgents.map((agent) => (
                 <tr
                   key={agent.id}
                   style={{
-                    borderBottom: "1px solid #f0f0f0",
+                    borderBottom: "1px solid var(--text-primary)",
                     transition: "background-color 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#f8f9fa";
+                    e.currentTarget.style.backgroundColor = 'var(--bg-card)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#fff";
+                    e.currentTarget.style.backgroundColor = "white";
                   }}
                 >
                   <td
@@ -809,7 +809,7 @@ const AgentManager: React.FC = () => {
                         <div
                           style={{
                             fontSize: "14px",
-                            color: "#666",
+                            color: "var(--text-secondary)",
                             marginTop: "4px",
                           }}
                         >
@@ -828,7 +828,7 @@ const AgentManager: React.FC = () => {
                       padding: "16px 24px",
                       whiteSpace: "nowrap",
                       fontSize: "14px",
-                      color: "#666",
+                      color: "var(--text-secondary)",
                     }}
                   >
                     {agent.identity?.model || "—"}
@@ -881,7 +881,7 @@ const AgentManager: React.FC = () => {
                             .catch(console.error);
                         }}
                         style={{
-                          color: "#1976d2",
+                          color: "var(--accent-color)",
                           background: "none",
                           border: "none",
                           cursor: "pointer",
@@ -891,10 +891,10 @@ const AgentManager: React.FC = () => {
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.color = "#0d47a1";
-                          e.currentTarget.style.backgroundColor = "#f5f5f5";
+                          e.currentTarget.style.backgroundColor = 'var(--bg-card)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.color = "#1976d2";
+                          e.currentTarget.style.color = "var(--accent-color)";
                           e.currentTarget.style.backgroundColor = "transparent";
                         }}
                       >
@@ -903,7 +903,7 @@ const AgentManager: React.FC = () => {
                       <button
                         onClick={() => handleDeleteAgent(agent.id)}
                         style={{
-                          color: "#d32f2f",
+                          color: "var(--danger-color)",
                           background: "none",
                           border: "none",
                           cursor: "pointer",
@@ -915,12 +915,12 @@ const AgentManager: React.FC = () => {
                         onMouseEnter={(e) => {
                           if (!loading) {
                             e.currentTarget.style.color = "#b71c1c";
-                            e.currentTarget.style.backgroundColor = "#f5f5f5";
+                            e.currentTarget.style.backgroundColor = 'var(--bg-card)';
                           }
                         }}
                         onMouseLeave={(e) => {
                           if (!loading) {
-                            e.currentTarget.style.color = "#d32f2f";
+                            e.currentTarget.style.color = "var(--danger-color)";
                             e.currentTarget.style.backgroundColor =
                               "transparent";
                           }
@@ -935,7 +935,7 @@ const AgentManager: React.FC = () => {
                           setShowBindingsModal(true);
                         }}
                         style={{
-                          color: "#388e3c",
+                          color: "var(--text-primary)",
                           background: "none",
                           border: "none",
                           cursor: "pointer",
@@ -945,10 +945,10 @@ const AgentManager: React.FC = () => {
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.color = "#1b5e20";
-                          e.currentTarget.style.backgroundColor = "#f5f5f5";
+                          e.currentTarget.style.backgroundColor = 'var(--bg-card)';
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.color = "#388e3c";
+                          e.currentTarget.style.color = "var(--text-primary)";
                           e.currentTarget.style.backgroundColor = "transparent";
                         }}
                       >
@@ -982,7 +982,7 @@ const AgentManager: React.FC = () => {
           {/* Full create modal code from original */}
           <div
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: "white",
               borderRadius: "12px",
               boxShadow:
                 "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
@@ -1011,7 +1011,7 @@ const AgentManager: React.FC = () => {
               <button
                 onClick={() => setShowCreateModal(false)}
                 style={{
-                  color: "#999",
+                  color: "var(--text-secondary)",
                   background: "none",
                   border: "none",
                   cursor: "pointer",
@@ -1020,11 +1020,11 @@ const AgentManager: React.FC = () => {
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#666";
-                  e.currentTarget.style.backgroundColor = "#f5f5f5";
+                  e.currentTarget.style.color = "var(--text-secondary)";
+                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#999";
+                  e.currentTarget.style.color = "var(--text-secondary)";
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
@@ -1061,12 +1061,12 @@ const AgentManager: React.FC = () => {
                     transition: "all 0.2s",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "#4ECDC4";
+                    e.target.style.borderColor = "var(--accent-color)";
                     e.target.style.boxShadow =
                       "0 0 0 3px rgba(78, 205, 196, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = "#e0e0e0";
+                    e.target.style.borderColor = "var(--text-primary)";
                     e.target.style.boxShadow = "none";
                   }}
                   placeholder="Ex: MeuAgente"
@@ -1099,12 +1099,12 @@ const AgentManager: React.FC = () => {
                     transition: "all 0.2s",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "#4ECDC4";
+                    e.target.style.borderColor = "var(--accent-color)";
                     e.target.style.boxShadow =
                       "0 0 0 3px rgba(78, 205, 196, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = "#e0e0e0";
+                    e.target.style.borderColor = "var(--text-primary)";
                     e.target.style.boxShadow = "none";
                   }}
                   placeholder="/caminho/para/workspace"
@@ -1112,7 +1112,7 @@ const AgentManager: React.FC = () => {
                 <p
                   style={{
                     fontSize: "12px",
-                    color: "#666",
+                    color: "var(--text-secondary)",
                     marginTop: "4px",
                   }}
                 >
@@ -1142,11 +1142,11 @@ const AgentManager: React.FC = () => {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = "#e9ecef";
-                  e.currentTarget.style.borderColor = "#ced4da";
+                  e.currentTarget.style.borderColor = "var(--border-color)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#f8f9fa";
-                  e.currentTarget.style.borderColor = "#e0e0e0";
+                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                  e.currentTarget.style.borderColor = "var(--text-primary)";
                 }}
               >
                 Cancelar
@@ -1156,8 +1156,8 @@ const AgentManager: React.FC = () => {
                 disabled={loading || !newAgentName.trim()}
                 style={{
                   padding: "10px 16px",
-                  backgroundColor: "#4ECDC4",
-                  color: "#fff",
+                  backgroundColor: "var(--accent-color)",
+                  color: "white",
                   border: "none",
                   borderRadius: "8px",
                   cursor:
@@ -1170,12 +1170,12 @@ const AgentManager: React.FC = () => {
                 }}
                 onMouseEnter={(e) => {
                   if (!loading && newAgentName.trim()) {
-                    e.currentTarget.style.backgroundColor = "#3dbcb4";
+                    e.currentTarget.style.backgroundColor = "var(--accent-hover)";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!loading && newAgentName.trim()) {
-                    e.currentTarget.style.backgroundColor = "#4ECDC4";
+                    e.currentTarget.style.backgroundColor = "var(--accent-color)";
                   }
                 }}
               >
@@ -1209,7 +1209,7 @@ const AgentManager: React.FC = () => {
         >
           <div
             style={{
-              backgroundColor: "#fff",
+              backgroundColor: "white",
               borderRadius: "12px",
               boxShadow:
                 "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
@@ -1248,7 +1248,7 @@ const AgentManager: React.FC = () => {
                   setEditAgentSoul("");
                 }}
                 style={{
-                  color: "#999",
+                  color: "var(--text-secondary)",
                   background: "none",
                   border: "none",
                   cursor: "pointer",
@@ -1257,11 +1257,11 @@ const AgentManager: React.FC = () => {
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#666";
-                  e.currentTarget.style.backgroundColor = "#f5f5f5";
+                  e.currentTarget.style.color = "var(--text-secondary)";
+                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#999";
+                  e.currentTarget.style.color = "var(--text-secondary)";
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
@@ -1299,12 +1299,12 @@ const AgentManager: React.FC = () => {
                     transition: "all 0.2s",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "#4ECDC4";
+                    e.target.style.borderColor = "var(--accent-color)";
                     e.target.style.boxShadow =
                       "0 0 0 3px rgba(78, 205, 196, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = "#e0e0e0";
+                    e.target.style.borderColor = "var(--text-primary)";
                     e.target.style.boxShadow = "none";
                   }}
                   placeholder="Nome do agente"
@@ -1443,7 +1443,7 @@ const AgentManager: React.FC = () => {
                   placeholder="Ex: Informal, engraçado, inteligente"
                 />
                 <p
-                  style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}
+                  style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}
                 >
                   Extraído do IDENTITY.md do agente
                 </p>
@@ -1489,7 +1489,7 @@ const AgentManager: React.FC = () => {
                   placeholder="Conteúdo do arquivo SOUL.md do agente"
                 />
                 <p
-                  style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}
+                  style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}
                 >
                   Conteúdo completo do arquivo SOUL.md
                 </p>
@@ -1536,7 +1536,7 @@ const AgentManager: React.FC = () => {
                   Escolher arquivo para avatar
                 </button>
                 <p
-                  style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}
+                  style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}
                 >
                   JPG, PNG ou GIF (máx. 5MB)
                 </p>
@@ -1580,8 +1580,8 @@ const AgentManager: React.FC = () => {
                 disabled={loading || !editAgentName.trim()}
                 style={{
                   padding: "10px 16px",
-                  backgroundColor: "#4ECDC4",
-                  color: "#fff",
+                  backgroundColor: "var(--accent-color)",
+                  color: "white",
                   border: "none",
                   borderRadius: "8px",
                   cursor:
@@ -1607,16 +1607,16 @@ const AgentManager: React.FC = () => {
             right: "24px",
             backgroundColor:
               processingToast.type === "error"
-                ? "#fef2f2"
+                ? "var(--bg-card)"
                 : processingToast.type === "success"
-                  ? "#f0fdf4"
-                  : "#f0f9ff",
+                  ? "var(--bg-card)"
+                  : "var(--bg-card)",
             border: `1px solid ${
               processingToast.type === "error"
-                ? "#fecaca"
+                ? "var(--bg-card)"
                 : processingToast.type === "success"
-                  ? "#bbf7d0"
-                  : "#bae6fd"
+                  ? 'var(--success-color)'
+                  : 'var(--accent-color)'
             }`,
             borderRadius: "12px",
             padding: "16px",
@@ -1645,8 +1645,8 @@ const AgentManager: React.FC = () => {
                   processingToast.type === "error"
                     ? "#ef4444"
                     : processingToast.type === "success"
-                      ? "#10b981"
-                      : "#3b82f6",
+                      ? "var(--success-color)"
+                      : "var(--accent-color)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -1688,10 +1688,10 @@ const AgentManager: React.FC = () => {
                         fontSize: "12px",
                         color:
                           index < (processingToast.currentStep || 0)
-                            ? "#10b981"
+                            ? "var(--success-color)"
                             : index === (processingToast.currentStep || 0)
-                              ? "#3b82f6"
-                              : "#666",
+                              ? "var(--accent-color)"
+                              : "var(--text-secondary)",
                       }}
                     >
                       <div
@@ -1701,10 +1701,10 @@ const AgentManager: React.FC = () => {
                           borderRadius: "50%",
                           backgroundColor:
                             index < (processingToast.currentStep || 0)
-                              ? "#10b981"
+                              ? "var(--success-color)"
                               : index === (processingToast.currentStep || 0)
-                                ? "#3b82f6"
-                                : "#e5e7eb",
+                                ? "var(--accent-color)"
+                                : "var(--border-color)",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -1730,7 +1730,7 @@ const AgentManager: React.FC = () => {
                 setProcessingToast((prev) => ({ ...prev, visible: false }))
               }
               style={{
-                color: "#999",
+                color: "var(--text-secondary)",
                 background: "none",
                 border: "none",
                 cursor: "pointer",
@@ -1739,11 +1739,11 @@ const AgentManager: React.FC = () => {
                 flexShrink: 0,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.color = "#666";
-                e.currentTarget.style.backgroundColor = "#f5f5f5";
+                e.currentTarget.style.color = "var(--text-secondary)";
+                e.currentTarget.style.backgroundColor = 'var(--bg-card)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.color = "#999";
+                e.currentTarget.style.color = "var(--text-secondary)";
                 e.currentTarget.style.backgroundColor = "transparent";
               }}
             >

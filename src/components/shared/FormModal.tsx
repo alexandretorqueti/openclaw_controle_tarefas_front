@@ -64,7 +64,7 @@ const FormModal: React.FC<FormModalProps> = ({
     >
       <div
         style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           borderRadius: '12px',
           width: '100%',
           maxWidth: size === 'sm' ? '400px' : size === 'md' ? '600px' : size === 'lg' ? '800px' : '1200px',
@@ -79,8 +79,8 @@ const FormModal: React.FC<FormModalProps> = ({
         <div
           style={{
             padding: '24px',
-            backgroundColor: '#fff',
-            borderBottom: '1px solid #e0e0e0',
+            backgroundColor: 'white',
+            borderBottom: '1px solid var(--text-primary)',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
@@ -102,7 +102,7 @@ const FormModal: React.FC<FormModalProps> = ({
               <p
                 style={{
                   fontSize: '14px',
-                  color: '#666',
+                  color: 'var(--text-secondary)',
                   margin: '4px 0 0',
                   lineHeight: 1.5,
                 }}
@@ -122,16 +122,16 @@ const FormModal: React.FC<FormModalProps> = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#666',
+              color: 'var(--text-secondary)',
               transition: 'all 0.2s',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f5f5f5';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
               e.currentTarget.style.color = '#333';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = '#666';
+              e.currentTarget.style.color = 'var(--text-secondary)';
             }}
             aria-label="Fechar"
           >
@@ -168,8 +168,8 @@ const FormModal: React.FC<FormModalProps> = ({
           <div
             style={{
               padding: '20px 24px',
-              backgroundColor: '#f8f9fa',
-              borderTop: '1px solid #e0e0e0',
+              backgroundColor: 'var(--bg-card)',
+              borderTop: '1px solid var(--text-primary)',
               display: 'flex',
               justifyContent: 'flex-end',
               gap: '12px',
@@ -186,8 +186,8 @@ const FormModal: React.FC<FormModalProps> = ({
                   style={{
                     padding: '10px 20px',
                     backgroundColor: 'transparent',
-                    color: '#666',
-                    border: '1px solid #ddd',
+                    color: 'var(--text-secondary)',
+                    border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px',
                     fontWeight: 500,
@@ -197,14 +197,14 @@ const FormModal: React.FC<FormModalProps> = ({
                   }}
                   onMouseEnter={(e) => {
                     if (!loading) {
-                      e.currentTarget.style.backgroundColor = '#f5f5f5';
-                      e.currentTarget.style.borderColor = '#ccc';
+                      e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                      e.currentTarget.style.borderColor = 'var(--text-secondary)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!loading) {
                       e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.borderColor = '#ddd';
+                      e.currentTarget.style.borderColor = 'var(--border-color)';
                     }
                   }}
                 >
@@ -218,8 +218,8 @@ const FormModal: React.FC<FormModalProps> = ({
                     disabled={loading}
                     style={{
                       padding: '10px 20px',
-                      backgroundColor: loading ? '#cccccc' : '#4ECDC4',
-                      color: '#fff',
+                      backgroundColor: loading ? 'var(--text-secondary)ccc' : 'var(--accent-color)',
+                      color: 'white',
                       border: 'none',
                       borderRadius: '6px',
                       fontSize: '14px',
@@ -230,12 +230,12 @@ const FormModal: React.FC<FormModalProps> = ({
                     }}
                     onMouseEnter={(e) => {
                       if (!loading) {
-                        e.currentTarget.style.backgroundColor = '#3DB8AC';
+                        e.currentTarget.style.backgroundColor = 'var(--accent-color)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!loading) {
-                        e.currentTarget.style.backgroundColor = '#4ECDC4';
+                        e.currentTarget.style.backgroundColor = 'var(--accent-color)';
                       }
                     }}
                   >

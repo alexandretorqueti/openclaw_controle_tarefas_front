@@ -27,10 +27,10 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
   // Ícones disponíveis para representar tipos de projeto
   const iconOptions = [
     { name: 'Desenvolvimento', icon: <FaCode size={20} />, color: '#118AB2' },
-    { name: 'Marketing', icon: <FaChartLine size={20} />, color: '#06D6A0' },
-    { name: 'Vendas', icon: <FaUsers size={20} />, color: '#9D4EDD' },
-    { name: 'Design', icon: <FaPalette size={20} />, color: '#FF9F1C' },
-    { name: 'IA', icon: <FaRobot size={20} />, color: '#4ECDC4' },
+    { name: 'Marketing', icon: <FaChartLine size={20} />, color: 'var(--success-color)' },
+    { name: 'Vendas', icon: <FaUsers size={20} />, color: 'var(--accent-color)' },
+    { name: 'Design', icon: <FaPalette size={20} />, color: 'var(--accent-color)' },
+    { name: 'IA', icon: <FaRobot size={20} />, color: 'var(--accent-color)' },
     { name: 'Documentação', icon: <FaFileAlt size={20} />, color: '#6C757D' }
   ];
 
@@ -212,7 +212,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
       padding: '20px'
     }}>
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '1000px',
@@ -235,13 +235,13 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
             <div style={{
               width: '48px',
               height: '48px',
-              backgroundColor: '#9D4EDD',
+              backgroundColor: 'var(--accent-color)',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <FaRobot size={24} color="#fff" />
+              <FaRobot size={24} color="white" />
             </div>
             <div>
               <h2 style={{
@@ -277,15 +277,15 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-              e.currentTarget.style.borderColor = '#FF6B6B';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+              e.currentTarget.style.borderColor = 'var(--danger-color)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#ddd';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
             }}
           >
-            <FaTimes size={18} color="#666" />
+            <FaTimes size={18} color="var(--text-secondary)" />
           </button>
         </div>
 
@@ -299,7 +299,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
           <div style={{
             flex: 1,
             padding: '24px',
-            borderRight: '1px solid #e0e0e0',
+            borderRight: '1px solid var(--text-primary)',
             overflowY: 'auto'
           }}>
             <div style={{
@@ -338,10 +338,10 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
             ) : error ? (
               <div style={{
                 padding: '20px',
-                backgroundColor: '#FFE5E5',
-                border: '1px solid #FF6B6B',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--danger-color)',
                 borderRadius: '8px',
-                color: '#FF6B6B',
+                color: 'var(--danger-color)',
                 marginBottom: '20px'
               }}>
                 {error}
@@ -350,8 +350,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                   style={{
                     marginTop: '10px',
                     padding: '8px 16px',
-                    backgroundColor: '#FF6B6B',
-                    color: '#fff',
+                    backgroundColor: 'var(--danger-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -369,7 +369,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
-                <FaRobot size={48} color="#ddd" style={{ marginBottom: '16px' }} />
+                <FaRobot size={48} color='var(--border-color)' style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhum tipo de projeto cadastrado</p>
                 <p style={{ fontSize: '14px', marginTop: '8px' }}>
                   Use o formulário ao lado para criar o primeiro tipo
@@ -388,14 +388,14 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                       key={projectType.id}
                       style={{
                         padding: '16px',
-                        backgroundColor: '#fff',
+                        backgroundColor: 'white',
                         border: '1px solid var(--border-color)',
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '16px',
                         transition: 'all 0.2s',
-                        background: `linear-gradient(90deg, ${matchedIcon.color}10 0%, #fff 30%)`
+                        background: `linear-gradient(90deg, ${matchedIcon.color}10 0%, white 30%)`
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.borderColor = matchedIcon.color;
@@ -403,7 +403,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                         e.currentTarget.style.transform = 'translateY(-2px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = '#e0e0e0';
+                        e.currentTarget.style.borderColor = 'var(--text-primary)';
                         e.currentTarget.style.boxShadow = 'none';
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
@@ -416,9 +416,9 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#fff',
+                        color: 'white',
                         fontSize: '20px',
-                        border: '2px solid #fff',
+                        border: '2px solid white',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                       }}>
                         {matchedIcon.icon}
@@ -468,8 +468,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                           onClick={() => handleEdit(projectType)}
                           style={{
                             padding: '8px 12px',
-                            backgroundColor: '#E3F2FD',
-                            color: '#1976D2',
+                            backgroundColor: 'var(--bg-card)',
+                            color: 'var(--accent-color)',
                             border: 'none',
                             borderRadius: '6px',
                             cursor: 'pointer',
@@ -486,8 +486,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                           onClick={() => handleDelete(projectType.id)}
                           style={{
                             padding: '8px 12px',
-                            backgroundColor: '#FFE5E5',
-                            color: '#FF6B6B',
+                            backgroundColor: 'var(--bg-card)',
+                            color: 'var(--danger-color)',
                             border: 'none',
                             borderRadius: '6px',
                             cursor: 'pointer',
@@ -544,7 +544,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    border: `1px solid ${error && !formData.name.trim() ? '#FF6B6B' : '#ddd'}`,
+                    border: `1px solid ${error && !formData.name.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
                     borderRadius: '8px',
                     fontSize: '16px',
                     boxSizing: 'border-box',
@@ -571,15 +571,15 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                       }}
                       style={{
                         padding: '4px 8px',
-                        backgroundColor: '#fff',
+                        backgroundColor: 'white',
                         border: '1px solid var(--border-color)',
                         borderRadius: '4px',
                         fontSize: '11px',
                         cursor: 'pointer',
                         transition: 'all 0.2s'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.borderColor = '#9D4EDD'}
-                      onMouseLeave={(e) => e.currentTarget.style.borderColor = '#ddd'}
+                      onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent-color)'}
+                      onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border-color)'}
                     >
                       {suggestion}
                     </button>
@@ -629,7 +629,7 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    border: `1px solid ${error && !formData.personaPrompt.trim() ? '#FF6B6B' : '#ddd'}`,
+                    border: `1px solid ${error && !formData.personaPrompt.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
                     borderRadius: '8px',
                     fontSize: '14px',
                     boxSizing: 'border-box',
@@ -712,10 +712,10 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
               {error && (
                 <div style={{
                   padding: '12px 16px',
-                  backgroundColor: '#FFE5E5',
-                  border: '1px solid #FF6B6B',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--danger-color)',
                   borderRadius: '8px',
-                  color: '#FF6B6B',
+                  color: 'var(--danger-color)',
                   marginBottom: '20px',
                   fontSize: '14px'
                 }}>
@@ -734,8 +734,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                   style={{
                     flex: 1,
                     padding: '14px',
-                    backgroundColor: '#9D4EDD',
-                    color: '#fff',
+                    backgroundColor: 'var(--accent-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '16px',
@@ -747,8 +747,8 @@ const ProjectTypeManager: React.FC<ProjectTypeManagerProps> = ({ isOpen, onClose
                     gap: '10px',
                     transition: 'all 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#8A3EC8'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9D4EDD'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
                 >
                   <FaSave size={18} />
                   {isEditing ? 'Atualizar Tipo' : 'Criar Tipo'}

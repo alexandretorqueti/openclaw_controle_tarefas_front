@@ -299,7 +299,7 @@ if (compact) {
           width: '12px',
           height: '12px',
           borderRadius: '50%',
-          backgroundColor: status?.colorCode || '#666'
+          backgroundColor: status?.colorCode || 'var(--text-secondary)'
         }} />
 
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -311,8 +311,8 @@ if (compact) {
                   width: '20px',
                   height: '20px',
                   borderRadius: '4px',
-                  border: `2px solid ${task.isCompleted ? '#06D6A0' : '#ddd'}`,
-                  backgroundColor: task.isCompleted ? '#06D6A0' : 'transparent',
+                  border: `2px solid ${task.isCompleted ? 'var(--success-color)' : 'var(--border-color)'}`,
+                  backgroundColor: task.isCompleted ? 'var(--success-color)' : 'transparent',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -320,7 +320,7 @@ if (compact) {
                   flexShrink: 0
                 }}
               >
-                {task.isCompleted && <FaCheck size={10} color="#fff" />}
+                {task.isCompleted && <FaCheck size={10} color="white" />}
               </button>
               <h3 style={{
                 fontSize: '14px',
@@ -349,7 +349,7 @@ if (compact) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               {project && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <FaProjectDiagram size={10} color="#666" />
+                  <FaProjectDiagram size={10} color="var(--text-secondary)" />
                   <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                     {project.name}
                   </span>
@@ -357,7 +357,7 @@ if (compact) {
               )}
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <FaCalendarAlt size={10} color={isOverdue ? '#FF6B6B' : '#666'} />
+                <FaCalendarAlt size={10} color={isOverdue ? 'var(--danger-color)' : 'var(--text-secondary)'} />
                 <span style={{
                   fontSize: '11px',
                   color: isOverdue ? 'var(--danger-color)' : 'var(--text-secondary)',
@@ -369,7 +369,7 @@ if (compact) {
 
               {assignedUser && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <FaUser size={10} color="#666" />
+                  <FaUser size={10} color="var(--text-secondary)" />
                   <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
                     {assignedUser.name.split(' ')[0]}
                   </span>
@@ -386,8 +386,8 @@ if (compact) {
             bottom: '8px',
             right: '8px',
             padding: '2px 8px',
-            backgroundColor: priority.weight >= 3 ? '#FF6B6B' : priority.weight === 2 ? '#FFD166' : '#4ECDC4',
-            color: '#fff',
+            backgroundColor: priority.weight >= 3 ? 'var(--danger-color)' : priority.weight === 2 ? 'var(--accent-color)' : 'var(--accent-color)',
+            color: 'white',
             borderRadius: '12px',
             fontSize: '10px',
             fontWeight: 500
@@ -420,7 +420,7 @@ if (compact) {
         transition: 'all 0.2s ease',
         boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         position: 'relative',
-        borderLeft: `4px solid ${status?.colorCode || '#666'}`
+        borderLeft: `4px solid ${status?.colorCode || 'var(--text-secondary)'}`
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
@@ -458,8 +458,8 @@ if (compact) {
             width: '24px',
             height: '24px',
             borderRadius: '6px',
-            border: `2px solid ${task.isCompleted ? '#06D6A0' : '#ddd'}`,
-            backgroundColor: task.isCompleted ? '#06D6A0' : 'transparent',
+            border: `2px solid ${task.isCompleted ? 'var(--success-color)' : 'var(--border-color)'}`,
+            backgroundColor: task.isCompleted ? 'var(--success-color)' : 'transparent',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -468,18 +468,18 @@ if (compact) {
           }}
           onMouseEnter={(e) => {
             if (!task.isCompleted) {
-              e.currentTarget.style.borderColor = '#4ECDC4';
-              e.currentTarget.style.backgroundColor = '#f0f9f8';
+              e.currentTarget.style.borderColor = 'var(--accent-color)';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
             }
           }}
           onMouseLeave={(e) => {
             if (!task.isCompleted) {
-              e.currentTarget.style.borderColor = '#ddd';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
               e.currentTarget.style.backgroundColor = 'transparent';
             }
           }}
         >
-          {task.isCompleted && <FaCheck size={14} color="#fff" />}
+          {task.isCompleted && <FaCheck size={14} color="white" />}
         </button>
       </div>
 
@@ -501,8 +501,8 @@ if (compact) {
           {priority && (
             <div style={{
               padding: '4px 12px',
-              backgroundColor: priority.weight >= 3 ? '#FF6B6B' : priority.weight === 2 ? '#FFD166' : '#4ECDC4',
-              color: '#fff',
+              backgroundColor: priority.weight >= 3 ? 'var(--danger-color)' : priority.weight === 2 ? 'var(--accent-color)' : 'var(--accent-color)',
+              color: 'white',
               borderRadius: '16px',
               fontSize: '12px',
               fontWeight: 600
@@ -514,7 +514,7 @@ if (compact) {
 
         {project && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <FaProjectDiagram size={14} color="#666" />
+            <FaProjectDiagram size={14} color="var(--text-secondary)" />
             <span style={{ fontSize: '14px', color: 'var(--text-secondary)', fontWeight: 500 }}>
               {project.name}
             </span>
@@ -572,7 +572,7 @@ if (compact) {
                 width: '12px',
                 height: '12px',
                 borderRadius: '50%',
-                backgroundColor: status?.colorCode || '#666'
+                backgroundColor: status?.colorCode || 'var(--text-secondary)'
               }} />
               <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
                 {status?.name || 'Desconhecido'}
@@ -673,12 +673,12 @@ if (compact) {
                   width: '24px',
                   height: '24px',
                   borderRadius: '50%',
-                  backgroundColor: '#e3f2fd',
+                  backgroundColor: 'var(--bg-card)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
-                  <FaUser size={12} color="#1976d2" />
+                  <FaUser size={12} color="var(--accent-color)" />
                 </div>
               )}
               <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>
@@ -709,8 +709,8 @@ if (compact) {
               disabled={isDeleting}
               style={{
                 padding: '8px 12px',
-                backgroundColor: isDeleting ? '#ccc' : '#FF6B6B',
-                color: '#fff',
+                backgroundColor: isDeleting ? 'var(--text-secondary)' : 'var(--danger-color)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '12px',
@@ -721,10 +721,10 @@ if (compact) {
                 transition: 'background-color 0.2s'
               }}
               onMouseEnter={(e) => {
-                if (!isDeleting) e.currentTarget.style.backgroundColor = '#e55a5a';
+                if (!isDeleting) e.currentTarget.style.backgroundColor = 'var(--danger-color)';
               }}
               onMouseLeave={(e) => {
-                if (!isDeleting) e.currentTarget.style.backgroundColor = '#FF6B6B';
+                if (!isDeleting) e.currentTarget.style.backgroundColor = 'var(--danger-color)';
               }}
             >
               <FaTrash size={12} />
@@ -737,8 +737,8 @@ if (compact) {
               onClick={handleToggleCompletion}
               style={{
                 padding: '8px 12px',
-                backgroundColor: task.isCompleted ? '#FFD166' : '#06D6A0',
-                color: '#fff',
+                backgroundColor: task.isCompleted ? 'var(--accent-color)' : 'var(--success-color)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '12px',
@@ -748,8 +748,8 @@ if (compact) {
                 gap: '6px',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = task.isCompleted ? '#e5bc5c' : '#05c090'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = task.isCompleted ? '#FFD166' : '#06D6A0'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = task.isCompleted ? 'var(--accent-color)' : 'var(--success-color)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = task.isCompleted ? 'var(--accent-color)' : 'var(--success-color)'}
             >
               <FaCheck size={12} />
               {task.isCompleted ? 'Reabrir' : 'Concluir'}
@@ -763,8 +763,8 @@ if (compact) {
             }}
             style={{
               padding: '8px 12px',
-              backgroundColor: '#4ECDC4',
-              color: '#fff',
+              backgroundColor: 'var(--accent-color)',
+              color: 'white',
               border: 'none',
               borderRadius: '6px',
               fontSize: '12px',
@@ -774,8 +774,8 @@ if (compact) {
               gap: '6px',
               transition: 'background-color 0.2s'
             }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
           >
             <FaEdit size={12} />
             Detalhes

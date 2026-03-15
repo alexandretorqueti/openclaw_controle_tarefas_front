@@ -90,7 +90,7 @@ const Card: React.FC<CardProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#4ECDC4',
+                  color: 'var(--accent-color)',
                   flexShrink: 0,
                 }}
               >

@@ -152,7 +152,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
       padding: '20px'
     }}>
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '500px',
@@ -176,12 +176,12 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
               width: '48px',
               height: '48px',
               borderRadius: '50%',
-              backgroundColor: '#4ECDC4',
+              backgroundColor: 'var(--accent-color)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <FaUser size={24} color="#fff" />
+              <FaUser size={24} color="white" />
             </div>
             <div>
               <h2 style={{
@@ -217,15 +217,15 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-              e.currentTarget.style.borderColor = '#FF6B6B';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+              e.currentTarget.style.borderColor = 'var(--danger-color)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#ddd';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
             }}
           >
-            <FaTimes size={16} color="#666" />
+            <FaTimes size={16} color="var(--text-secondary)" />
           </button>
         </div>
 
@@ -234,8 +234,8 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
           {error && (
             <div style={{
               padding: '12px 16px',
-              backgroundColor: '#FFE5E5',
-              border: '1px solid #FF6B6B',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--danger-color)',
               borderRadius: '8px',
               marginBottom: '20px',
               display: 'flex',
@@ -246,23 +246,23 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 width: '24px',
                 height: '24px',
                 borderRadius: '50%',
-                backgroundColor: '#FF6B6B',
+                backgroundColor: 'var(--danger-color)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0
               }}>
-                <FaTimes size={12} color="#fff" />
+                <FaTimes size={12} color="white" />
               </div>
-              <span style={{ color: '#FF6B6B', fontSize: '14px' }}>{error}</span>
+              <span style={{ color: 'var(--danger-color)', fontSize: '14px' }}>{error}</span>
             </div>
           )}
 
           {success && (
             <div style={{
               padding: '12px 16px',
-              backgroundColor: '#E5F7ED',
-              border: '1px solid #4ECDC4',
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--accent-color)',
               borderRadius: '8px',
               marginBottom: '20px',
               display: 'flex',
@@ -273,15 +273,15 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 width: '24px',
                 height: '24px',
                 borderRadius: '50%',
-                backgroundColor: '#4ECDC4',
+                backgroundColor: 'var(--accent-color)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0
               }}>
-                <FaSave size={12} color="#fff" />
+                <FaSave size={12} color="white" />
               </div>
-              <span style={{ color: '#4ECDC4', fontSize: '14px' }}>{success}</span>
+              <span style={{ color: 'var(--accent-color)', fontSize: '14px' }}>{success}</span>
             </div>
           )}
 
@@ -297,7 +297,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <FaImage size={14} color="#4ECDC4" />
+                <FaImage size={14} color="var(--accent-color)" />
                 Foto do Perfil
               </label>
               <AvatarUpload
@@ -320,7 +320,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <FaUser size={14} color="#4ECDC4" />
+                <FaUser size={14} color="var(--accent-color)" />
                 Nome Completo *
               </label>
               <input
@@ -341,12 +341,12 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#4ECDC4';
-                  e.target.style.backgroundColor = '#fff';
+                  e.target.style.borderColor = 'var(--accent-color)';
+                  e.target.style.backgroundColor = 'white';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.backgroundColor = '#f8f9fa';
+                  e.target.style.borderColor = 'var(--border-color)';
+                  e.target.style.backgroundColor = 'var(--bg-card)';
                 }}
               />
             </div>
@@ -363,7 +363,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <FaEnvelope size={14} color="#4ECDC4" />
+                <FaEnvelope size={14} color="var(--accent-color)" />
                 Email *
               </label>
               <input
@@ -384,12 +384,12 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#4ECDC4';
-                  e.target.style.backgroundColor = '#fff';
+                  e.target.style.borderColor = 'var(--accent-color)';
+                  e.target.style.backgroundColor = 'white';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.backgroundColor = '#f8f9fa';
+                  e.target.style.borderColor = 'var(--border-color)';
+                  e.target.style.backgroundColor = 'var(--bg-card)';
                 }}
               />
             </div>
@@ -406,7 +406,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <FaUserTag size={14} color="#4ECDC4" />
+                <FaUserTag size={14} color="var(--accent-color)" />
                 Apelido (Nickname)
               </label>
               <input
@@ -426,17 +426,17 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   transition: 'all 0.2s'
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = '#4ECDC4';
-                  e.target.style.backgroundColor = '#fff';
+                  e.target.style.borderColor = 'var(--accent-color)';
+                  e.target.style.backgroundColor = 'white';
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderColor = '#ddd';
-                  e.target.style.backgroundColor = '#f8f9fa';
+                  e.target.style.borderColor = 'var(--border-color)';
+                  e.target.style.backgroundColor = 'var(--bg-card)';
                 }}
               />
               <p style={{
                 fontSize: '12px',
-                color: '#999',
+                color: 'var(--text-secondary)',
                 marginTop: '8px'
               }}>
                 Apelido usado para identificação no sistema (opcional)
@@ -448,7 +448,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
               display: 'flex',
               gap: '12px',
               paddingTop: '20px',
-              borderTop: '1px solid #e0e0e0'
+              borderTop: '1px solid var(--text-primary)'
             }}>
               <button
                 type="button"
@@ -466,12 +466,12 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f8f9fa';
-                  e.currentTarget.style.borderColor = '#999';
+                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                  e.currentTarget.style.borderColor = 'var(--text-secondary)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.borderColor = '#ddd';
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
                 }}
                 disabled={loading}
               >
@@ -483,12 +483,12 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                 style={{
                   flex: 1,
                   padding: '14px 20px',
-                  backgroundColor: '#4ECDC4',
+                  backgroundColor: 'var(--accent-color)',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: 500,
-                  color: '#fff',
+                  color: 'white',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -496,8 +496,8 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                   gap: '8px',
                   transition: 'all 0.2s'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3DB8AC'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
                 disabled={loading}
               >
                 {loading ? (
@@ -506,7 +506,7 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
                       width: '16px',
                       height: '16px',
                       border: '2px solid rgba(255,255,255,0.3)',
-                      borderTopColor: '#fff',
+                      borderTopColor: 'white',
                       borderRadius: '50%',
                       animation: 'spin 1s linear infinite'
                     }} />

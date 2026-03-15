@@ -1,11 +1,11 @@
 :root {
-  --bg-primary: #121212;
-  --bg-secondary: #1e1e1e;
-  --bg-card: #2d2d2d;
-  --bg-input: #333333;
-  --text-primary: #e0e0e0;
-  --text-secondary: #b0b0b0;
-  --border-color: #444444;
+  --bg-primary: #0a0a0a;           /* Mais escuro: quase preto puro */
+  --bg-secondary: #121212;         /* Mais escuro: anterior era --bg-primary */
+  --bg-card: #1a1a1a;             /* Mais escuro: cinza muito escuro */
+  --bg-input: #222222;            /* Mais escuro: cinza escuro */
+  --text-primary: #f0f0f0;        /* Texto mais claro para melhor contraste */
+  --text-secondary: #cccccc;      /* Texto secundário mais claro */
+  --border-color: #333333;        /* Bordas mais escuras */
   --accent-color: #4a90e2;
   --accent-hover: #357ae8;
   --danger-color: #e74c3c;

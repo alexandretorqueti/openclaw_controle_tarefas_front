@@ -52,13 +52,13 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
     // This would ideally come from the status data
     // For now, using a simple mapping
     const colors: Record<string, string> = {
-      'todo': '#FF6B6B',
-      'in-progress': '#FFD166',
-      'review': '#4ECDC4',
-      'done': '#06D6A0',
-      'cancelled': '#666666'
+      'todo': 'var(--danger-color)',
+      'in-progress': 'var(--accent-color)',
+      'review': 'var(--accent-color)',
+      'done': 'var(--success-color)',
+      'cancelled': 'var(--text-secondary)666'
     };
-    return colors[statusId] || '#666666';
+    return colors[statusId] || 'var(--text-secondary)666';
   };
 
   const renderHistoryItem = (item: TaskHistory) => {
@@ -66,7 +66,7 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
       <div key={item.id} style={{
         marginBottom: '16px',
         padding: '16px',
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '8px',
         border: '1px solid #e9ecef',
         position: 'relative'
@@ -78,12 +78,12 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
               width: '40px',
               height: '40px',
               borderRadius: '50%',
-              backgroundColor: '#f0f9f8',
+              backgroundColor: 'var(--bg-card)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <FaExchangeAlt size={18} color="#4ECDC4" />
+              <FaExchangeAlt size={18} color="var(--accent-color)" />
             </div>
             <div>
               <div style={{ fontSize: '14px', fontWeight: 600, color: '#333' }}>
@@ -113,12 +113,12 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
                 width: '24px',
                 height: '24px',
                 borderRadius: '50%',
-                backgroundColor: '#e3f2fd',
+                backgroundColor: 'var(--bg-card)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <FaUser size={12} color="#1976d2" />
+                <FaUser size={12} color="var(--accent-color)" />
               </div>
             )}
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
@@ -149,7 +149,7 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
             </div>
           </div>
           
-          <FaExchangeAlt size={14} color="#666" />
+          <FaExchangeAlt size={14} color="var(--text-secondary)" />
           
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
             <div style={{
@@ -168,12 +168,12 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
         {item.notes && (
           <div style={{
             padding: '12px',
-            backgroundColor: '#f0f9f8',
+            backgroundColor: 'var(--bg-card)',
             borderRadius: '6px',
-            borderLeft: '4px solid #4ECDC4'
+            borderLeft: '4px solid var(--accent-color)'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <FaInfoCircle size={14} color="#4ECDC4" />
+              <FaInfoCircle size={14} color="var(--accent-color)" />
               <div style={{ fontSize: '12px', fontWeight: 600, color: '#333' }}>
                 Observações
               </div>
@@ -205,9 +205,9 @@ const TaskHistorySection: React.FC<TaskHistorySectionProps> = ({ taskId, current
       {/* Error message */}
       {error && (
         <div style={{
-          backgroundColor: '#FFE5E5',
-          border: '1px solid #FF6B6B',
-          color: '#D32F2F',
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--danger-color)',
+          color: 'var(--danger-color)',
           padding: '16px',
           borderRadius: '8px',
           marginBottom: '20px'

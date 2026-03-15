@@ -36,10 +36,10 @@ try {
       fontFamily: 'Arial, sans-serif',
       color: '#333'
     }}>
-      <h1 style={{ color: '#FF6B6B' }}>⚠️ Erro no Aplicativo</h1>
+      <h1 style={{ color: 'var(--danger-color)' }}>⚠️ Erro no Aplicativo</h1>
       <p>Ocorreu um erro ao carregar o aplicativo.</p>
       <p style={{ 
-        backgroundColor: '#f8f9fa', 
+        backgroundColor: 'var(--bg-card)', 
         padding: '15px',
         borderRadius: '8px',
         marginTop: '20px',
@@ -53,7 +53,7 @@ try {
         style={{
           marginTop: '20px',
           padding: '10px 20px',
-          backgroundColor: '#4ECDC4',
+          backgroundColor: 'var(--accent-color)',
           color: 'white',
           border: 'none',
           borderRadius: '6px',

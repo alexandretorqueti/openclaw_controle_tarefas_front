@@ -20,7 +20,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
   
   const [formData, setFormData] = useState({
     name: '',
-    colorCode: '#4ECDC4',
+    colorCode: 'var(--accent-color)',
     order: 0,
     isFinalState: false,
     visibleToAi: true
@@ -28,16 +28,16 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
 
   // Cores pré-definidas para facilitar a seleção
   const colorOptions = [
-    { name: 'Teal', value: '#4ECDC4' },
-    { name: 'Vermelho', value: '#FF6B6B' },
-    { name: 'Verde', value: '#06D6A0' },
-    { name: 'Amarelo', value: '#FFD166' },
+    { name: 'Teal', value: 'var(--accent-color)' },
+    { name: 'Vermelho', value: 'var(--danger-color)' },
+    { name: 'Verde', value: 'var(--success-color)' },
+    { name: 'Amarelo', value: 'var(--accent-color)' },
     { name: 'Azul', value: '#118AB2' },
-    { name: 'Roxo', value: '#9D4EDD' },
+    { name: 'Roxo', value: 'var(--accent-color)' },
     { name: 'Rosa', value: '#EF476F' },
     { name: 'Cinza', value: '#6C757D' },
-    { name: 'Preto', value: '#333333' },
-    { name: 'Laranja', value: '#FF9F1C' }
+    { name: 'Preto', value: 'var(--bg-input)' },
+    { name: 'Laranja', value: 'var(--accent-color)' }
   ];
 
   // Carregar status ao abrir o modal
@@ -156,7 +156,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
   const resetForm = () => {
     setFormData({
       name: '',
-      colorCode: '#4ECDC4',
+      colorCode: 'var(--accent-color)',
       order: statuses.length > 0 ? Math.max(...statuses.map(s => s.order || 0)) + 1 : 0,
       isFinalState: false,
       visibleToAi: true
@@ -188,7 +188,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
       padding: '20px'
     }}>
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '800px',
@@ -211,13 +211,13 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
             <div style={{
               width: '48px',
               height: '48px',
-              backgroundColor: '#4ECDC4',
+              backgroundColor: 'var(--accent-color)',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <FaListAlt size={24} color="#fff" />
+              <FaListAlt size={24} color="white" />
             </div>
             <div>
               <h2 style={{
@@ -253,15 +253,15 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-              e.currentTarget.style.borderColor = '#FF6B6B';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+              e.currentTarget.style.borderColor = 'var(--danger-color)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#ddd';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
             }}
           >
-            <FaTimes size={18} color="#666" />
+            <FaTimes size={18} color="var(--text-secondary)" />
           </button>
         </div>
 
@@ -275,7 +275,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
           <div style={{
             flex: 1,
             padding: '24px',
-            borderRight: '1px solid #e0e0e0',
+            borderRight: '1px solid var(--text-primary)',
             overflowY: 'auto'
           }}>
             <div style={{
@@ -314,10 +314,10 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
             ) : error ? (
               <div style={{
                 padding: '20px',
-                backgroundColor: '#FFE5E5',
-                border: '1px solid #FF6B6B',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--danger-color)',
                 borderRadius: '8px',
-                color: '#FF6B6B',
+                color: 'var(--danger-color)',
                 marginBottom: '20px'
               }}>
                 {error}
@@ -326,8 +326,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                   style={{
                     marginTop: '10px',
                     padding: '8px 16px',
-                    backgroundColor: '#FF6B6B',
-                    color: '#fff',
+                    backgroundColor: 'var(--danger-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -345,7 +345,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
-                <FaListAlt size={48} color="#ddd" style={{ marginBottom: '16px' }} />
+                <FaListAlt size={48} color='var(--border-color)' style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhum status cadastrado</p>
                 <p style={{ fontSize: '14px', marginTop: '8px' }}>
                   Use o formulário ao lado para criar o primeiro status
@@ -360,14 +360,14 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       key={status.id}
                       style={{
                         padding: '16px',
-                        backgroundColor: '#fff',
+                        backgroundColor: 'white',
                         border: '1px solid var(--border-color)',
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '16px',
                         transition: 'all 0.2s',
-                        background: `linear-gradient(90deg, ${status.colorCode}10 0%, #fff 30%)`
+                        background: `linear-gradient(90deg, ${status.colorCode}10 0%, white 30%)`
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.borderColor = status.colorCode;
@@ -375,7 +375,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         e.currentTarget.style.transform = 'translateY(-2px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = '#e0e0e0';
+                        e.currentTarget.style.borderColor = 'var(--text-primary)';
                         e.currentTarget.style.boxShadow = 'none';
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
@@ -388,10 +388,10 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: '#fff',
+                        color: 'white',
                         fontSize: '18px',
                         fontWeight: 'bold',
-                        border: '2px solid #fff',
+                        border: '2px solid white',
                         boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                       }}>
                         {status.order}
@@ -414,8 +414,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                           {status.isFinalState && (
                             <span style={{
                               fontSize: '12px',
-                              backgroundColor: '#06D6A0',
-                              color: '#fff',
+                              backgroundColor: 'var(--success-color)',
+                              color: 'white',
                               padding: '2px 8px',
                               borderRadius: '4px',
                               display: 'flex',
@@ -429,8 +429,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                           {status.visibleToAi && (
                             <span style={{
                               fontSize: '12px',
-                              backgroundColor: '#4ECDC4',
-                              color: '#fff',
+                              backgroundColor: 'var(--accent-color)',
+                              color: 'white',
                               padding: '2px 8px',
                               borderRadius: '4px',
                               display: 'flex',
@@ -465,8 +465,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                           onClick={() => handleEdit(status)}
                           style={{
                             padding: '8px 12px',
-                            backgroundColor: '#E3F2FD',
-                            color: '#1976D2',
+                            backgroundColor: 'var(--bg-card)',
+                            color: 'var(--accent-color)',
                             border: 'none',
                             borderRadius: '6px',
                             cursor: 'pointer',
@@ -483,8 +483,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                           onClick={() => handleDelete(status.id)}
                           style={{
                             padding: '8px 12px',
-                            backgroundColor: '#FFE5E5',
-                            color: '#FF6B6B',
+                            backgroundColor: 'var(--bg-card)',
+                            color: 'var(--danger-color)',
                             border: 'none',
                             borderRadius: '6px',
                             cursor: 'pointer',
@@ -539,7 +539,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    border: `1px solid ${error && !formData.name.trim() ? '#FF6B6B' : '#ddd'}`,
+                    border: `1px solid ${error && !formData.name.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
                     borderRadius: '8px',
                     fontSize: '16px',
                     boxSizing: 'border-box',
@@ -572,7 +572,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                     height: '60px',
                     backgroundColor: formData.colorCode,
                     borderRadius: '8px',
-                    border: '3px solid #fff',
+                    border: '3px solid white',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                   }} />
                   
@@ -624,7 +624,7 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         style={{
                           height: '40px',
                           backgroundColor: color.value,
-                          border: formData.colorCode === color.value ? '3px solid #333' : '2px solid #fff',
+                          border: formData.colorCode === color.value ? '3px solid #333' : '2px solid white',
                           borderRadius: '6px',
                           cursor: 'pointer',
                           boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
@@ -704,8 +704,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         flex: 1,
                         padding: '12px',
                         backgroundColor: 'var(--bg-input)',
-                        color: formData.isFinalState ? '#fff' : '#333',
-                        border: formData.isFinalState ? 'none' : '1px solid #ddd',
+                        color: formData.isFinalState ? 'white' : '#333',
+                        border: formData.isFinalState ? 'none' : '1px solid var(--border-color)',
                         borderRadius: '8px',
                         cursor: 'pointer',
                         display: 'flex',
@@ -725,8 +725,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                         flex: 1,
                         padding: '12px',
                         backgroundColor: 'var(--bg-input)',
-                        color: !formData.isFinalState ? '#fff' : '#333',
-                        border: !formData.isFinalState ? 'none' : '1px solid #ddd',
+                        color: !formData.isFinalState ? 'white' : '#333',
+                        border: !formData.isFinalState ? 'none' : '1px solid var(--border-color)',
                         borderRadius: '8px',
                         cursor: 'pointer',
                         display: 'flex',
@@ -767,8 +767,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       flex: 1,
                       padding: '12px',
                       backgroundColor: 'var(--bg-input)',
-                      color: formData.visibleToAi ? '#fff' : '#333',
-                      border: formData.visibleToAi ? 'none' : '1px solid #ddd',
+                      color: formData.visibleToAi ? 'white' : '#333',
+                      border: formData.visibleToAi ? 'none' : '1px solid var(--border-color)',
                       borderRadius: '8px',
                       cursor: 'pointer',
                       display: 'flex',
@@ -788,8 +788,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                       flex: 1,
                       padding: '12px',
                       backgroundColor: 'var(--bg-input)',
-                      color: !formData.visibleToAi ? '#fff' : '#333',
-                      border: !formData.visibleToAi ? 'none' : '1px solid #ddd',
+                      color: !formData.visibleToAi ? 'white' : '#333',
+                      border: !formData.visibleToAi ? 'none' : '1px solid var(--border-color)',
                       borderRadius: '8px',
                       cursor: 'pointer',
                       display: 'flex',
@@ -809,10 +809,10 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
               {error && (
                 <div style={{
                   padding: '12px 16px',
-                  backgroundColor: '#FFE5E5',
-                  border: '1px solid #FF6B6B',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--danger-color)',
                   borderRadius: '8px',
-                  color: '#FF6B6B',
+                  color: 'var(--danger-color)',
                   marginBottom: '20px',
                   fontSize: '14px'
                 }}>
@@ -831,8 +831,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                   style={{
                     flex: 1,
                     padding: '14px',
-                    backgroundColor: '#4ECDC4',
-                    color: '#fff',
+                    backgroundColor: 'var(--accent-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '16px',
@@ -844,8 +844,8 @@ const StatusManager: React.FC<StatusManagerProps> = ({ isOpen, onClose, onStatus
                     gap: '10px',
                     transition: 'all 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3DB8AC'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
                 >
                   <FaSave size={18} />
                   {isEditing ? 'Atualizar Status' : 'Criar Status'}

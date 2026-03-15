@@ -47,7 +47,7 @@ class ErrorBoundary extends Component<
           fontFamily: 'Arial, sans-serif',
           color: 'var(--text-primary)'
         }}>
-          <h1 style={{ color: '#FF6B6B' }}>⚠️ Erro no Componente</h1>
+          <h1 style={{ color: 'var(--danger-color)' }}>⚠️ Erro no Componente</h1>
           <p>Ocorreu um erro ao renderizar este componente.</p>
           <p style={{
             backgroundColor: 'var(--bg-input)',
@@ -65,7 +65,7 @@ class ErrorBoundary extends Component<
             style={{
               marginTop: '20px',
               padding: '10px 20px',
-              backgroundColor: '#4ECDC4',
+              backgroundColor: 'var(--accent-color)',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -334,7 +334,7 @@ const AppContent: React.FC = () => {
           justifyContent: 'center',
           height: '300px'
         }}>
-          <FaSpinner size={48} style={{ animation: 'spin 1s linear infinite', color: '#4ECDC4' }} />
+          <FaSpinner size={48} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent-color)' }} />
         </div>
       );
     }
@@ -344,7 +344,7 @@ const AppContent: React.FC = () => {
         <div style={{
           padding: '40px',
           textAlign: 'center',
-          color: '#FF6B6B'
+          color: 'var(--danger-color)'
         }}>
           <h3>Erro ao carregar dados</h3>
           <p>{error}</p>
@@ -352,7 +352,7 @@ const AppContent: React.FC = () => {
             onClick={loadInitialData}
             style={{
               padding: '10px 20px',
-              backgroundColor: '#4ECDC4',
+              backgroundColor: 'var(--accent-color)',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -535,7 +535,7 @@ const App: React.FC = () => {
         justifyContent: 'center',
         backgroundColor: 'var(--bg-primary)'
       }}>
-        <FaSpinner size={48} style={{ animation: 'spin 1s linear infinite', color: '#4ECDC4' }} />
+        <FaSpinner size={48} style={{ animation: 'spin 1s linear infinite', color: 'var(--accent-color)' }} />
       </div>
     );
   }

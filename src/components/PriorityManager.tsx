@@ -143,11 +143,11 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
 
   // Função para obter cor baseada no peso
   const getPriorityColor = (weight: number) => {
-    if (weight >= 6) return '#FF6B6B'; // Crítica/Urgente - Vermelho
-    if (weight >= 4) return '#FF9F1C'; // Alta/Muito Alta - Laranja
-    if (weight >= 3) return '#FFD166'; // Média - Amarelo
-    if (weight >= 2) return '#4ECDC4'; // Baixa - Teal
-    return '#06D6A0'; // Muito Baixa - Verde
+    if (weight >= 6) return 'var(--danger-color)'; // Crítica/Urgente - Vermelho
+    if (weight >= 4) return 'var(--accent-color)'; // Alta/Muito Alta - Laranja
+    if (weight >= 3) return 'var(--accent-color)'; // Média - Amarelo
+    if (weight >= 2) return 'var(--accent-color)'; // Baixa - Teal
+    return 'var(--success-color)'; // Muito Baixa - Verde
   };
 
   // Função para obter ícone baseado no peso
@@ -174,7 +174,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
       padding: '20px'
     }}>
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '800px',
@@ -197,13 +197,13 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
             <div style={{
               width: '48px',
               height: '48px',
-              backgroundColor: '#FF9F1C',
+              backgroundColor: 'var(--accent-color)',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <FaFlag size={24} color="#fff" />
+              <FaFlag size={24} color="white" />
             </div>
             <div>
               <h2 style={{
@@ -239,15 +239,15 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-              e.currentTarget.style.borderColor = '#FF6B6B';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+              e.currentTarget.style.borderColor = 'var(--danger-color)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#ddd';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
             }}
           >
-            <FaTimes size={18} color="#666" />
+            <FaTimes size={18} color="var(--text-secondary)" />
           </button>
         </div>
 
@@ -261,7 +261,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
           <div style={{
             flex: 1,
             padding: '24px',
-            borderRight: '1px solid #e0e0e0',
+            borderRight: '1px solid var(--text-primary)',
             overflowY: 'auto'
           }}>
             <div style={{
@@ -300,10 +300,10 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
             ) : error ? (
               <div style={{
                 padding: '20px',
-                backgroundColor: '#FFE5E5',
-                border: '1px solid #FF6B6B',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--danger-color)',
                 borderRadius: '8px',
-                color: '#FF6B6B',
+                color: 'var(--danger-color)',
                 marginBottom: '20px'
               }}>
                 {error}
@@ -312,8 +312,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                   style={{
                     marginTop: '10px',
                     padding: '8px 16px',
-                    backgroundColor: '#FF6B6B',
-                    color: '#fff',
+                    backgroundColor: 'var(--danger-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -331,7 +331,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
-                <FaFlag size={48} color="#ddd" style={{ marginBottom: '16px' }} />
+                <FaFlag size={48} color='var(--border-color)' style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhuma prioridade cadastrada</p>
                 <p style={{ fontSize: '14px', marginTop: '8px' }}>
                   Use o formulário ao lado para criar a primeira prioridade
@@ -350,14 +350,14 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                         key={priority.id}
                         style={{
                           padding: '16px',
-                          backgroundColor: '#fff',
+                          backgroundColor: 'white',
                           border: `1px solid ${color}20`,
                           borderRadius: '8px',
                           display: 'flex',
                           alignItems: 'center',
                           gap: '16px',
                           transition: 'all 0.2s',
-                          background: `linear-gradient(90deg, ${color}10 0%, #fff 30%)`
+                          background: `linear-gradient(90deg, ${color}10 0%, white 30%)`
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.borderColor = color;
@@ -378,7 +378,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          color: '#fff',
+                          color: 'white',
                           fontSize: '20px',
                           fontWeight: 'bold'
                         }}>
@@ -402,7 +402,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                             <span style={{
                               fontSize: '12px',
                               backgroundColor: color,
-                              color: '#fff',
+                              color: 'white',
                               padding: '2px 8px',
                               borderRadius: '4px',
                               display: 'flex',
@@ -431,8 +431,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                             onClick={() => handleEdit(priority)}
                             style={{
                               padding: '8px 12px',
-                              backgroundColor: '#E3F2FD',
-                              color: '#1976D2',
+                              backgroundColor: 'var(--bg-card)',
+                              color: 'var(--accent-color)',
                               border: 'none',
                               borderRadius: '6px',
                               cursor: 'pointer',
@@ -449,8 +449,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                             onClick={() => handleDelete(priority.id)}
                             style={{
                               padding: '8px 12px',
-                              backgroundColor: '#FFE5E5',
-                              color: '#FF6B6B',
+                              backgroundColor: 'var(--bg-card)',
+                              color: 'var(--danger-color)',
                               border: 'none',
                               borderRadius: '6px',
                               cursor: 'pointer',
@@ -506,7 +506,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                   style={{
                     width: '100%',
                     padding: '12px 16px',
-                    border: `1px solid ${error && !formData.name.trim() ? '#FF6B6B' : '#ddd'}`,
+                    border: `1px solid ${error && !formData.name.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
                     borderRadius: '8px',
                     fontSize: '16px',
                     boxSizing: 'border-box',
@@ -542,7 +542,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                       flex: 1,
                       height: '8px',
                       borderRadius: '4px',
-                      backgroundColor: '#ddd',
+                      backgroundColor: 'var(--border-color)',
                       outline: 'none'
                     }}
                   />
@@ -554,7 +554,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#fff',
+                    color: 'white',
                     fontSize: '24px',
                     fontWeight: 'bold'
                   }}>
@@ -594,10 +594,10 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
               {error && (
                 <div style={{
                   padding: '12px 16px',
-                  backgroundColor: '#FFE5E5',
-                  border: '1px solid #FF6B6B',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--danger-color)',
                   borderRadius: '8px',
-                  color: '#FF6B6B',
+                  color: 'var(--danger-color)',
                   marginBottom: '20px',
                   fontSize: '14px'
                 }}>
@@ -616,8 +616,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                   style={{
                     flex: 1,
                     padding: '14px',
-                    backgroundColor: '#FF9F1C',
-                    color: '#fff',
+                    backgroundColor: 'var(--accent-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '16px',
@@ -629,8 +629,8 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                     gap: '10px',
                     transition: 'all 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#E68A00'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#FF9F1C'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
                 >
                   <FaSave size={18} />
                   {isEditing ? 'Atualizar Prioridade' : 'Criar Prioridade'}
@@ -657,11 +657,11 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = '#e9ecef';
-                      e.currentTarget.style.borderColor = '#666';
+                      e.currentTarget.style.borderColor = 'var(--text-secondary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8f9fa';
-                      e.currentTarget.style.borderColor = '#ddd';
+                      e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                      e.currentTarget.style.borderColor = 'var(--border-color)';
                     }}
                   >
                     <FaTimes size={18} />
@@ -675,7 +675,7 @@ const PriorityManager: React.FC<PriorityManagerProps> = ({ isOpen, onClose, onPr
             <div style={{
               marginTop: '32px',
               padding: '16px',
-              backgroundColor: '#fff',
+              backgroundColor: 'white',
               borderRadius: '8px',
               border: '1px solid var(--border-color)'
             }}>

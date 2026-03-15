@@ -315,7 +315,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             transition: 'background-color 0.2s'
           }}
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e9ecef'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
         >
           <FaArrowLeft size={14} />
           Voltar para lista
@@ -324,9 +324,9 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         {/* Exibição de erro */}
         {error && (
           <div style={{
-            backgroundColor: '#FFE5E5',
-            border: '1px solid #FF6B6B',
-            color: '#D32F2F',
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--danger-color)',
+            color: 'var(--danger-color)',
             padding: '16px',
             borderRadius: '8px',
             marginBottom: '20px',
@@ -343,7 +343,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         )}
 
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '24px',
           borderRadius: '12px',
           boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
@@ -383,8 +383,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     style={{
                       padding: '6px 12px',
                       backgroundColor: 'var(--bg-input)',
-                      color: task.isCompleted ? '#fff' : '#333',
-                      border: `1px solid ${task.isCompleted ? '#06D6A0' : '#ddd'}`,
+                      color: task.isCompleted ? 'white' : '#333',
+                      border: `1px solid ${task.isCompleted ? 'var(--success-color)' : 'var(--border-color)'}`,
                       borderRadius: '6px',
                       fontSize: '12px',
                       cursor: 'pointer',
@@ -401,7 +401,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
               {project && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                  <FaProjectDiagram size={16} color="#666" />
+                  <FaProjectDiagram size={16} color="var(--text-secondary)" />
                   <span style={{ fontSize: '16px', color: 'var(--text-secondary)', fontWeight: 500 }}>
                     Projeto: {project.name}
                   </span>
@@ -450,8 +450,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     onClick={() => setIsEditing(true)}
                     style={{
                       padding: '10px 16px',
-                      backgroundColor: '#4ECDC4',
-                      color: '#fff',
+                      backgroundColor: 'var(--accent-color)',
+                      color: 'white',
                       border: 'none',
                       borderRadius: '8px',
                       fontSize: '14px',
@@ -469,8 +469,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     disabled={isDeleting}
                     style={{
                       padding: '10px 16px',
-                      backgroundColor: isDeleting ? '#ccc' : '#FF6B6B',
-                      color: '#fff',
+                      backgroundColor: isDeleting ? 'var(--text-secondary)' : 'var(--danger-color)',
+                      color: 'white',
                       border: 'none',
                       borderRadius: '8px',
                       fontSize: '14px',
@@ -509,8 +509,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     disabled={isSaving}
                     style={{
                       padding: '10px 16px',
-                      backgroundColor: isSaving ? '#ccc' : '#06D6A0',
-                      color: '#fff',
+                      backgroundColor: isSaving ? 'var(--text-secondary)' : 'var(--success-color)',
+                      color: 'white',
                       border: 'none',
                       borderRadius: '8px',
                       fontSize: '14px',
@@ -539,7 +539,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       }}>
         {/* Status Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
@@ -571,7 +571,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 width: '16px',
                 height: '16px',
                 borderRadius: '50%',
-                backgroundColor: status?.colorCode || '#666'
+                backgroundColor: status?.colorCode || 'var(--text-secondary)'
               }} />
               <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
                 {status?.name || 'Desconhecido'}
@@ -582,7 +582,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Priority Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
@@ -611,8 +611,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <FaFlag size={16} color={
-                (priority?.weight || 0) >= 3 ? '#FF6B6B' : 
-                (priority?.weight || 0) === 2 ? '#FFD166' : '#4ECDC4'
+                (priority?.weight || 0) >= 3 ? 'var(--danger-color)' : 
+                (priority?.weight || 0) === 2 ? 'var(--accent-color)' : 'var(--accent-color)'
               } />
               <span style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
                 {priority?.name || 'Desconhecida'}
@@ -623,16 +623,16 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Deadline Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          border: isOverdue ? '1px solid #FF6B6B' : 'none'
+          border: isOverdue ? '1px solid var(--danger-color)' : 'none'
         }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
             Prazo
             {isOverdue && (
-              <span style={{ color: '#FF6B6B', marginLeft: '8px', fontSize: '14px' }}>
+              <span style={{ color: 'var(--danger-color)', marginLeft: '8px', fontSize: '14px' }}>
                 (Atrasado)
               </span>
             )}
@@ -666,13 +666,13 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             />
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <FaCalendarAlt size={16} color={isOverdue ? '#FF6B6B' : '#666'} />
+              <FaCalendarAlt size={16} color={isOverdue ? 'var(--danger-color)' : 'var(--text-secondary)'} />
               <div>
-                <div style={{ fontSize: '16px', fontWeight: 500, color: isOverdue ? '#FF6B6B' : '#333' }}>
+                <div style={{ fontSize: '16px', fontWeight: 500, color: isOverdue ? 'var(--danger-color)' : '#333' }}>
                   {formattedDeadline}
                 </div>
                 {isOverdue && (
-                  <div style={{ fontSize: '12px', color: '#FF6B6B', marginTop: '4px' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--danger-color)', marginTop: '4px' }}>
                     <FaExclamationTriangle size={12} /> Esta tarefa está atrasada
                   </div>
                 )}
@@ -683,17 +683,17 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Recurrence Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-          border: task.isRecurring ? '1px solid #4ECDC4' : 'none'
+          border: task.isRecurring ? '1px solid var(--accent-color)' : 'none'
         }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <FaSync size={14} />
             Recorrência
             {task.isRecurring && (
-              <span style={{ fontSize: '12px', backgroundColor: '#4ECDC4', color: 'white', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px' }}>
+              <span style={{ fontSize: '12px', backgroundColor: 'var(--accent-color)', color: 'white', padding: '2px 8px', borderRadius: '12px', marginLeft: '8px' }}>
                 Ativa
               </span>
             )}
@@ -717,7 +717,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           ) : task.isRecurring ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FaSync size={14} color="#4ECDC4" />
+                <FaSync size={14} color="var(--accent-color)" />
                 <span style={{ fontWeight: 500 }}>
                   {task.recurrenceType === 'daily' && 'Diária'}
                   {task.recurrenceType === 'weekly' && 'Semanal'}
@@ -727,14 +727,14 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               
               {task.recurrenceTimes && Array.isArray(task.recurrenceTimes) && task.recurrenceTimes.length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FaClock size={14} color="#666" />
+                  <FaClock size={14} color="var(--text-secondary)" />
                   <span>Horários: {task.recurrenceTimes.join(', ')}</span>
                 </div>
               )}
               
               {task.recurrenceType === 'weekly' && task.recurrenceDays && task.recurrenceDays.length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FaCalendarAlt size={14} color="#666" />
+                  <FaCalendarAlt size={14} color="var(--text-secondary)" />
                   <span>
                     Dias: {task.recurrenceDays.map(d => {
                       const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -746,7 +746,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               
               {task.lastExecutedAt && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FaHistory size={14} color="#666" />
+                  <FaHistory size={14} color="var(--text-secondary)" />
                   <span>
                     Última execução: {safeFormatDate(task.lastExecutedAt, 'dd/MM/yyyy HH:mm')}
                   </span>
@@ -755,7 +755,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               
               {task.nextExecutionAt && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <FaCalendarAlt size={14} color="#4ECDC4" />
+                  <FaCalendarAlt size={14} color="var(--accent-color)" />
                   <span style={{ fontWeight: 500 }}>
                     Próxima execução: {safeFormatDate(task.nextExecutionAt, 'dd/MM/yyyy HH:mm')}
                   </span>
@@ -771,7 +771,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Assigned To Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
@@ -821,12 +821,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  backgroundColor: '#e3f2fd',
+                  backgroundColor: 'var(--bg-card)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
-                  <FaUser size={20} color="#1976d2" />
+                  <FaUser size={20} color="var(--accent-color)" />
                 </div>
               )}
               <div>
@@ -845,7 +845,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Model Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
@@ -869,7 +869,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
-                backgroundColor: '#fff'
+                backgroundColor: 'white'
               }}
             >
               {agents.length > 0 ? (
@@ -888,12 +888,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                backgroundColor: '#f0f9f8',
+                backgroundColor: 'var(--bg-card)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#4ECDC4' }}>AI</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--accent-color)' }}>AI</div>
               </div>
               <div>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
@@ -914,7 +914,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Parent Task Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
@@ -955,12 +955,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                backgroundColor: '#f0f9f8',
+                backgroundColor: 'var(--bg-card)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#4ECDC4' }}>↗</div>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--accent-color)' }}>↗</div>
               </div>
               <div>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
@@ -976,7 +976,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Created By Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
@@ -1001,12 +1001,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                backgroundColor: '#e3f2fd',
+                backgroundColor: 'var(--bg-card)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <FaUser size={20} color="#1976d2" />
+                <FaUser size={20} color="var(--accent-color)" />
               </div>
             )}
             <div>
@@ -1022,7 +1022,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
         {/* Project Card */}
         <div style={{
-          backgroundColor: '#fff',
+          backgroundColor: 'white',
           padding: '20px',
           borderRadius: '12px',
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
@@ -1050,7 +1050,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             </select>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <FaProjectDiagram size={20} color="#4ECDC4" />
+              <FaProjectDiagram size={20} color="var(--accent-color)" />
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
                   {project?.name || 'Projeto não encontrado'}
@@ -1066,7 +1066,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     padding: '12px', 
                     borderRadius: '8px',
                     marginTop: '12px',
-                    borderLeft: '4px solid #4ECDC4'
+                    borderLeft: '4px solid var(--accent-color)'
                   }}>
                     <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '6px' }}>
                       📋 Regras do Projeto
@@ -1142,7 +1142,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       
       {/* Tabs for Comments, History, and Execution Logs */}
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
         marginBottom: '32px',
@@ -1159,10 +1159,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             style={{
               flex: 1,
               padding: '16px 24px',
-              backgroundColor: activeTab === 'comments' ? '#fff' : 'transparent',
+              backgroundColor: activeTab === 'comments' ? 'white' : 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'comments' ? '3px solid #4ECDC4' : '3px solid transparent',
-              color: activeTab === 'comments' ? '#333' : '#666',
+              borderBottom: activeTab === 'comments' ? '3px solid var(--accent-color)' : '3px solid transparent',
+              color: activeTab === 'comments' ? '#333' : 'var(--text-secondary)',
               fontWeight: activeTab === 'comments' ? 600 : 500,
               fontSize: '14px',
               cursor: 'pointer',
@@ -1181,10 +1181,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             style={{
               flex: 1,
               padding: '16px 24px',
-              backgroundColor: activeTab === 'history' ? '#fff' : 'transparent',
+              backgroundColor: activeTab === 'history' ? 'white' : 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'history' ? '3px solid #4ECDC4' : '3px solid transparent',
-              color: activeTab === 'history' ? '#333' : '#666',
+              borderBottom: activeTab === 'history' ? '3px solid var(--accent-color)' : '3px solid transparent',
+              color: activeTab === 'history' ? '#333' : 'var(--text-secondary)',
               fontWeight: activeTab === 'history' ? 600 : 500,
               fontSize: '14px',
               cursor: 'pointer',
@@ -1203,10 +1203,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             style={{
               flex: 1,
               padding: '16px 24px',
-              backgroundColor: activeTab === 'execution' ? '#fff' : 'transparent',
+              backgroundColor: activeTab === 'execution' ? 'white' : 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'execution' ? '3px solid #4ECDC4' : '3px solid transparent',
-              color: activeTab === 'execution' ? '#333' : '#666',
+              borderBottom: activeTab === 'execution' ? '3px solid var(--accent-color)' : '3px solid transparent',
+              color: activeTab === 'execution' ? '#333' : 'var(--text-secondary)',
               fontWeight: activeTab === 'execution' ? 600 : 500,
               fontSize: '14px',
               cursor: 'pointer',
@@ -1225,10 +1225,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             style={{
               flex: 1,
               padding: '16px 24px',
-              backgroundColor: activeTab === 'generatedFiles' ? '#fff' : 'transparent',
+              backgroundColor: activeTab === 'generatedFiles' ? 'white' : 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'generatedFiles' ? '3px solid #4ECDC4' : '3px solid transparent',
-              color: activeTab === 'generatedFiles' ? '#333' : '#666',
+              borderBottom: activeTab === 'generatedFiles' ? '3px solid var(--accent-color)' : '3px solid transparent',
+              color: activeTab === 'generatedFiles' ? '#333' : 'var(--text-secondary)',
               fontWeight: activeTab === 'generatedFiles' ? 600 : 500,
               fontSize: '14px',
               cursor: 'pointer',
@@ -1273,12 +1273,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               {/* Prompt do Arquiteto */}
               {task.arquitetosPromptContent && (
                 <div style={{ marginBottom: '32px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FaFileAlt size={14} />
                     Prompt do Arquiteto
                   </h4>
                   <pre style={{
-                    backgroundColor: '#f8f9fa',
+                    backgroundColor: 'var(--bg-card)',
                     padding: '16px',
                     borderRadius: '8px',
                     border: '1px solid #e9ecef',
@@ -1298,12 +1298,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               {/* Análise do Arquiteto */}
               {task.arquitetosAnalysisContent && (
                 <div style={{ marginBottom: '32px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FaFileAlt size={14} />
                     Análise do Arquiteto
                   </h4>
                   <pre style={{
-                    backgroundColor: '#f8f9fa',
+                    backgroundColor: 'var(--bg-card)',
                     padding: '16px',
                     borderRadius: '8px',
                     border: '1px solid #e9ecef',
@@ -1323,13 +1323,13 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               {/* Terminal do Arquiteto */}
               {task.arquitetosTerminalContent && (
                 <div style={{ marginBottom: '32px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FaFileAlt size={14} />
                     Terminal do Arquiteto
                   </h4>
                   <pre style={{
-                    backgroundColor: '#1e1e1e',
-                    color: '#e0e0e0',
+                    backgroundColor: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)',
                     padding: '16px',
                     borderRadius: '8px',
                     border: '1px solid #333',
@@ -1349,13 +1349,13 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               {/* Terminal do Programador */}
               {task.programadorTerminalContent && (
                 <div style={{ marginBottom: '32px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FaFileAlt size={14} />
                     Terminal do Programador
                   </h4>
                   <pre style={{
-                    backgroundColor: '#1e1e1e',
-                    color: '#e0e0e0',
+                    backgroundColor: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)',
                     padding: '16px',
                     borderRadius: '8px',
                     border: '1px solid #333',
@@ -1375,12 +1375,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               {/* Relatório do Programador */}
               {task.programadorReportContent && (
                 <div style={{ marginBottom: '32px' }}>
-                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: '#555', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h4 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <FaFileAlt size={14} />
                     Relatório do Programador
                   </h4>
                   <pre style={{
-                    backgroundColor: '#f8f9fa',
+                    backgroundColor: 'var(--bg-card)',
                     padding: '16px',
                     borderRadius: '8px',
                     border: '1px solid #e9ecef',
@@ -1398,7 +1398,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               )}
               
               {!task.arquitetosPromptContent && !task.arquitetosAnalysisContent && !task.arquitetosTerminalContent && !task.programadorTerminalContent && !task.programadorReportContent && (
-                <div style={{ textAlign: 'center', padding: '48px 24px', color: '#666' }}>
+                <div style={{ textAlign: 'center', padding: '48px 24px', color: 'var(--text-secondary)' }}>
                   <FaFileAlt size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
                   <p style={{ fontSize: '16px', marginBottom: '8px' }}>Nenhum arquivo gerado disponível</p>
                   <p style={{ fontSize: '14px', opacity: 0.7 }}>Os arquivos serão exibidos aqui após a execução da tarefa pelo monitor</p>
@@ -1411,11 +1411,11 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     
 
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         padding: '20px',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-        border: '2px dashed #ddd'
+        border: '2px dashed var(--border-color)'
       }}>
         <div style={{ textAlign: 'center', color: 'var(--text-secondary)' }}>
           <FaPaperclip size={24} style={{ marginBottom: '12px' }} />
@@ -1441,8 +1441,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             width: '50px',
             height: '50px',
             borderRadius: '50%',
-            backgroundColor: '#4ECDC4',
-            color: '#fff',
+            backgroundColor: 'var(--accent-color)',
+            color: 'white',
             border: 'none',
             boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
             cursor: 'pointer',
@@ -1454,12 +1454,12 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             transition: 'all 0.3s ease'
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = '#3db8af';
+            e.currentTarget.style.backgroundColor = 'var(--accent-hover)';
             e.currentTarget.style.transform = 'scale(1.1)';
             e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = '#4ECDC4';
+            e.currentTarget.style.backgroundColor = 'var(--accent-color)';
             e.currentTarget.style.transform = 'scale(1)';
             e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
           }}

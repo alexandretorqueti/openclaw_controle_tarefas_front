@@ -147,7 +147,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
         marginBottom: '16px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
         borderLeft: `4px solid ${
-          isDue ? (getStatusColor(task) === 'red' ? '#FF6B6B' : '#FFD166') : '#4ECDC4'
+          isDue ? (getStatusColor(task) === 'red' ? 'var(--danger-color)' : 'var(--accent-color)') : 'var(--accent-color)'
         }`,
         cursor: onTaskSelect ? 'pointer' : 'default'
       }}
@@ -156,7 +156,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <FaSync size={14} color="#4ECDC4" />
+            <FaSync size={14} color="var(--accent-color)" />
             <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
               {task.title}
             </h3>
@@ -175,7 +175,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FaClock size={12} color="#666" />
+              <FaClock size={12} color="var(--text-secondary)" />
               <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                 {getRecurrenceDescription(task)}
               </span>
@@ -183,7 +183,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             
             {task.lastExecutedAt && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FaHistory size={12} color="#666" />
+                <FaHistory size={12} color="var(--text-secondary)" />
                 <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                   Última execução: {safeFormatDate(task.lastExecutedAt, 'dd/MM/yyyy HH:mm')}
                 </span>
@@ -193,14 +193,14 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             {task.nextExecutionAt && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaCalendarAlt size={12} color={
-                  getStatusColor(task) === 'red' ? '#FF6B6B' : 
-                  getStatusColor(task) === 'orange' ? '#FFD166' : '#4ECDC4'
+                  getStatusColor(task) === 'red' ? 'var(--danger-color)' : 
+                  getStatusColor(task) === 'orange' ? 'var(--accent-color)' : 'var(--accent-color)'
                 } />
                 <span style={{ 
                   fontSize: '14px', 
                   fontWeight: 500,
-                  color: getStatusColor(task) === 'red' ? '#FF6B6B' : 
-                         getStatusColor(task) === 'orange' ? '#FFD166' : '#4ECDC4'
+                  color: getStatusColor(task) === 'red' ? 'var(--danger-color)' : 
+                         getStatusColor(task) === 'orange' ? 'var(--accent-color)' : 'var(--accent-color)'
                 }}>
                   Próxima: {safeFormatDate(task.nextExecutionAt, 'dd/MM/yyyy HH:mm')}
                   {getStatusColor(task) === 'red' && ' (Atrasada!)'}
@@ -220,7 +220,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             disabled={executing === task.id}
             style={{
               padding: '8px 16px',
-              backgroundColor: executing === task.id ? '#ccc' : '#4ECDC4',
+              backgroundColor: executing === task.id ? 'var(--text-secondary)' : 'var(--accent-color)',
               color: 'white',
               border: 'none',
               borderRadius: '6px',
@@ -270,7 +270,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
       }}>
         <div>
           <h2 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '8px' }}>
-            <FaSync style={{ marginRight: '12px', color: '#4ECDC4' }} />
+            <FaSync style={{ marginRight: '12px', color: 'var(--accent-color)' }} />
             Tarefas Recorrentes
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
@@ -284,7 +284,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
             disabled={executingAll}
             style={{
               padding: '10px 20px',
-              backgroundColor: executingAll ? '#ccc' : '#FFD166',
+              backgroundColor: executingAll ? 'var(--text-secondary)' : 'var(--accent-color)',
               color: 'var(--text-primary)',
               border: 'none',
               borderRadius: '8px',
@@ -321,10 +321,10 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
           onClick={() => setActiveTab('due')}
           style={{
             padding: '12px 24px',
-            backgroundColor: activeTab === 'due' ? '#4ECDC4' : 'transparent',
-            color: activeTab === 'due' ? 'white' : '#666',
+            backgroundColor: activeTab === 'due' ? 'var(--accent-color)' : 'transparent',
+            color: activeTab === 'due' ? 'white' : 'var(--text-secondary)',
             border: 'none',
-            borderBottom: activeTab === 'due' ? '2px solid #4ECDC4' : 'none',
+            borderBottom: activeTab === 'due' ? '2px solid var(--accent-color)' : 'none',
             fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer',
@@ -337,8 +337,8 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
           Pendentes
           {dueTasks.length > 0 && (
             <span style={{
-              backgroundColor: activeTab === 'due' ? 'white' : '#FF6B6B',
-              color: activeTab === 'due' ? '#4ECDC4' : 'white',
+              backgroundColor: activeTab === 'due' ? 'white' : 'var(--danger-color)',
+              color: activeTab === 'due' ? 'var(--accent-color)' : 'white',
               fontSize: '12px',
               padding: '2px 8px',
               borderRadius: '12px',
@@ -353,10 +353,10 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
           onClick={() => setActiveTab('all')}
           style={{
             padding: '12px 24px',
-            backgroundColor: activeTab === 'all' ? '#4ECDC4' : 'transparent',
-            color: activeTab === 'all' ? 'white' : '#666',
+            backgroundColor: activeTab === 'all' ? 'var(--accent-color)' : 'transparent',
+            color: activeTab === 'all' ? 'white' : 'var(--text-secondary)',
             border: 'none',
-            borderBottom: activeTab === 'all' ? '2px solid #4ECDC4' : 'none',
+            borderBottom: activeTab === 'all' ? '2px solid var(--accent-color)' : 'none',
             fontSize: '14px',
             fontWeight: 600,
             cursor: 'pointer',
@@ -376,8 +376,8 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
           <div className="animate-spin" style={{ 
             width: '40px', 
             height: '40px', 
-            border: '4px solid #f0f0f0',
-            borderTop: '4px solid #4ECDC4',
+            border: '4px solid var(--text-primary)',
+            borderTop: '4px solid var(--accent-color)',
             borderRadius: '50%',
             margin: '0 auto 16px'
           }} />
@@ -392,7 +392,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
               backgroundColor: 'var(--bg-input)',
               borderRadius: '12px'
             }}>
-              <FaCheckCircle size={48} color="#4ECDC4" style={{ marginBottom: '16px' }} />
+              <FaCheckCircle size={48} color="var(--accent-color)" style={{ marginBottom: '16px' }} />
               <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
                 Nenhuma tarefa pendente!
               </h3>
@@ -403,19 +403,19 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
           ) : (
             <div>
               <div style={{ 
-                backgroundColor: '#FFF3CD', 
-                border: '1px solid #FFEEBA',
+                backgroundColor: 'var(--bg-card)', 
+                border: '1px solid var(--border-color)',
                 borderRadius: '8px',
                 padding: '16px',
                 marginBottom: '24px'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <FaExclamationTriangle color="#856404" />
+                  <FaExclamationTriangle color="var(--text-secondary)" />
                   <div>
-                    <strong style={{ color: '#856404' }}>
+                    <strong style={{ color: 'var(--text-secondary)' }}>
                       {dueTasks.length} tarefa(s) aguardando execução
                     </strong>
-                    <p style={{ color: '#856404', marginTop: '4px', fontSize: '14px' }}>
+                    <p style={{ color: 'var(--text-secondary)', marginTop: '4px', fontSize: '14px' }}>
                       Estas tarefas passaram do horário agendado e ainda não foram executadas.
                     </p>
                   </div>
@@ -435,7 +435,7 @@ const RecurrenceManager: React.FC<RecurrenceManagerProps> = ({ onTaskSelect }) =
               backgroundColor: 'var(--bg-input)',
               borderRadius: '12px'
             }}>
-              <FaSync size={48} color="#666" style={{ marginBottom: '16px' }} />
+              <FaSync size={48} color="var(--text-secondary)" style={{ marginBottom: '16px' }} />
               <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '8px' }}>
                 Nenhuma tarefa recorrente
               </h3>

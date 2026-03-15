@@ -442,7 +442,7 @@ const TaskList: React.FC<TaskListProps> = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             {/* Ordenação */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <FaSortAmountDown size={16} color="#666" />
+              <FaSortAmountDown size={16} color="var(--text-secondary)" />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
@@ -451,7 +451,7 @@ const TaskList: React.FC<TaskListProps> = ({
                   border: '1px solid var(--border-color)',
                   borderRadius: '6px',
                   fontSize: '14px',
-                  backgroundColor: '#fff',
+                  backgroundColor: 'white',
                   outline: 'none'
                 }}
               >
@@ -497,11 +497,11 @@ const TaskList: React.FC<TaskListProps> = ({
           padding: '20px',
           borderRadius: '8px',
           marginBottom: '24px',
-          border: '2px solid #4ECDC4',
+          border: '2px solid var(--accent-color)',
           boxShadow: '0 4px 12px rgba(78, 205, 196, 0.15)'
         }}>
           <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '16px' }}>
-            <h2 style={{ fontSize: '24px', color: '#4ECDC4', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h2 style={{ fontSize: '24px', color: 'var(--accent-color)', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
               <FaPlus size={24} />
               Criar Nova Tarefa
             </h2>
@@ -513,9 +513,9 @@ const TaskList: React.FC<TaskListProps> = ({
             {/* Exibição de erro */}
             {error && (
               <div style={{
-                backgroundColor: '#FFE5E5',
-                border: '1px solid #FF6B6B',
-                color: '#D32F2F',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--danger-color)',
+                color: 'var(--danger-color)',
                 padding: '12px',
                 borderRadius: '6px',
                 marginBottom: '16px',
@@ -544,12 +544,12 @@ const TaskList: React.FC<TaskListProps> = ({
                   style={{
                     width: '100%',
                     padding: '12px',
-                    border: '2px solid #4ECDC4',
+                    border: '2px solid var(--accent-color)',
                     borderRadius: '8px',
                     fontSize: '16px',
                     fontWeight: 'bold',
-                    backgroundColor: '#f0f9f8',
-                    color: '#2a7c74'
+                    backgroundColor: 'var(--bg-card)',
+                    color: 'var(--text-primary)'
                   }}
                 />
               </div>
@@ -562,11 +562,11 @@ const TaskList: React.FC<TaskListProps> = ({
                   <div style={{
                     width: '100%',
                     padding: '10px',
-                    border: '1px solid #4ECDC4',
+                    border: '1px solid var(--accent-color)',
                     borderRadius: '6px',
                     fontSize: '14px',
-                    backgroundColor: '#f0f9f8',
-                    color: '#2a7c74',
+                    backgroundColor: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
                     fontWeight: 500
                   }}>
                     {selectedProject.name}
@@ -689,7 +689,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     border: '1px solid var(--border-color)',
                     borderRadius: '6px',
                     fontSize: '14px',
-                    backgroundColor: '#fff'
+                    backgroundColor: 'white'
                   }}
                 >
                   {agents.length > 0 ? (
@@ -802,9 +802,9 @@ const TaskList: React.FC<TaskListProps> = ({
                 onClick={() => setIsCreatingTask(false)}
                 style={{
                   padding: '12px 24px',
-                  backgroundColor: '#fff',
+                  backgroundColor: 'white',
                   color: 'var(--text-secondary)',
-                  border: '2px solid #ddd',
+                  border: '2px solid var(--border-color)',
                   borderRadius: '8px',
                   fontSize: '16px',
                   fontWeight: 'bold',
@@ -812,12 +812,12 @@ const TaskList: React.FC<TaskListProps> = ({
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#999';
+                  e.currentTarget.style.borderColor = 'var(--text-secondary)';
                   e.currentTarget.style.color = '#333';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = '#ddd';
-                  e.currentTarget.style.color = '#666';
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
                 }}
               >
                 Cancelar
@@ -827,8 +827,8 @@ const TaskList: React.FC<TaskListProps> = ({
                 disabled={!newTaskData.title || !newTaskData.projectId || !newTaskData.statusId || !newTaskData.priorityId || !newTaskData.assignedToId || !newTaskData.deadline || !newTaskData.agent}
                 style={{
                   padding: '12px 24px',
-                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? '#4ECDC4' : '#ccc',
-                  color: '#fff',
+                  backgroundColor: (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) ? 'var(--accent-color)' : 'var(--text-secondary)',
+                  color: 'white',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '16px',
@@ -839,13 +839,13 @@ const TaskList: React.FC<TaskListProps> = ({
                 }}
                 onMouseEnter={(e) => {
                   if (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) {
-                    e.currentTarget.style.backgroundColor = '#3db8af';
+                    e.currentTarget.style.backgroundColor = 'var(--accent-hover)';
                     e.currentTarget.style.boxShadow = '0 6px 16px rgba(78, 205, 196, 0.4)';
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (newTaskData.title && newTaskData.projectId && newTaskData.statusId && newTaskData.priorityId && newTaskData.assignedToId && newTaskData.deadline && newTaskData.agent) {
-                    e.currentTarget.style.backgroundColor = '#4ECDC4';
+                    e.currentTarget.style.backgroundColor = 'var(--accent-color)';
                     e.currentTarget.style.boxShadow = '0 4px 12px rgba(78, 205, 196, 0.3)';
                   }
                 }}
@@ -861,7 +861,7 @@ const TaskList: React.FC<TaskListProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {/* Ordenação */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <FaSortAmountDown size={16} color="#666" />
+            <FaSortAmountDown size={16} color="var(--text-secondary)" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
@@ -870,7 +870,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
-                backgroundColor: '#fff',
+                backgroundColor: 'white',
                 outline: 'none'
               }}
             >
@@ -889,13 +889,13 @@ const TaskList: React.FC<TaskListProps> = ({
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total de Tarefas</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: '#06D6A0' }}>
+              <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--success-color)' }}>
                 {tasks.filter(t => t.isCompleted).length}
               </div>
               <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Concluídas</div>
             </div>
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: '#FF6B6B' }}>
+              <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--danger-color)' }}>
                 {tasks.filter(t => {
                   if (t.isCompleted) return false;
                   const deadlineDate = safeParseDate(t.deadline || '');
@@ -921,7 +921,7 @@ const TaskList: React.FC<TaskListProps> = ({
           </h2>
           {!selectedProject && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <FaProjectDiagram size={16} color="#666" />
+              <FaProjectDiagram size={16} color="var(--text-secondary)" />
               <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
                 Mostrando tarefas de {projects.length} projetos
               </span>
@@ -952,16 +952,16 @@ const TaskList: React.FC<TaskListProps> = ({
               }}
               style={{
                 padding: '10px 20px',
-                backgroundColor: '#4ECDC4',
-                color: '#fff',
+                backgroundColor: 'var(--accent-color)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '14px',
                 cursor: 'pointer',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3db8af'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
             >
               Limpar Filtros
             </button>
@@ -996,8 +996,8 @@ const TaskList: React.FC<TaskListProps> = ({
               width: '50px',
               height: '50px',
               borderRadius: '50%',
-              backgroundColor: '#4ECDC4',
-              color: '#fff',
+              backgroundColor: 'var(--accent-color)',
+              color: 'white',
               border: 'none',
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
               cursor: 'pointer',
@@ -1009,12 +1009,12 @@ const TaskList: React.FC<TaskListProps> = ({
               transition: 'all 0.3s ease'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#3db8af';
+              e.currentTarget.style.backgroundColor = 'var(--accent-hover)';
               e.currentTarget.style.transform = 'scale(1.1)';
               e.currentTarget.style.boxShadow = '0 6px 16px rgba(0,0,0,0.2)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = '#4ECDC4';
+              e.currentTarget.style.backgroundColor = 'var(--accent-color)';
               e.currentTarget.style.transform = 'scale(1)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
             }}

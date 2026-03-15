@@ -242,7 +242,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
       padding: '20px'
     }}>
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '1000px',
@@ -265,13 +265,13 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
             <div style={{
               width: '48px',
               height: '48px',
-              backgroundColor: '#9D4EDD',
+              backgroundColor: 'var(--accent-color)',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <FaUser size={24} color="#fff" />
+              <FaUser size={24} color="white" />
             </div>
             <div>
               <h2 style={{
@@ -307,15 +307,15 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-              e.currentTarget.style.borderColor = '#FF6B6B';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+              e.currentTarget.style.borderColor = 'var(--danger-color)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#ddd';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
             }}
           >
-            <FaTimes size={18} color="#666" />
+            <FaTimes size={18} color="var(--text-secondary)" />
           </button>
         </div>
 
@@ -329,7 +329,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
           <div style={{
             flex: 1,
             padding: '24px',
-            borderRight: '1px solid #e0e0e0',
+            borderRight: '1px solid var(--text-primary)',
             overflowY: 'auto'
           }}>
             <div style={{
@@ -368,10 +368,10 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
             ) : error ? (
               <div style={{
                 padding: '20px',
-                backgroundColor: '#FFE5E5',
-                border: '1px solid #FF6B6B',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--danger-color)',
                 borderRadius: '8px',
-                color: '#FF6B6B',
+                color: 'var(--danger-color)',
                 marginBottom: '20px'
               }}>
                 {error}
@@ -380,8 +380,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                   style={{
                     marginTop: '10px',
                     padding: '8px 16px',
-                    backgroundColor: '#FF6B6B',
-                    color: '#fff',
+                    backgroundColor: 'var(--danger-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
@@ -399,7 +399,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
-                <FaUser size={48} color="#ddd" style={{ marginBottom: '16px' }} />
+                <FaUser size={48} color='var(--border-color)' style={{ marginBottom: '16px' }} />
                 <p style={{ margin: 0 }}>Nenhum usuário cadastrado</p>
                 <p style={{ fontSize: '14px', marginTop: '8px' }}>
                   Use o formulário ao lado para criar o primeiro usuário
@@ -412,7 +412,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     key={user.id}
                     style={{
                       padding: '16px',
-                      backgroundColor: '#fff',
+                      backgroundColor: 'white',
                       border: '1px solid var(--border-color)',
                       borderRadius: '8px',
                       display: 'flex',
@@ -421,11 +421,11 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       transition: 'all 0.2s'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#9D4EDD';
+                      e.currentTarget.style.borderColor = 'var(--accent-color)';
                       e.currentTarget.style.boxShadow = '0 4px 12px rgba(157, 78, 221, 0.1)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = '#e0e0e0';
+                      e.currentTarget.style.borderColor = 'var(--text-primary)';
                       e.currentTarget.style.boxShadow = 'none';
                     }}
                   >
@@ -434,7 +434,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       height: '48px',
                       borderRadius: '50%',
                       overflow: 'hidden',
-                      backgroundColor: '#e3f2fd',
+                      backgroundColor: 'var(--bg-card)',
                       flexShrink: 0
                     }}>
                       <img 
@@ -460,9 +460,9 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                         </span>
                         <span style={{
                           fontSize: '12px',
-                          backgroundColor: user.role === 'Admin' ? '#9D4EDD' : 
-                                         user.role === 'Editor' ? '#06D6A0' : '#118AB2',
-                          color: '#fff',
+                          backgroundColor: user.role === 'Admin' ? 'var(--accent-color)' : 
+                                         user.role === 'Editor' ? 'var(--success-color)' : '#118AB2',
+                          color: 'white',
                           padding: '2px 8px',
                           borderRadius: '4px'
                         }}>
@@ -491,7 +491,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       </div>
                       <div style={{
                         fontSize: '12px',
-                        color: '#999',
+                        color: 'var(--text-secondary)',
                         display: 'flex',
                         alignItems: 'center',
                         gap: '12px'
@@ -508,8 +508,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                         onClick={() => handleEdit(user)}
                         style={{
                           padding: '8px 12px',
-                          backgroundColor: '#E3F2FD',
-                          color: '#1976D2',
+                          backgroundColor: 'var(--bg-card)',
+                          color: 'var(--accent-color)',
                           border: 'none',
                           borderRadius: '6px',
                           cursor: 'pointer',
@@ -526,8 +526,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                         onClick={() => handleDelete(user.id)}
                         style={{
                           padding: '8px 12px',
-                          backgroundColor: '#FFE5E5',
-                          color: '#FF6B6B',
+                          backgroundColor: 'var(--bg-card)',
+                          color: 'var(--danger-color)',
                           border: 'none',
                           borderRadius: '6px',
                           cursor: 'pointer',
@@ -596,7 +596,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     left: '12px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    color: '#999'
+                    color: 'var(--text-secondary)'
                   }} />
                   <input
                     type="text"
@@ -606,7 +606,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     style={{
                       width: '100%',
                       padding: '12px 16px 12px 40px',
-                      border: `1px solid ${error && !formData.name.trim() ? '#FF6B6B' : '#ddd'}`,
+                      border: `1px solid ${error && !formData.name.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
                       borderRadius: '8px',
                       fontSize: '16px',
                       boxSizing: 'border-box',
@@ -634,7 +634,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     left: '12px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    color: '#999'
+                    color: 'var(--text-secondary)'
                   }} />
                   <input
                     type="email"
@@ -644,7 +644,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     style={{
                       width: '100%',
                       padding: '12px 16px 12px 40px',
-                      border: `1px solid ${error && !formData.email.trim() ? '#FF6B6B' : '#ddd'}`,
+                      border: `1px solid ${error && !formData.email.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
                       borderRadius: '8px',
                       fontSize: '16px',
                       boxSizing: 'border-box',
@@ -672,7 +672,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     left: '12px',
                     top: '50%',
                     transform: 'translateY(-50%)',
-                    color: '#999'
+                    color: 'var(--text-secondary)'
                   }} />
                   <input
                     type="text"
@@ -739,10 +739,10 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       style={{
                         padding: '16px',
                         backgroundColor: formData.role === option.value ? 
-                          (option.value === 'Admin' ? '#9D4EDD' : 
-                           option.value === 'Editor' ? '#06D6A0' : '#118AB2') : '#fff',
-                        color: formData.role === option.value ? '#fff' : '#333',
-                        border: `1px solid ${formData.role === option.value ? 'transparent' : '#ddd'}`,
+                          (option.value === 'Admin' ? 'var(--accent-color)' : 
+                           option.value === 'Editor' ? 'var(--success-color)' : '#118AB2') : 'white',
+                        color: formData.role === option.value ? 'white' : '#333',
+                        border: `1px solid ${formData.role === option.value ? 'transparent' : 'var(--border-color)'}`,
                         borderRadius: '8px',
                         cursor: 'pointer',
                         textAlign: 'left',
@@ -753,14 +753,14 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                       }}
                       onMouseEnter={(e) => {
                         if (formData.role !== option.value) {
-                          e.currentTarget.style.backgroundColor = '#f8f9fa';
-                          e.currentTarget.style.borderColor = '#9D4EDD';
+                          e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                          e.currentTarget.style.borderColor = 'var(--accent-color)';
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (formData.role !== option.value) {
-                          e.currentTarget.style.backgroundColor = '#fff';
-                          e.currentTarget.style.borderColor = '#ddd';
+                          e.currentTarget.style.backgroundColor = 'white';
+                          e.currentTarget.style.borderColor = 'var(--border-color)';
                         }
                       }}
                     >
@@ -775,8 +775,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                         flexShrink: 0
                       }}>
                         <FaUserTag size={18} color={formData.role === option.value ? 
-                          (option.value === 'Admin' ? '#9D4EDD' : 
-                           option.value === 'Editor' ? '#06D6A0' : '#118AB2') : '#666'} />
+                          (option.value === 'Admin' ? 'var(--accent-color)' : 
+                           option.value === 'Editor' ? 'var(--success-color)' : '#118AB2') : 'var(--text-secondary)'} />
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{
@@ -797,7 +797,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                         <div style={{
                           width: '20px',
                           height: '20px',
-                          backgroundColor: '#fff',
+                          backgroundColor: 'white',
                           borderRadius: '50%',
                           display: 'flex',
                           alignItems: 'center',
@@ -807,8 +807,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                           <div style={{
                             width: '10px',
                             height: '10px',
-                            backgroundColor: option.value === 'Admin' ? '#9D4EDD' : 
-                                           option.value === 'Editor' ? '#06D6A0' : '#118AB2',
+                            backgroundColor: option.value === 'Admin' ? 'var(--accent-color)' : 
+                                           option.value === 'Editor' ? 'var(--success-color)' : '#118AB2',
                             borderRadius: '50%'
                           }} />
                         </div>
@@ -822,10 +822,10 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
               {error && (
                 <div style={{
                   padding: '12px 16px',
-                  backgroundColor: '#FFE5E5',
-                  border: '1px solid #FF6B6B',
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--danger-color)',
                   borderRadius: '8px',
-                  color: '#FF6B6B',
+                  color: 'var(--danger-color)',
                   marginBottom: '20px',
                   fontSize: '14px'
                 }}>
@@ -844,8 +844,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                   style={{
                     flex: 1,
                     padding: '14px',
-                    backgroundColor: '#9D4EDD',
-                    color: '#fff',
+                    backgroundColor: 'var(--accent-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     fontSize: '16px',
@@ -857,8 +857,8 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     gap: '10px',
                     transition: 'all 0.2s'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#8A3EC8'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#9D4EDD'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
                 >
                   <FaSave size={18} />
                   {isEditing ? 'Atualizar Usuário' : 'Criar Usuário'}
@@ -885,11 +885,11 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = '#e9ecef';
-                      e.currentTarget.style.borderColor = '#666';
+                      e.currentTarget.style.borderColor = 'var(--text-secondary)';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = '#f8f9fa';
-                      e.currentTarget.style.borderColor = '#ddd';
+                      e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                      e.currentTarget.style.borderColor = 'var(--border-color)';
                     }}
                   >
                     <FaTimes size={18} />
@@ -903,7 +903,7 @@ const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate
             <div style={{
               marginTop: '32px',
               padding: '16px',
-              backgroundColor: '#fff',
+              backgroundColor: 'white',
               borderRadius: '8px',
               border: '1px solid var(--border-color)'
             }}>

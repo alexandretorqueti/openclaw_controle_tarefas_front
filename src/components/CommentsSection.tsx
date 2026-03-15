@@ -199,12 +199,12 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
-                backgroundColor: '#e3f2fd',
+                backgroundColor: 'var(--bg-card)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <FaUser size={16} color="#1976d2" />
+                <FaUser size={16} color="var(--accent-color)" />
               </div>
             )}
             <div>
@@ -249,8 +249,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 style={{
                   padding: '6px 10px',
                   backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                  color: '#e53e3e',
-                  border: '1px solid #fed7d7',
+                  color: 'var(--danger-color)',
+                  border: '1px solid var(--border-color)',
                   borderRadius: '4px',
                   fontSize: '12px',
                   cursor: 'pointer',
@@ -288,8 +288,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 onClick={() => handleUpdateComment(comment.id)}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: '#06D6A0',
-                  color: '#fff',
+                  backgroundColor: 'var(--success-color)',
+                  color: 'white',
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',
@@ -409,8 +409,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 disabled={!replyContent.trim()}
                 style={{
                   padding: '8px 16px',
-                  backgroundColor: replyContent.trim() ? '#4ECDC4' : '#ccc',
-                  color: '#fff',
+                  backgroundColor: replyContent.trim() ? 'var(--accent-color)' : 'var(--text-secondary)',
+                  color: 'white',
                   border: 'none',
                   borderRadius: '6px',
                   fontSize: '14px',
@@ -476,9 +476,9 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
       {/* Error message */}
       {error && (
         <div style={{
-          backgroundColor: '#FFE5E5',
-          border: '1px solid #FF6B6B',
-          color: '#D32F2F',
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--danger-color)',
+          color: 'var(--danger-color)',
           padding: '16px',
           borderRadius: '8px',
           marginBottom: '20px'
@@ -512,8 +512,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }
                 disabled={!newComment.trim()}
                 style={{
                   padding: '12px 24px',
-                  backgroundColor: newComment.trim() ? '#4ECDC4' : '#ccc',
-                  color: '#fff',
+                  backgroundColor: newComment.trim() ? 'var(--accent-color)' : 'var(--text-secondary)',
+                  color: 'white',
                   border: 'none',
                   borderRadius: '8px',
                   fontSize: '14px',

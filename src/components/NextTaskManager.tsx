@@ -105,7 +105,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
       padding: '20px'
     }}>
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '800px',
@@ -128,13 +128,13 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
             <div style={{
               width: '48px',
               height: '48px',
-              backgroundColor: '#4ECDC4',
+              backgroundColor: 'var(--accent-color)',
               borderRadius: '12px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <FaTasks size={24} color="#fff" />
+              <FaTasks size={24} color="white" />
             </div>
             <div>
               <h2 style={{
@@ -170,15 +170,15 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               transition: 'all 0.2s'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = '#f8f9fa';
-              e.currentTarget.style.borderColor = '#FF6B6B';
+              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+              e.currentTarget.style.borderColor = 'var(--danger-color)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = '#ddd';
+              e.currentTarget.style.borderColor = 'var(--border-color)';
             }}
           >
-            <FaTimes size={18} color="#666" />
+            <FaTimes size={18} color="var(--text-secondary)" />
           </button>
         </div>
 
@@ -199,7 +199,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               alignItems: 'center',
               gap: '8px'
             }}>
-              <FaUser size={16} color="#4ECDC4" />
+              <FaUser size={16} color="var(--accent-color)" />
               Selecione um Usuário
             </h3>
             
@@ -217,10 +217,10 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
             ) : error ? (
               <div style={{
                 padding: '16px',
-                backgroundColor: '#FFE5E5',
-                border: '1px solid #FF6B6B',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--danger-color)',
                 borderRadius: '8px',
-                color: '#FF6B6B'
+                color: 'var(--danger-color)'
               }}>
                 {error}
                 <button
@@ -228,8 +228,8 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                   style={{
                     marginTop: '10px',
                     padding: '8px 16px',
-                    backgroundColor: '#FF6B6B',
-                    color: '#fff',
+                    backgroundColor: 'var(--danger-color)',
+                    color: 'white',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer'
@@ -246,7 +246,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                 textAlign: 'center',
                 color: 'var(--text-secondary)'
               }}>
-                <FaUser size={32} color="#ddd" style={{ marginBottom: '12px' }} />
+                <FaUser size={32} color='var(--border-color)' style={{ marginBottom: '12px' }} />
                 <p>Nenhum usuário cadastrado</p>
               </div>
             ) : (
@@ -261,9 +261,9 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                     onClick={() => handleUserChange(user.id)}
                     style={{
                       padding: '16px',
-                      backgroundColor: selectedUserId === user.id ? '#4ECDC4' : '#fff',
-                      color: selectedUserId === user.id ? '#fff' : '#333',
-                      border: `1px solid ${selectedUserId === user.id ? '#4ECDC4' : '#ddd'}`,
+                      backgroundColor: selectedUserId === user.id ? 'var(--accent-color)' : 'white',
+                      color: selectedUserId === user.id ? 'white' : '#333',
+                      border: `1px solid ${selectedUserId === user.id ? 'var(--accent-color)' : 'var(--border-color)'}`,
                       borderRadius: '8px',
                       cursor: 'pointer',
                       textAlign: 'left',
@@ -274,14 +274,14 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                     }}
                     onMouseEnter={(e) => {
                       if (selectedUserId !== user.id) {
-                        e.currentTarget.style.backgroundColor = '#f8f9fa';
-                        e.currentTarget.style.borderColor = '#4ECDC4';
+                        e.currentTarget.style.backgroundColor = 'var(--bg-card)';
+                        e.currentTarget.style.borderColor = 'var(--accent-color)';
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (selectedUserId !== user.id) {
-                        e.currentTarget.style.backgroundColor = '#fff';
-                        e.currentTarget.style.borderColor = '#ddd';
+                        e.currentTarget.style.backgroundColor = 'white';
+                        e.currentTarget.style.borderColor = 'var(--border-color)';
                       }
                     }}
                   >
@@ -290,7 +290,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       height: '40px',
                       borderRadius: '50%',
                       overflow: 'hidden',
-                      backgroundColor: '#e3f2fd',
+                      backgroundColor: 'var(--bg-card)',
                       flexShrink: 0
                     }}>
                       <img 
@@ -334,7 +334,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               alignItems: 'center',
               gap: '8px'
             }}>
-              <FaArrowRight size={16} color="#4ECDC4" />
+              <FaArrowRight size={16} color="var(--accent-color)" />
               Próxima Tarefa Pendente
               {selectedUserNickname && (
                 <span style={{
@@ -367,17 +367,17 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                 borderRadius: '8px',
                 color: 'var(--text-secondary)'
               }}>
-                <FaTasks size={48} color="#ddd" style={{ marginBottom: '16px' }} />
+                <FaTasks size={48} color='var(--border-color)' style={{ marginBottom: '16px' }} />
                 <p>Selecione um usuário para ver sua próxima tarefa</p>
               </div>
             ) : !nextTask ? (
               <div style={{
                 padding: '40px',
                 textAlign: 'center',
-                backgroundColor: '#E8F5E9',
-                border: '1px solid #C8E6C9',
+                backgroundColor: 'var(--bg-card)',
+                border: '1px solid var(--border-color)',
                 borderRadius: '8px',
-                color: '#2E7D32'
+                color: 'var(--text-primary)'
               }}>
                 <FaCheckCircle size={48} style={{ marginBottom: '16px' }} />
                 <h4 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>
@@ -389,7 +389,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
               </div>
             ) : (
               <div style={{
-                backgroundColor: '#fff',
+                backgroundColor: 'white',
                 border: '1px solid var(--border-color)',
                 borderRadius: '12px',
                 overflow: 'hidden',
@@ -398,8 +398,8 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                 {/* Cabeçalho da Tarefa */}
                 <div style={{
                   padding: '24px',
-                  backgroundColor: '#4ECDC4',
-                  color: '#fff'
+                  backgroundColor: 'var(--accent-color)',
+                  color: 'white'
                 }}>
                   <div style={{
                     display: 'flex',
@@ -470,7 +470,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                         <div style={{
                           width: '12px',
                           height: '12px',
-                          backgroundColor: nextTask.status?.color || '#4ECDC4',
+                          backgroundColor: nextTask.status?.color || 'var(--accent-color)',
                           borderRadius: '50%'
                         }} />
                         <span style={{
@@ -500,7 +500,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                         alignItems: 'center',
                         gap: '8px'
                       }}>
-                        <FaProjectDiagram size={16} color="#666" />
+                        <FaProjectDiagram size={16} color="var(--text-secondary)" />
                         <span style={{
                           fontSize: '16px',
                           fontWeight: 600,
@@ -528,7 +528,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                         alignItems: 'center',
                         gap: '8px'
                       }}>
-                        <FaCalendarAlt size={16} color="#666" />
+                        <FaCalendarAlt size={16} color="var(--text-secondary)" />
                         <span style={{
                           fontSize: '16px',
                           fontWeight: 600,
@@ -556,7 +556,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                         alignItems: 'center',
                         gap: '8px'
                       }}>
-                        <FaFlag size={16} color={nextTask.priority?.color || '#666'} />
+                        <FaFlag size={16} color={nextTask.priority?.color || 'var(--text-secondary)'} />
                         <span style={{
                           fontSize: '16px',
                           fontWeight: 600,
@@ -571,8 +571,8 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                   {/* Regras do Projeto */}
                   {nextTask.project?.regras && (
                     <div style={{
-                      backgroundColor: '#FFF3E0',
-                      border: '1px solid #FFB74D',
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--accent-color)',
                       padding: '16px',
                       borderRadius: '8px',
                       marginTop: '20px'
@@ -580,7 +580,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       <h5 style={{
                         fontSize: '14px',
                         fontWeight: 600,
-                        color: '#F57C00',
+                        color: 'var(--accent-color)',
                         marginBottom: '12px',
                         display: 'flex',
                         alignItems: 'center',
@@ -593,10 +593,10 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                         color: 'var(--text-secondary)',
                         lineHeight: 1.6,
                         whiteSpace: 'pre-wrap',
-                        backgroundColor: '#FFF9E6',
+                        backgroundColor: 'var(--bg-card)',
                         padding: '12px',
                         borderRadius: '6px',
-                        border: '1px solid #FFE0B2'
+                        border: '1px solid var(--border-color)'
                       }}>
                         {nextTask.project.regras}
                       </div>
@@ -661,8 +661,8 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                       }}
                       style={{
                         padding: '12px 32px',
-                        backgroundColor: '#4ECDC4',
-                        color: '#fff',
+                        backgroundColor: 'var(--accent-color)',
+                        color: 'white',
                         border: 'none',
                         borderRadius: '8px',
                         fontSize: '16px',
@@ -673,8 +673,8 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
                         gap: '10px',
                         transition: 'all 0.2s'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#3DB8AC'}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4ECDC4'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
                     >
                       <FaCheckCircle size={18} />
                       Marcar como Concluída
@@ -690,7 +690,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
         <div style={{
           padding: '16px 24px',
           backgroundColor: 'var(--bg-input)',
-          borderTop: '1px solid #e0e0e0',
+          borderTop: '1px solid var(--text-primary)',
           fontSize: '12px',
           color: 'var(--text-secondary)',
           textAlign: 'center'
@@ -698,7 +698,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
           <p style={{ margin: 0 }}>
             Endpoint testado: <code>GET /api/users/nickname/:nickname/next-task</code>
           </p>
-          <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#999' }}>
+          <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: 'var(--text-secondary)' }}>
             Filtra tarefas pendentes com status habilitado para IA, ordenadas por prioridade e data
           </p>
         </div>

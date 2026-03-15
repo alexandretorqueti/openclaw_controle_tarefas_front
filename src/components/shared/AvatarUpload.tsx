@@ -89,8 +89,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         height: '120px',
         borderRadius: '50%',
         overflow: 'hidden',
-        border: '2px solid #e2e8f0',
-        backgroundColor: '#f7fafc',
+        border: '2px solid var(--bg-input)',
+        backgroundColor: 'var(--bg-card)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -106,7 +106,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
             }}
           />
         ) : (
-          <FaUser size={48} color="#a0aec0" />
+          <FaUser size={48} color="var(--text-secondary)" />
         )}
         
         {/* Remove button */}
@@ -154,8 +154,8 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
           style={{
             width: '100%',
             padding: '12px 16px',
-            backgroundColor: disabled ? '#e2e8f0' : '#4299e1',
-            color: disabled ? '#a0aec0' : 'white',
+            backgroundColor: disabled ? 'var(--bg-input)' : 'var(--accent-color)',
+            color: disabled ? 'var(--text-secondary)' : 'white',
             border: 'none',
             borderRadius: '8px',
             fontSize: '14px',
@@ -169,12 +169,12 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
           }}
           onMouseEnter={(e) => {
             if (!disabled && !isUploading) {
-              e.currentTarget.style.backgroundColor = '#3182ce';
+              e.currentTarget.style.backgroundColor = 'var(--accent-hover)';
             }
           }}
           onMouseLeave={(e) => {
             if (!disabled && !isUploading) {
-              e.currentTarget.style.backgroundColor = '#4299e1';
+              e.currentTarget.style.backgroundColor = 'var(--accent-color)';
             }
           }}
         >
@@ -204,10 +204,10 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
         <div style={{
           width: '100%',
           padding: '12px',
-          backgroundColor: '#fed7d7',
-          border: '1px solid #fc8181',
+          backgroundColor: 'var(--border-color)',
+          border: '1px solid var(--danger-color)',
           borderRadius: '6px',
-          color: '#c53030',
+          color: 'var(--danger-color)',
           fontSize: '14px',
           textAlign: 'center'
         }}>
@@ -218,7 +218,7 @@ const AvatarUpload: React.FC<AvatarUploadProps> = ({
       {/* Help Text */}
       <div style={{
         fontSize: '12px',
-        color: '#718096',
+        color: 'var(--text-secondary)',
         textAlign: 'center',
         lineHeight: '1.4'
       }}>

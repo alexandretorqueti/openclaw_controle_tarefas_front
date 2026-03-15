@@ -107,11 +107,11 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
   const getLevelColor = (level: string) => {
     switch (level) {
-      case 'ERROR': return '#FF6B6B';
-      case 'WARN': return '#FFD166';
-      case 'INFO': return '#4ECDC4';
-      case 'DEBUG': return '#666666';
-      default: return '#666666';
+      case 'ERROR': return 'var(--danger-color)';
+      case 'WARN': return 'var(--accent-color)';
+      case 'INFO': return 'var(--accent-color)';
+      case 'DEBUG': return 'var(--text-secondary)666';
+      default: return 'var(--text-secondary)666';
     }
   };
 
@@ -127,12 +127,12 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
   const getMethodColor = (method: string) => {
     switch (method) {
-      case 'GET': return '#06D6A0';
-      case 'POST': return '#4ECDC4';
-      case 'PUT': return '#FFD166';
-      case 'DELETE': return '#FF6B6B';
-      case 'PATCH': return '#FF9A76';
-      default: return '#666666';
+      case 'GET': return 'var(--success-color)';
+      case 'POST': return 'var(--accent-color)';
+      case 'PUT': return 'var(--accent-color)';
+      case 'DELETE': return 'var(--danger-color)';
+      case 'PATCH': return 'var(--accent-color)';
+      default: return 'var(--text-secondary)666';
     }
   };
 
@@ -197,7 +197,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               <div style={{
                 fontSize: '12px',
                 fontWeight: 600,
-                color: '#fff',
+                color: 'white',
                 backgroundColor: getMethodColor(log.method),
                 padding: '4px 8px',
                 borderRadius: '4px',
@@ -211,7 +211,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               <div style={{
                 fontSize: '13px',
                 fontWeight: 600,
-                color: log.statusCode >= 400 ? '#FF6B6B' : log.statusCode >= 300 ? '#FFD166' : '#06D6A0'
+                color: log.statusCode >= 400 ? 'var(--danger-color)' : log.statusCode >= 300 ? 'var(--accent-color)' : 'var(--success-color)'
               }}>
                 {log.statusCode}
               </div>
@@ -238,7 +238,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                   <pre style={{
                     fontSize: '11px',
                     color: 'var(--text-primary)',
-                    backgroundColor: '#fff',
+                    backgroundColor: 'white',
                     padding: '8px',
                     borderRadius: '6px',
                     border: '1px solid #e9ecef',
@@ -257,7 +257,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                   <pre style={{
                     fontSize: '11px',
                     color: 'var(--text-primary)',
-                    backgroundColor: '#fff',
+                    backgroundColor: 'white',
                     padding: '8px',
                     borderRadius: '6px',
                     border: '1px solid #e9ecef',
@@ -276,7 +276,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                   <pre style={{
                     fontSize: '11px',
                     color: 'var(--text-primary)',
-                    backgroundColor: '#fff',
+                    backgroundColor: 'white',
                     padding: '8px',
                     borderRadius: '6px',
                     border: '1px solid #e9ecef',
@@ -302,11 +302,11 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
             </h4>
             <pre style={{
               fontSize: '11px',
-              color: '#D32F2F',
-              backgroundColor: '#FFE5E5',
+              color: 'var(--danger-color)',
+              backgroundColor: 'var(--bg-card)',
               padding: '12px',
               borderRadius: '6px',
-              border: '1px solid #FFCDD2',
+              border: '1px solid var(--border-color)',
               overflow: 'auto',
               maxHeight: '300px',
               margin: 0,
@@ -357,15 +357,15 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       <div key={log.id} style={{
         marginBottom: '12px',
         padding: '16px',
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         borderRadius: '8px',
         border: '1px solid #e9ecef',
         cursor: 'pointer',
         transition: 'all 0.2s'
       }}
       onClick={() => setExpandedLogId(isExpanded ? null : log.id)}
-      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#fff'}
+      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
+      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'white'}
       >
         {/* Log header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
@@ -391,7 +391,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                 {formatDate(log.timestamp)}
                 {log.errorType && (
                   <>
-                    <span style={{ color: '#999' }}>•</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>•</span>
                     <span style={{ color: getLevelColor(log.level), fontWeight: 500 }}>
                       {log.errorType}
                     </span>
@@ -406,7 +406,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
             <div style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#fff',
+              color: 'white',
               backgroundColor: getLevelColor(log.level),
               padding: '4px 8px',
               borderRadius: '12px'
@@ -416,7 +416,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
             <div style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: '#fff',
+              color: 'white',
               backgroundColor: getMethodColor(log.method),
               padding: '4px 8px',
               borderRadius: '12px'
@@ -426,8 +426,8 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
             <div style={{
               fontSize: '11px',
               fontWeight: 600,
-              color: log.statusCode >= 400 ? '#FF6B6B' : log.statusCode >= 300 ? '#FFD166' : '#06D6A0',
-              backgroundColor: log.statusCode >= 400 ? '#FFE5E5' : log.statusCode >= 300 ? '#FFF9E6' : '#E6F7F5',
+              color: log.statusCode >= 400 ? 'var(--danger-color)' : log.statusCode >= 300 ? 'var(--accent-color)' : 'var(--success-color)',
+              backgroundColor: log.statusCode >= 400 ? 'var(--bg-card)' : log.statusCode >= 300 ? 'var(--bg-card)' : '#E6F7F5',
               padding: '4px 8px',
               borderRadius: '12px'
             }}>
@@ -444,7 +444,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
             gap: '8px',
             marginBottom: '12px',
             padding: '8px',
-            backgroundColor: '#f0f9f8',
+            backgroundColor: 'var(--bg-card)',
             borderRadius: '6px'
           }}>
             {log.user.avatarUrl ? (
@@ -463,12 +463,12 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                 width: '20px',
                 height: '20px',
                 borderRadius: '50%',
-                backgroundColor: '#e3f2fd',
+                backgroundColor: 'var(--bg-card)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}>
-                <FaUser size={10} color="#1976d2" />
+                <FaUser size={10} color="var(--accent-color)" />
               </div>
             )}
             <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>
@@ -534,9 +534,9 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
       {/* Error message */}
       {error && (
         <div style={{
-          backgroundColor: '#FFE5E5',
-          border: '1px solid #FF6B6B',
-          color: '#D32F2F',
+          backgroundColor: 'var(--bg-card)',
+          border: '1px solid var(--danger-color)',
+          color: 'var(--danger-color)',
           padding: '16px',
           borderRadius: '8px',
           marginBottom: '20px'
@@ -547,7 +547,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
 
       {/* Filters */}
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         padding: '20px',
         borderRadius: '12px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
@@ -573,7 +573,7 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
                 border: '1px solid var(--border-color)',
                 borderRadius: '6px',
                 fontSize: '14px',
-                backgroundColor: '#fff'
+                backgroundColor: 'white'
               }}
             >
               <option value="all">Todos os níveis</option>
@@ -678,8 +678,8 @@ const TaskExecutionLog: React.FC<TaskExecutionLogProps> = ({ taskId, currentUser
               onClick={loadExecutionLogs}
               style={{
                 padding: '8px 16px',
-                backgroundColor: '#4ECDC4',
-                color: '#fff',
+                backgroundColor: 'var(--accent-color)',
+                color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '14px',

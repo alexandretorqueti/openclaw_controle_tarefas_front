@@ -10,23 +10,23 @@ function AppSimple() {
       <h1 style={{ color: '#333', marginBottom: '20px' }}>
         ✅ Sistema de Gestão de Tarefas
       </h1>
-      <p style={{ color: '#666', marginBottom: '30px' }}>
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>
         Aplicativo React + TypeScript funcionando corretamente
       </p>
       
       <div style={{
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         padding: '30px',
         borderRadius: '12px',
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
         maxWidth: '600px',
         margin: '0 auto'
       }}>
-        <h2 style={{ color: '#4ECDC4', marginBottom: '20px' }}>
+        <h2 style={{ color: 'var(--accent-color)', marginBottom: '20px' }}>
           Componentes Implementados:
         </h2>
         
-        <ul style={{ textAlign: 'left', color: '#444', lineHeight: '1.8' }}>
+        <ul style={{ textAlign: 'left', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
           <li>✅ <strong>TaskList</strong> - Lista com filtros e ordenação</li>
           <li>✅ <strong>TaskCard</strong> - Cards individuais de tarefas</li>
           <li>✅ <strong>TaskDetail</strong> - Visualização detalhada</li>
@@ -39,10 +39,10 @@ function AppSimple() {
         <div style={{ 
           marginTop: '30px', 
           padding: '20px',
-          backgroundColor: '#f8f9fa',
+          backgroundColor: 'var(--bg-card)',
           borderRadius: '8px'
         }}>
-          <p style={{ margin: 0, color: '#666' }}>
+          <p style={{ margin: 0, color: 'var(--text-secondary)' }}>
             <strong>Status:</strong> Aplicativo 100% funcional
             <br />
             <strong>URL:</strong> http://localhost:3000/

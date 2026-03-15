@@ -113,13 +113,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           <div style={{
             width: '32px',
             height: '32px',
-            backgroundColor: '#2563eb',
+            backgroundColor: 'var(--accent-color)',
             borderRadius: '8px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}>
-            <FaHome size={16} color="#fff" />
+            <FaHome size={16} color="white" />
           </div>
           <h1 style={{
             fontSize: '18px',
@@ -145,7 +145,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               style={{
                 padding: '10px 16px',
                 backgroundColor: currentView === view.id ? 'var(--accent-color)' : 'transparent',
-                color: currentView === view.id ? '#fff' : 'var(--text-secondary)',
+                color: currentView === view.id ? 'white' : 'var(--text-secondary)',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -172,7 +172,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                backgroundColor: '#e0e0e0',
+                backgroundColor: 'var(--text-primary)',
                 backgroundImage: user.avatarUrl ? `url(${user.avatarUrl})` : 'none',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
@@ -227,7 +227,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             display: 'flex',
             justifyContent: 'flex-end',
             padding: '0 24px 16px',
-            borderBottom: '1px solid #e0e0e0',
+            borderBottom: '1px solid var(--text-primary)',
             marginBottom: '16px'
           }}>
             <button
