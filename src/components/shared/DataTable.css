@@ -1,0 +1,93 @@
+/* DataTable.css - Complete migration from inline styles */
+
+.datatable-loading, .datatable-empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.datatable-wrapper {
+  overflow-x: auto;
+  border-radius: 8px;
+  background-color: var(--bg-card);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.datatable-wrapper-no-border {
+  border: none;
+  box-shadow: none;
+}
+
+.datatable-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 600px;
+}
+
+.datatable-table.compact {
+  font-size: 13px;
+}
+
+.datatable-thead-tr {
+  background-color: var(--bg-card);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.datatable-th {
+  padding: 16px 24px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.datatable-th.compact {
+  padding: 12px 16px;
+  font-size: 13px;
+}
+
+.datatable-th-right {
+  text-align: right;
+}
+
+.datatable-th-center {
+  text-align: center;
+}
+
+.datatable-tr {
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.datatable-tr-striped {
+  background-color: var(--bg-card);
+}
+
+.datatable-tr-hover {
+  background-color: var(--bg-hover);
+}
+
+.datatable-td {
+  padding: 16px 24px;
+  color: var(--text-primary);
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: top;
+}
+
+.datatable-td.compact {
+  padding: 12px 16px;
+  font-size: 13px;
+}
+
+.datatable-td-right {
+  text-align: right;
+}
+
+.datatable-td-center {
+  text-align: center;
+}

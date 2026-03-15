@@ -62,19 +62,8 @@ const DataTable = <T extends Record<string, any>>({
 
   return (
     keyExtractor &&
-    <div style={{
-      overflowX: 'auto',
-      borderRadius: '8px',
-      border: bordered ? '1px solid var(--text-primary)' : 'none',
-      backgroundColor: 'white',
-      boxShadow: bordered ? '0 2px 4px rgba(0,0,0,0.05)' : 'none'
-    }}>
-      <table style={{
-        width: '100%',
-        borderCollapse: 'collapse',
-        fontSize: compact ? '13px' : '14px',
-        minWidth: '600px'
-      }}>
+    <div className={`datatable-wrapper ${bordered ? '' : 'datatable-wrapper-no-border'}`}>
+      <table className={`datatable ${compact ? 'compact' : ''}`} style={{ fontSize: compact ? '13px' : '14px', minWidth: '600px' }}>
         <thead>
           <tr style={{
             backgroundColor: 'var(--bg-card)',
@@ -87,7 +76,7 @@ const DataTable = <T extends Record<string, any>>({
                   padding: compact ? '12px 16px' : '16px 24px',
                   textAlign: column.align || 'left',
                   fontWeight: 600,
-                  color: '#333',
+                  color: 'var(--text-secondary)',
                   fontSize: compact ? '13px' : '14px',
                   whiteSpace: 'nowrap',
                   width: column.width || 'auto'
@@ -121,19 +110,19 @@ const DataTable = <T extends Record<string, any>>({
                 }
               }}
               style={{
-                backgroundColor: striped && rowIndex % 2 === 0 ? 'var(--bg-card)' : 'white',
+                backgroundColor: striped && rowIndex % 2 === 0 ? 'var(--bg-card)' : '#666',
                 borderBottom: '1px solid var(--text-primary)',
                 cursor: onRowClick ? 'pointer' : 'default',
                 transition: hover ? 'all 0.2s ease' : 'none'
               }}
               onMouseEnter={(e) => {
                 if (hover) {
-                  e.currentTarget.style.backgroundColor = onRowClick ? '#f5f8ff' : 'var(--bg-card)';
+                  e.currentTarget.style.backgroundColor = onRowClick ? 'var(--bg-primary)' : 'var(--bg-secondary)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (hover) {
-                  e.currentTarget.style.backgroundColor = striped && rowIndex % 2 === 0 ? 'var(--bg-card)' : 'white';
+                  e.currentTarget.style.backgroundColor = striped && rowIndex % 2 === 0 ? 'var(--bg-card)' : '#666';
                 }
               }}
             >
@@ -143,7 +132,7 @@ const DataTable = <T extends Record<string, any>>({
                   style={{
                     padding: compact ? '12px 16px' : '16px 24px',
                     textAlign: column.align || 'left',
-                    color: '#333',
+                    color: 'var(--text-secondary)',
                     fontSize: compact ? '13px' : '14px',
                     borderBottom: '1px solid var(--text-primary)',
                     verticalAlign: 'top'
