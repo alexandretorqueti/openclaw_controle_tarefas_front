@@ -601,6 +601,35 @@ class ApiService {
       method: 'DELETE'
     });
   }
+
+  // Stage endpoints
+  async getStages() {
+    return this.request('/stages');
+  }
+
+  async getStage(id: number) {
+    return this.request(`/stages/${id}`);
+  }
+
+  async createStage(data: { etapa: string }) {
+    return this.request('/stages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateStage(id: number, data: { etapa: string }) {
+    return this.request(`/stages/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteStage(id: number) {
+    return this.request(`/stages/${id}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export default new ApiService();

@@ -205,6 +205,13 @@ export type LegacyTask = Task & {
   is_completed: boolean;
 };
 
+export interface Stage {
+  id: number;
+  etapa: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 // Helper function to convert legacy snake_case to camelCase
 export function convertToCamelCase<T>(obj: any): T {
   if (Array.isArray(obj)) {

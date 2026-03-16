@@ -14,7 +14,8 @@ import {
   FaBars,
   FaTimes,
   FaHome,
-  FaSignOutAlt, FaChevronLeft, FaChevronRight
+  FaSignOutAlt, FaChevronLeft, FaChevronRight,
+  FaLayerGroup
 } from 'react-icons/fa';
 
 interface MainLayoutProps {
@@ -64,6 +65,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
     { id: 'users', label: 'Usuários', icon: <FaUser size={16} />, action: onOpenUser },
     { id: 'project-types', label: 'Tipos de Projeto', icon: <FaProjectDiagram size={16} />, action: onOpenProjectType },
     { id: 'next-task', label: 'Próximas Tarefas', icon: <FaTasks size={16} />, action: onOpenNextTask },
+    { id: 'stages', label: 'Etapas', icon: <FaLayerGroup size={16} />, action: () => onViewChange('stages') },
   ];
 
   return (

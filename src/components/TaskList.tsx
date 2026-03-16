@@ -857,55 +857,6 @@ const TaskList: React.FC<TaskListProps> = ({
             </div>
           </div>
         )}
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {/* Ordenação */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <FaSortAmountDown size={16} color="var(--text-secondary)" />
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              style={{
-                padding: '8px 12px',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                fontSize: '14px',
-                backgroundColor: 'white',
-                outline: 'none'
-              }}
-            >
-              <option value="deadline">Ordenar por Prazo</option>
-              <option value="priority">Ordenar por Prioridade</option>
-              <option value="title">Ordenar por Título</option>
-            </select>
-          </div>
-
-          {/* Contadores */}
-          <div style={{ display: 'flex', gap: '24px' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: '#333' }}>
-                {tasks.length}
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total de Tarefas</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--success-color)' }}>
-                {tasks.filter(t => t.isCompleted).length}
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Concluídas</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--danger-color)' }}>
-                {tasks.filter(t => {
-                  if (t.isCompleted) return false;
-                  const deadlineDate = safeParseDate(t.deadline || '');
-                  return deadlineDate && deadlineDate < new Date();
-                }).length}
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Atrasadas</div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Lista de Tarefas */}

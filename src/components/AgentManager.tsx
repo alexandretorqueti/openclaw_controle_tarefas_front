@@ -1,1759 +1,557 @@
-// @ts-nocheck
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Agent, AgentsResponse, OperationResponse } from "../types/agent";
-import api from "../services/api";
+import React, { useState, useEffect } from 'react';
+import { Agent } from '../types/agent';
+import api from '../services/api';
+import './AgentManager.css';
 import {
   FaRobot,
   FaPlus,
   FaEdit,
   FaTrash,
-  FaLink,
-  FaUnlink,
-  FaSync,
-  FaCheck,
+  FaSearch,
   FaTimes,
   FaUserCircle,
   FaSpinner,
-  FaSearch,
+  FaCheck,
+  FaExclamationTriangle,
+  FaInfoCircle,
+  FaCalendarAlt,
+  FaCode,
+  FaFolder,
+  FaUpload,
   FaTimesCircle,
-} from "react-icons/fa";
+  FaFilter
+} from 'react-icons/fa';
 
-// Estilos inline para animações
-const styles = {
-  "@keyframes spin": {
-    "0%": { transform: "rotate(0deg)" },
-    "100%": { transform: "rotate(360deg)" },
-  },
-  "@keyframes slideIn": {
-    "0%": { transform: "translateX(100%)", opacity: 0 },
-    "100%": { transform: "translateX(0)", opacity: 1 },
-  },
-};
+// Componente de Toast para notificações
+interface ToastProps {
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message: string;
+  onClose: () => void;
+}
 
-const AgentManager: React.FC = () => {
-  const [agents, setAgents] = useState<Agent[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-
-  // Filtros locais
-  const [searchName, setSearchName] = useState("");
-  const [searchModel, setSearchModel] = useState("");
-
-  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
-  const [showEditModal, setShowEditModal] = useState<boolean>(false);
-  const [showBindingsModal, setShowBindingsModal] = useState<boolean>(false);
-  const [newAgentName, setNewAgentName] = useState<string>("");
-  const [newAgentWorkspace, setNewAgentWorkspace] = useState<string>("");
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
-  const [editAgentName, setEditAgentName] = useState<string>("");
-  const [editAgentEmoji, setEditAgentEmoji] = useState<string>("");
-  const [editAgentAvatar, setEditAgentAvatar] = useState<string>("");
-  const [editAgentModel, setEditAgentModel] = useState<string>("");
-  const [editAgentWorkspace, setEditAgentWorkspace] = useState<string>("");
-  const [editAgentVibe, setEditAgentVibe] = useState<string>("");
-  const [editAgentSoul, setEditAgentSoul] = useState<string>("");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [fileLoading, setFileLoading] = useState(false);
-  const [newBinding, setNewBinding] = useState<string>("");
-  const [models, setModels] = useState<string[]>([]);
-
-  // Estado para toast de processamento assíncrono
-  const [processingToast, setProcessingToast] = useState<{
-    visible: boolean;
-    message: string;
-    type: "processing" | "success" | "error";
-    steps?: string[];
-    currentStep?: number;
-  }>({
-    visible: false,
-    message: "",
-    type: "processing",
-  });
-
-  const loadAgents = async () => {
-    setLoading(true);
-    try {
-      const response = (await api.getAgents()) as AgentsResponse;
-      if (response.success) {
-        setAgents(response.data);
-      } else {
-        // Mostrar erro via toast
-        setProcessingToast({
-          visible: true,
-          message: `Erro ao carregar agentes: ${response.error || "Erro desconhecido"}`,
-          type: "error",
-        });
-      }
-    } catch (err: any) {
-      // Mostrar erro via toast
-      setProcessingToast({
-        visible: true,
-        message: `Erro ao conectar com o servidor: ${err.message || "Erro desconhecido"}`,
-        type: "error",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const Toast: React.FC<ToastProps> = ({ type, title, message, onClose }) => {
   useEffect(() => {
-    loadAgents();
-
-    // Load models
-    const loadModels = async () => {
-      try {
-        const data = await api.request("/models");
-        setModels(data.models || []);
-      } catch (error) {
-        console.error("Error loading models:", error);
-      }
-    };
-
-    loadModels();
-  }, []);
-
-  // Lógica de filtragem
-  const filteredAgents = useMemo(() => {
-    return agents.filter((agent) => {
-      const name = (agent.identity?.name || "").toLowerCase();
-      const model = (agent.identity?.model || "").toLowerCase();
-      return (
-        name.includes(searchName.toLowerCase()) &&
-        model.includes(searchModel.toLowerCase())
-      );
-    });
-  }, [agents, searchName, searchModel]);
-
-  const handleCreateAgent = async () => {
-    if (!newAgentName.trim()) {
-      setProcessingToast({
-        visible: true,
-        message: "O nome do agente é obrigatório",
-        type: "error",
-      });
-      return;
-    }
-
-    // Fechar modal imediatamente
-    setShowCreateModal(false);
-
-    // Mostrar toast de processamento
-    setProcessingToast({
-      visible: true,
-      message: "Criando agente...",
-      type: "processing",
-    });
-
-    try {
-      const response = (await api.createAgent({
-        name: newAgentName,
-        workspace: newAgentWorkspace || undefined,
-      })) as OperationResponse;
-
-      if (response.success) {
-        // Limpar formulário
-        setNewAgentName("");
-        setNewAgentWorkspace("");
-
-        // Atualizar lista em background
-        loadAgents().catch(console.error);
-
-        // Mostrar toast de sucesso
-        setProcessingToast({
-          visible: true,
-          message: "Agente criado com sucesso!",
-          type: "success",
-        });
-
-        // Auto-esconder toast após 3 segundos
-        setTimeout(() => {
-          setProcessingToast((prev) => ({ ...prev, visible: false }));
-        }, 3000);
-      } else {
-        setProcessingToast({
-          visible: true,
-          message: `Erro ao criar agente: ${response.error || "Erro desconhecido"}`,
-          type: "error",
-        });
-      }
-    } catch (err: any) {
-      setProcessingToast({
-        visible: true,
-        message: `Erro ao criar agente: ${err.message || "Erro desconhecido"}`,
-        type: "error",
-      });
-    }
-  };
-
-  const handleDeleteAgent = async (id: string) => {
-    if (!confirm("Tem certeza que deseja excluir este agente?")) return;
-
-    // Mostrar toast de processamento
-    setProcessingToast({
-      visible: true,
-      message: "Excluindo agente...",
-      type: "processing",
-    });
-
-    try {
-      const response = (await api.deleteAgent(id)) as OperationResponse;
-
-      if (response.success) {
-        // Atualizar lista em background
-        loadAgents().catch(console.error);
-
-        // Mostrar toast de sucesso
-        setProcessingToast({
-          visible: true,
-          message: "Agente excluído com sucesso!",
-          type: "success",
-        });
-
-        // Auto-esconder toast após 3 segundos
-        setTimeout(() => {
-          setProcessingToast((prev) => ({ ...prev, visible: false }));
-        }, 3000);
-      } else {
-        setProcessingToast({
-          visible: true,
-          message: `Erro ao excluir agente: ${response.error || "Erro desconhecido"}`,
-          type: "error",
-        });
-      }
-    } catch (err: any) {
-      setProcessingToast({
-        visible: true,
-        message: `Erro ao excluir agente: ${err.message || "Erro desconhecido"}`,
-        type: "error",
-      });
-    }
-  };
-
-  const handleUpdateAgent = async () => {
-    if (!selectedAgent) return;
-
-    if (!editAgentName.trim()) {
-      setProcessingToast({
-        visible: true,
-        message: "O nome do agente é obrigatório",
-        type: "error",
-      });
-      return;
-    }
-
-    // Fechar modal imediatamente para UX não-bloqueante
-    setShowEditModal(false);
-    setSelectedAgent(null);
-
-    // Mostrar toast de processamento
-    setProcessingToast({
-      visible: true,
-      message: "Atualizando agente...",
-      type: "processing",
-      steps: [
-        "Atualizando identidade",
-        "Atualizando VIBE",
-        "Atualizando SOUL.md",
-      ],
-      currentStep: 0,
-    });
-
-    try {
-      // 1. Atualizar identidade do agente (assíncrono, não bloqueia UI)
-      setProcessingToast((prev) => ({ ...prev, currentStep: 1 }));
-      const identityPromise = api.updateAgentIdentity(selectedAgent.id, {
-        name: editAgentName,
-        emoji: editAgentEmoji,
-        // Não enviamos avatar aqui - OpenClaw não aceita
-        // Avatar é gerenciado separadamente via upload
-        model: editAgentModel,
-        workspace: editAgentWorkspace || undefined,
-      }) as Promise<OperationResponse>;
-
-      // 2. Preparar atualizações de arquivos (se houver conteúdo)
-      const filePromises: Promise<any>[] = [];
-
-      if (editAgentVibe.trim()) {
-        setProcessingToast((prev) => ({ ...prev, currentStep: 2 }));
-        filePromises.push(
-          (async () => {
-            try {
-              // Ler IDENTITY.md atual
-              const identityResponse = await api.request(
-                `/agents/${selectedAgent.id}/files/IDENTITY.md`,
-              );
-              let identityContent =
-                identityResponse.success && identityResponse.data
-                  ? identityResponse.data
-                  : "";
-
-              // Atualizar ou adicionar VIBE
-              if (identityContent.includes("VIBE:")) {
-                identityContent = identityContent.replace(
-                  /VIBE:\s*.+/i,
-                  `VIBE: ${editAgentVibe}`,
-                );
-              } else {
-                identityContent += `\n\nVIBE: ${editAgentVibe}`;
-              }
-
-              // Salvar IDENTITY.md atualizado
-              return await api.request(
-                `/agents/${selectedAgent.id}/files/IDENTITY.md`,
-                {
-                  method: "PUT",
-                  body: JSON.stringify({ content: identityContent }),
-                },
-              );
-            } catch (error) {
-              console.error("Erro ao atualizar VIBE:", error);
-              return { success: false, error };
-            }
-          })(),
-        );
-      }
-
-      if (editAgentSoul.trim()) {
-        setProcessingToast((prev) => ({ ...prev, currentStep: 3 }));
-        filePromises.push(
-          (async () => {
-            try {
-              return await api.request(
-                `/agents/${selectedAgent.id}/files/SOUL.md`,
-                {
-                  method: "PUT",
-                  body: JSON.stringify({ content: editAgentSoul }),
-                },
-              );
-            } catch (error) {
-              console.error("Erro ao atualizar SOUL.md:", error);
-              return { success: false, error };
-            }
-          })(),
-        );
-      }
-
-      // Executar todas as promessas em paralelo
-      const [identityResult, ...fileResults] = await Promise.allSettled([
-        identityPromise,
-        ...filePromises,
-      ]);
-
-      // Verificar resultado da identidade
-      if (
-        identityResult.status === "rejected" ||
-        (identityResult.status === "fulfilled" && !identityResult.value.success)
-      ) {
-        const error =
-          identityResult.status === "rejected"
-            ? identityResult.reason
-            : identityResult.value.error;
-
-        setProcessingToast({
-          visible: true,
-          message: `Erro ao atualizar agente: ${error?.message || error || "Erro desconhecido"}`,
-          type: "error",
-        });
-        return;
-      }
-
-      // Atualizar lista de agentes em background
-      loadAgents().catch(console.error);
-
-      // Mostrar toast de sucesso
-      setProcessingToast({
-        visible: true,
-        message: "Agente atualizado com sucesso!",
-        type: "success",
-      });
-
-      // Limpar estados do formulário
-      setEditAgentName("");
-      setEditAgentEmoji("");
-      setEditAgentAvatar("");
-      setEditAgentModel("");
-      setEditAgentWorkspace("");
-      setEditAgentVibe("");
-      setEditAgentSoul("");
-
-      // Auto-esconder toast de sucesso após 3 segundos
-      setTimeout(() => {
-        setProcessingToast((prev) => ({ ...prev, visible: false }));
-      }, 3000);
-    } catch (err: any) {
-      setProcessingToast({
-        visible: true,
-        message: `Erro ao atualizar agente: ${err.message || "Erro desconhecido"}`,
-        type: "error",
-      });
-    }
-  };
-
-  const clearMessages = () => {
-    // Função mantida para compatibilidade, mas não faz mais nada
-  };
-
-  const AgentAvatar: React.FC<{ agent: Agent }> = ({ agent }) => {
-    const [imgError, setImgError] = useState(false);
-    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-    // Buscar avatar do novo sistema
-    useEffect(() => {
-      const fetchAvatar = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:3001/api/agents/${agent.id}/avatar`,
-          );
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.data) {
-              // URL já é completa no novo sistema
-              setAvatarUrl(`http://localhost:3001${data.data.avatarUrl}`);
-            }
-          }
-        } catch (error) {
-          console.error("Erro ao buscar avatar:", error);
-        }
-      };
-
-      fetchAvatar();
-    }, [agent.id]);
-
-    if (avatarUrl && !imgError) {
-      return (
-        <img
-          src={avatarUrl}
-          alt={agent.identity?.name || "Agente"}
-          style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "50%",
-            objectFit: "cover",
-          }}
-          onError={() => setImgError(true)}
-        />
-      );
-    }
-
-    if (agent.identity && agent.identity.emoji) {
-      return (
-        <div
-          style={{
-            width: "32px",
-            height: "32px",
-            borderRadius: "50%",
-            backgroundColor: "var(--text-primary)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "18px",
-          }}
-        >
-          {agent.identity.emoji}
-        </div>
-      );
-    }
-
-    return (
-      <FaUserCircle style={{ width: "32px", height: "32px", color: "var(--text-secondary)" }} />
-    );
-  };
-
-  const renderAgentAvatar = (agent: Agent) => {
-    return <AgentAvatar agent={agent} />;
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return "—";
-    return new Date(dateString).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+    const timer = setTimeout(() => {
+      onClose();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          <h2
-            style={{
-              fontSize: "24px",
-              fontWeight: 600,
-              color: "var(--text-primary)",
-              margin: 0,
-              display: "flex",
-              alignItems: "center",
-              gap: "12px",
-            }}
-          >
-            <div
-              style={{
-                width: "40px",
-                height: "40px",
-                backgroundColor: "var(--accent-color)",
-                borderRadius: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <FaRobot size={20} color="white" />
-            </div>
-            Gerenciamento de Agentes OpenClaw
-          </h2>
-          <p style={{ fontSize: "14px", color: "var(--text-secondary)", margin: "8px 0 0" }}>
-            Gerencie agentes através da CLI do OpenClaw
-          </p>
-        </div>
-
-        <div style={{ display: "flex", gap: "12px" }}>
-          <button
-            onClick={loadAgents}
-            style={{
-              padding: "10px 16px",
-              backgroundColor: 'var(--bg-input)',
-              color: "var(--text-primary)",
-              border: "1px solid var(--border-color)",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              cursor: "pointer",
-              transition: "all 0.2s",
-              opacity: loading ? 0.6 : 1,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#e9ecef";
-              e.currentTarget.style.borderColor = "var(--border-color)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-              e.currentTarget.style.borderColor = "var(--text-primary)";
-            }}
-            disabled={loading}
-          >
-            <FaSync
-              style={loading ? { animation: "spin 1s linear infinite" } : {}}
-            />
-            Atualizar
-          </button>
-
-          <button
-            onClick={() => setShowCreateModal(true)}
-            style={{
-              padding: "10px 16px",
-              backgroundColor: "var(--accent-color)",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              cursor: "pointer",
-              transition: "all 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--accent-hover)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--accent-color)";
-            }}
-          >
-            <FaPlus />
-            Novo Agente
-          </button>
-        </div>
+    <div className={`toast toast-${type}`}>
+      <div className="toast-header">
+        <h4 className="toast-title">{title}</h4>
+        <button className="toast-close" onClick={onClose}>
+          <FaTimes size={14} />
+        </button>
       </div>
-
-      {/* Filtros */}
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          flexWrap: "wrap",
-          alignItems: "end",
-          padding: "16px",
-          backgroundColor: 'var(--bg-input)',
-          borderRadius: "12px",
-          border: "1px solid var(--border-color)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            flex: 1,
-            minWidth: "200px",
-          }}
-        >
-          <FaSearch size={16} color="var(--text-secondary)" />
-          <input
-            placeholder="Filtrar por nome..."
-            value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "8px 12px",
-              border: "1px solid var(--border-color)",
-              borderRadius: "6px",
-              fontSize: "14px",
-              outline: "none",
-            }}
-          />
-          {searchName && (
-            <FaTimesCircle
-              size={16}
-              color="var(--text-secondary)"
-              style={{ cursor: "pointer" }}
-              onClick={() => setSearchName("")}
-            />
-          )}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            flex: 1,
-            minWidth: "200px",
-          }}
-        >
-          <FaSearch size={16} color="var(--text-secondary)" />
-          <input
-            placeholder="Filtrar por modelo..."
-            value={searchModel}
-            onChange={(e) => setSearchModel(e.target.value)}
-            style={{
-              flex: 1,
-              padding: "8px 12px",
-              border: "1px solid var(--border-color)",
-              borderRadius: "6px",
-              fontSize: "14px",
-              outline: "none",
-            }}
-          />
-          {searchModel && (
-            <FaTimesCircle
-              size={16}
-              color="var(--text-secondary)"
-              style={{ cursor: "pointer" }}
-              onClick={() => setSearchModel("")}
-            />
-          )}
-        </div>
-        <div
-          style={{
-            fontSize: "14px",
-            color: "var(--text-secondary)",
-            whiteSpace: "nowrap",
-            fontWeight: 500,
-          }}
-        >
-          Resultados: {filteredAgents.length} de {agents.length}
-        </div>
-      </div>
-
-      <div
-        style={{
-          backgroundColor: "white",
-          borderRadius: "12px",
-          border: "1px solid var(--border-color)",
-          overflow: "auto",
-        }}
-      >
-        {loading && agents.length === 0 ? (
-          <div
-            style={{
-              padding: "48px",
-              textAlign: "center",
-              color: "var(--text-secondary)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "16px",
-            }}
-          >
-            <FaSpinner
-              style={{
-                animation: "spin 1s linear infinite",
-                fontSize: "32px",
-                color: "var(--accent-color)",
-              }}
-            />
-            <span style={{ fontSize: "16px" }}>Carregando agentes...</span>
-          </div>
-        ) : filteredAgents.length === 0 ? (
-          <div
-            style={{
-              padding: "48px",
-              textAlign: "center",
-              color: "var(--text-secondary)",
-            }}
-          >
-            <FaRobot
-              style={{ fontSize: "48px", margin: "0 auto 16px", color: 'var(--border-color)' }}
-            />
-            <p style={{ fontSize: "18px", margin: "0 0 8px" }}>
-              Nenhum agente encontrado
-              {(searchName || searchModel) && " com os filtros aplicados"}
-            </p>
-            <p style={{ fontSize: "14px" }}>
-              {searchName || searchModel
-                ? "Ajuste os filtros ou limpe para ver todos"
-                : "Crie seu primeiro agente para começar"}
-            </p>
-          </div>
-        ) : (
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-            }}
-          >
-            <thead>
-              <tr
-                style={{
-                  backgroundColor: 'var(--bg-input)',
-                  borderBottom: "1px solid var(--text-primary)",
-                }}
-              >
-                <th
-                  style={{
-                    padding: "16px 24px",
-                    textAlign: "left",
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    color: "var(--text-secondary)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  Agente
-                </th>
-                <th
-                  style={{
-                    padding: "16px 24px",
-                    textAlign: "left",
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    color: "var(--text-secondary)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  Modelo
-                </th>
-                <th
-                  style={{
-                    padding: "16px 24px",
-                    textAlign: "left",
-                    fontSize: "12px",
-                    fontWeight: 500,
-                    color: "var(--text-secondary)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  Ações
-                </th>
-              </tr>
-            </thead>
-            <tbody
-              style={{
-                backgroundColor: "white",
-              }}
-            >
-              {filteredAgents.map((agent) => (
-                <tr
-                  key={agent.id}
-                  style={{
-                    borderBottom: "1px solid var(--text-primary)",
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "white";
-                  }}
-                >
-                  <td
-                    style={{
-                      padding: "16px 24px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <div style={{ flexShrink: 0 }}>
-                        {renderAgentAvatar(agent)}
-                      </div>
-                      <div style={{ marginLeft: "16px" }}>
-                        <div
-                          style={{
-                            fontSize: "14px",
-                            fontWeight: 500,
-                            color: "var(--text-primary)",
-                          }}
-                        >
-                          {agent.identity ? agent.identity.name : "Sem nome"}
-                        </div>
-                        <div
-                          style={{
-                            fontSize: "14px",
-                            color: "var(--text-secondary)",
-                            marginTop: "4px",
-                          }}
-                        >
-                          {agent.identity && agent.identity.emoji && (
-                            <span style={{ marginRight: "8px" }}>
-                              {agent.identity.emoji}
-                            </span>
-                          )}
-                          {/* Avatar agora é gerenciado separadamente */}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td
-                    style={{
-                      padding: "16px 24px",
-                      whiteSpace: "nowrap",
-                      fontSize: "14px",
-                      color: "var(--text-secondary)",
-                    }}
-                  >
-                    {agent.identity?.model || "—"}
-                  </td>
-                  <td
-                    style={{
-                      padding: "16px 24px",
-                      whiteSpace: "nowrap",
-                      fontSize: "14px",
-                      fontWeight: 500,
-                    }}
-                  >
-                    <div style={{ display: "flex", gap: "8px" }}>
-                      <button
-                        onClick={async () => {
-                          setSelectedAgent(agent);
-                          setEditAgentName(agent.identity?.name || "");
-                          setEditAgentEmoji(agent.identity?.emoji || "");
-                          // Avatar não é mais gerenciado via identity.avatar do OpenClaw
-                          // Será carregado separadamente se existir no workspace
-                          setEditAgentAvatar("");
-                          setEditAgentModel(agent.identity?.model || "");
-                          setEditAgentWorkspace(agent.workspace || "");
-                          setEditAgentVibe("");
-                          setEditAgentSoul("");
-                          setFileLoading(true);
-                          setShowEditModal(true);
-
-                          // Carregar arquivos em background
-                          Promise.allSettled([
-                            api
-                              .request(`/agents/${agent.id}/files/IDENTITY.md`)
-                              .then((res) => {
-                                if (res.success && res.data) {
-                                  const match = res.data.match(/VIBE:\s*(.+)/i);
-                                  setEditAgentVibe(
-                                    match ? match[1].trim() : "",
-                                  );
-                                }
-                              }),
-                            api
-                              .request(`/agents/${agent.id}/files/SOUL.md`)
-                              .then((res) => {
-                                setEditAgentSoul(
-                                  res.success && res.data ? res.data : "",
-                                );
-                              }),
-                          ])
-                            .finally(() => setFileLoading(false))
-                            .catch(console.error);
-                        }}
-                        style={{
-                          color: "var(--accent-color)",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          padding: "4px",
-                          borderRadius: "4px",
-                          transition: "all 0.2s",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = "#0d47a1";
-                          e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = "var(--accent-color)";
-                          e.currentTarget.style.backgroundColor = "transparent";
-                        }}
-                      >
-                        <FaEdit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteAgent(agent.id)}
-                        style={{
-                          color: "var(--danger-color)",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          padding: "4px",
-                          borderRadius: "4px",
-                          transition: "all 0.2s",
-                          opacity: loading ? 0.5 : 1,
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!loading) {
-                            e.currentTarget.style.color = "#b71c1c";
-                            e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!loading) {
-                            e.currentTarget.style.color = "var(--danger-color)";
-                            e.currentTarget.style.backgroundColor =
-                              "transparent";
-                          }
-                        }}
-                        disabled={loading}
-                      >
-                        <FaTrash size={16} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedAgent(agent);
-                          setShowBindingsModal(true);
-                        }}
-                        style={{
-                          color: "var(--text-primary)",
-                          background: "none",
-                          border: "none",
-                          cursor: "pointer",
-                          padding: "4px",
-                          borderRadius: "4px",
-                          transition: "all 0.2s",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.color = "#1b5e20";
-                          e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.color = "var(--text-primary)";
-                          e.currentTarget.style.backgroundColor = "transparent";
-                        }}
-                      >
-                        <FaLink size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Create Modal */}
-      {showCreateModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-          }}
-        >
-          {/* Full create modal code from original */}
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              boxShadow:
-                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              width: "100%",
-              maxWidth: "28rem",
-              padding: "24px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "16px",
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                }}
-              >
-                Criar Novo Agente
-              </h3>
-              <button
-                onClick={() => setShowCreateModal(false)}
-                style={{
-                  color: "var(--text-secondary)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                  borderRadius: "4px",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
-              >
-                <FaTimes />
-              </button>
-            </div>
-
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-            >
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Nome do Agente *
-                </label>
-                <input
-                  type="text"
-                  value={newAgentName}
-                  onChange={(e) => setNewAgentName(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    transition: "all 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "var(--accent-color)";
-                    e.target.style.boxShadow =
-                      "0 0 0 3px rgba(78, 205, 196, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "var(--text-primary)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                  placeholder="Ex: MeuAgente"
-                />
-              </div>
-
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Workspace (opcional)
-                </label>
-                <input
-                  type="text"
-                  value={newAgentWorkspace}
-                  onChange={(e) => setNewAgentWorkspace(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    transition: "all 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "var(--accent-color)";
-                    e.target.style.boxShadow =
-                      "0 0 0 3px rgba(78, 205, 196, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "var(--text-primary)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                  placeholder="/caminho/para/workspace"
-                />
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "var(--text-secondary)",
-                    marginTop: "4px",
-                  }}
-                >
-                  Caminho absoluto para o workspace do agente
-                </p>
-              </div>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "12px",
-                marginTop: "24px",
-              }}
-            >
-              <button
-                onClick={() => setShowCreateModal(false)}
-                style={{
-                  padding: "10px 16px",
-                  color: "var(--text-primary)",
-                  backgroundColor: 'var(--bg-input)',
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#e9ecef";
-                  e.currentTarget.style.borderColor = "var(--border-color)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                  e.currentTarget.style.borderColor = "var(--text-primary)";
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCreateAgent}
-                disabled={loading || !newAgentName.trim()}
-                style={{
-                  padding: "10px 16px",
-                  backgroundColor: "var(--accent-color)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor:
-                    loading || !newAgentName.trim() ? "not-allowed" : "pointer",
-                  opacity: loading || !newAgentName.trim() ? 0.5 : 1,
-                  transition: "all 0.2s",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading && newAgentName.trim()) {
-                    e.currentTarget.style.backgroundColor = "var(--accent-hover)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading && newAgentName.trim()) {
-                    e.currentTarget.style.backgroundColor = "var(--accent-color)";
-                  }
-                }}
-              >
-                {loading ? (
-                  <FaSpinner style={{ animation: "spin 1s linear infinite" }} />
-                ) : (
-                  <FaPlus />
-                )}
-                Criar Agente
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {showEditModal && selectedAgent && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 50,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              boxShadow:
-                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              width: "100%",
-              maxWidth: "28rem",
-              padding: "24px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "16px",
-              }}
-            >
-              <h3
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 600,
-                  color: "var(--text-primary)",
-                }}
-              >
-                Editar Agente
-              </h3>
-              <button
-                onClick={() => {
-                  setShowEditModal(false);
-                  setSelectedAgent(null);
-                  setEditAgentName("");
-                  setEditAgentEmoji("");
-                  setEditAgentAvatar("");
-                  setEditAgentModel("");
-                  setEditAgentWorkspace("");
-                  setEditAgentVibe("");
-                  setEditAgentSoul("");
-                }}
-                style={{
-                  color: "var(--text-secondary)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  padding: "4px",
-                  borderRadius: "4px",
-                  transition: "all 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
-              >
-                <FaTimes />
-              </button>
-            </div>
-
-            <div
-              style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-            >
-              {/* Nome */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Nome do Agente *
-                </label>
-                <input
-                  type="text"
-                  value={editAgentName}
-                  onChange={(e) => setEditAgentName(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    transition: "all 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = "var(--accent-color)";
-                    e.target.style.boxShadow =
-                      "0 0 0 3px rgba(78, 205, 196, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = "var(--text-primary)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                  placeholder="Nome do agente"
-                />
-              </div>
-
-              {/* Emoji */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Emoji
-                </label>
-                <input
-                  type="text"
-                  value={editAgentEmoji}
-                  onChange={(e) => setEditAgentEmoji(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    transition: "all 0.2s",
-                  }}
-                  placeholder="😀 🚀 🤖"
-                />
-              </div>
-
-              {/* Modelo */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Modelo
-                </label>
-                <select
-                  value={editAgentModel}
-                  onChange={(e) => setEditAgentModel(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    backgroundColor: "white",
-                  }}
-                >
-                  <option value="">Selecione um modelo</option>
-                  {models.map((model) => (
-                    <option key={model} value={model}>
-                      {model}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Workspace */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Workspace
-                </label>
-                <input
-                  type="text"
-                  value={editAgentWorkspace}
-                  onChange={(e) => setEditAgentWorkspace(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                  }}
-                  placeholder="/caminho/para/workspace"
-                />
-              </div>
-
-              {/* VIBE */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  VIBE{" "}
-                  {fileLoading && (
-                    <FaSpinner
-                      style={{
-                        animation: "spin 1s linear infinite",
-                        marginLeft: "8px",
-                      }}
-                    />
-                  )}
-                </label>
-                <input
-                  type="text"
-                  value={editAgentVibe}
-                  onChange={(e) => setEditAgentVibe(e.target.value)}
-                  disabled={fileLoading}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    opacity: fileLoading ? 0.6 : 1,
-                  }}
-                  placeholder="Ex: Informal, engraçado, inteligente"
-                />
-                <p
-                  style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}
-                >
-                  Extraído do IDENTITY.md do agente
-                </p>
-              </div>
-
-              {/* SOUL.md */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  SOUL.md{" "}
-                  {fileLoading && (
-                    <FaSpinner
-                      style={{
-                        animation: "spin 1s linear infinite",
-                        marginLeft: "8px",
-                      }}
-                    />
-                  )}
-                </label>
-                <textarea
-                  value={editAgentSoul}
-                  onChange={(e) => setEditAgentSoul(e.target.value)}
-                  disabled={fileLoading}
-                  rows={6}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    outline: "none",
-                    fontFamily: "monospace",
-                    resize: "vertical",
-                    opacity: fileLoading ? 0.6 : 1,
-                  }}
-                  placeholder="Conteúdo do arquivo SOUL.md do agente"
-                />
-                <p
-                  style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}
-                >
-                  Conteúdo completo do arquivo SOUL.md
-                </p>
-              </div>
-
-              {/* Upload de Avatar */}
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                    color: "var(--text-primary)",
-                    marginBottom: "8px",
-                  }}
-                >
-                  Avatar
-                </label>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-
-                    // Implementar upload de avatar aqui
-                    alert("Upload de avatar será implementado separadamente");
-                  }}
-                />
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  style={{
-                    padding: "10px 16px",
-                    backgroundColor: 'var(--bg-input)',
-                    color: "var(--text-primary)",
-                    border: "1px solid var(--border-color)",
-                    borderRadius: "8px",
-                    cursor: "pointer",
-                    width: "100%",
-                  }}
-                >
-                  Escolher arquivo para avatar
-                </button>
-                <p
-                  style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}
-                >
-                  JPG, PNG ou GIF (máx. 5MB)
-                </p>
-              </div>
-            </div>
-            {/* ... full edit form fields, avatar upload, VIBE, SOUL.md ... */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "12px",
-                marginTop: "24px",
-              }}
-            >
-              <button
-                onClick={() => {
-                  setShowEditModal(false);
-                  setSelectedAgent(null);
-                  setEditAgentName("");
-                  setEditAgentEmoji("");
-                  setEditAgentAvatar("");
-                  setEditAgentModel("");
-                  setEditAgentWorkspace("");
-                  setEditAgentVibe("");
-                  setEditAgentSoul("");
-                }}
-                style={{
-                  padding: "10px 16px",
-                  color: "var(--text-primary)",
-                  backgroundColor: 'var(--bg-input)',
-                  border: "1px solid var(--border-color)",
-                  borderRadius: "8px",
-                  cursor: "pointer",
-                  transition: "all 0.2s",
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleUpdateAgent}
-                disabled={loading || !editAgentName.trim()}
-                style={{
-                  padding: "10px 16px",
-                  backgroundColor: "var(--accent-color)",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  cursor:
-                    loading || !editAgentName.trim()
-                      ? "not-allowed"
-                      : "pointer",
-                  opacity: loading || !editAgentName.trim() ? 0.5 : 1,
-                }}
-              >
-                Salvar Alterações
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Toast */}
-      {processingToast.visible && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: "24px",
-            right: "24px",
-            backgroundColor:
-              processingToast.type === "error"
-                ? "var(--bg-card)"
-                : processingToast.type === "success"
-                  ? "var(--bg-card)"
-                  : "var(--bg-card)",
-            border: `1px solid ${
-              processingToast.type === "error"
-                ? "var(--bg-card)"
-                : processingToast.type === "success"
-                  ? 'var(--success-color)'
-                  : 'var(--accent-color)'
-            }`,
-            borderRadius: "12px",
-            padding: "16px",
-            minWidth: "300px",
-            maxWidth: "400px",
-            boxShadow:
-              "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-            zIndex: 100,
-            animation: "slideIn 0.3s ease-out",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: "12px",
-            }}
-          >
-            <div
-              style={{
-                flexShrink: 0,
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                backgroundColor:
-                  processingToast.type === "error"
-                    ? "#ef4444"
-                    : processingToast.type === "success"
-                      ? "var(--success-color)"
-                      : "var(--accent-color)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "white",
-                fontSize: "12px",
-              }}
-            >
-              {processingToast.type === "processing" ? (
-                <FaSpinner style={{ animation: "spin 1s linear infinite" }} />
-              ) : processingToast.type === "success" ? (
-                <FaCheck />
-              ) : (
-                <FaTimes />
-              )}
-            </div>
-
-            <div style={{ flex: 1 }}>
-              <div
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 500,
-                  color: "var(--text-primary)",
-                  marginBottom: processingToast.steps ? "8px" : "0",
-                }}
-              >
-                {processingToast.message}
-              </div>
-
-              {processingToast.steps && (
-                <div style={{ marginTop: "8px" }}>
-                  {processingToast.steps.map((step, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        marginBottom: "4px",
-                        fontSize: "12px",
-                        color:
-                          index < (processingToast.currentStep || 0)
-                            ? "var(--success-color)"
-                            : index === (processingToast.currentStep || 0)
-                              ? "var(--accent-color)"
-                              : "var(--text-secondary)",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: "16px",
-                          height: "16px",
-                          borderRadius: "50%",
-                          backgroundColor:
-                            index < (processingToast.currentStep || 0)
-                              ? "var(--success-color)"
-                              : index === (processingToast.currentStep || 0)
-                                ? "var(--accent-color)"
-                                : "var(--border-color)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "white",
-                          fontSize: "8px",
-                        }}
-                      >
-                        {index < (processingToast.currentStep || 0) ? (
-                          <FaCheck />
-                        ) : (
-                          index + 1
-                        )}
-                      </div>
-                      <span>{step}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <button
-              onClick={() =>
-                setProcessingToast((prev) => ({ ...prev, visible: false }))
-              }
-              style={{
-                color: "var(--text-secondary)",
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                padding: "4px",
-                borderRadius: "4px",
-                flexShrink: 0,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = "var(--text-secondary)";
-                e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = "var(--text-secondary)";
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
-            >
-              <FaTimes />
-            </button>
-          </div>
-        </div>
-      )}
+      <p className="toast-message">{message}</p>
     </div>
   );
 };
 
-export default AgentManager;
+// Componente de Loading
+const LoadingSpinner: React.FC = () => (
+  <div className="loading-state">
+    <FaSpinner className="loading-spinner" />
+    <p className="loading-text">Carregando agentes...</p>
+  </div>
+);
+
+// Componente de Estado Vazio
+const EmptyState: React.FC<{ message: string; subMessage?: string }> = ({ message, subMessage }) => (
+  <div className="empty-state">
+    <FaRobot className="empty-state-icon" />
+    <h3 className="empty-state-title">{message}</h3>
+    {subMessage && <p className="empty-state-description">{subMessage}</p>}
+  </div>
+);
+
+// Componente de Card de Agente
+interface AgentCardProps {
+  agent: Agent;
+  onEdit: (agent: Agent) => void;
+  onDelete: (agent: Agent) => void;
+}
+
+const AgentCard: React.FC<AgentCardProps> = ({ agent, onEdit, onDelete }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Tem certeza que deseja excluir o agente "${agent.id}"?`)) {
+      return;
+    }
+    
+    setIsDeleting(true);
+    try {
+      await api.deleteAgent(agent.id);
+      onDelete(agent);
+    } catch (error) {
+      console.error('Erro ao excluir agente:', error);
+      alert('Erro ao excluir agente. Verifique o console para mais detalhes.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const getAvatarUrl = () => {
+    if (agent.avatarUrl) {
+      return agent.avatarUrl;
+    }
+    return null;
+  };
+
+  const getModelName = () => {
+    if (agent.identity?.model) {
+      return agent.identity.model;
+    }
+    return 'Modelo não definido';
+  };
+
+  const getDescription = () => {
+    if (agent.identity?.description) {
+      return agent.identity.description;
+    }
+    return 'Nenhuma descrição fornecida.';
+  };
+
+  return (
+    <div className="agent-card">
+      <div className="agent-card-header">
+        {getAvatarUrl() ? (
+          <img src={getAvatarUrl()} alt={agent.id} className="agent-avatar" />
+        ) : (
+          <div className="agent-avatar-placeholder">
+            <FaRobot size={24} />
+          </div>
+        )}
+        <div className="agent-info">
+          <h3 className="agent-name">{agent.id}</h3>
+          <p className="agent-model">{getModelName()}</p>
+        </div>
+      </div>
+      
+      <div className="agent-card-body">
+        <div className="agent-meta">
+          <div className="agent-meta-item">
+            <FaCalendarAlt className="agent-meta-icon" />
+            <span>Criado em: {new Date(agent.createdAt || Date.now()).toLocaleDateString()}</span>
+          </div>
+          {agent.identity?.emoji && (
+            <div className="agent-meta-item">
+              <FaInfoCircle className="agent-meta-icon" />
+              <span>Emoji: {agent.identity.emoji}</span>
+            </div>
+          )}
+        </div>
+        
+        <p className="agent-description">{getDescription()}</p>
+      </div>
+      
+      <div className="agent-card-footer">
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={() => onEdit(agent)}
+          disabled={isDeleting}
+        >
+          <FaEdit size={12} />
+          Editar
+        </button>
+        <button
+          className="btn btn-danger btn-sm"
+          onClick={handleDelete}
+          disabled={isDeleting}
+        >
+          {isDeleting ? (
+            <FaSpinner size={12} className="loading-spinner" />
+          ) : (
+            <FaTrash size={12} />
+          )}
+          Excluir
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Modal de Criação de Agente
+interface CreateAgentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onCreate: (agentData: { name: string; workspace?: string }) => Promise<void>;
+}
+
+const CreateAgentModal: React.FC<CreateAgentModalProps> = ({ isOpen, onClose, onCreate }) => {
+  const [name, setName] = useState('');
+  const [workspace, setWorkspace] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!name.trim()) {
+      setError('O nome do agente é obrigatório');
+      return;
+    }
+    
+    setIsCreating(true);
+    setError('');
+    
+    try {
+      await onCreate({ 
+        name: name.trim(), 
+        workspace: workspace.trim() || undefined 
+      });
+      setName('');
+      setWorkspace('');
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Erro ao criar agente');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal">
+        <div className="modal-header">
+          <h2 className="modal-title">Criar Novo Agente</h2>
+          <button className="modal-close" onClick={onClose}>
+            <FaTimes size={16} />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="modal-body">
+            <div className="form-group">
+              <label className="form-label form-label-required">
+                Nome do Agente
+              </label>
+              <input
+                type="text"
+                className="form-input"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="ex: analista-junior, programador-senior"
+                required
+              />
+              <p className="form-help">
+                Identificador único para o agente (sem espaços, preferencialmente com hífens)
+              </p>
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label">
+                Workspace (Opcional)
+              </label>
+              <input
+                type="text"
+                className="form-input"
+                value={workspace}
+                onChange={(e) => setWorkspace(e.target.value)}
+                placeholder="ex: /caminho/para/workspace"
+              />
+              <p className="form-help">
+                Caminho absoluto para o workspace do agente. Deixe em branco para usar o padrão.
+              </p>
+            </div>
+            
+            {error && (
+              <div className="form-group">
+                <div className="form-error">
+                  <FaExclamationTriangle size={12} /> {error}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onClose}
+              disabled={isCreating}
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isCreating || !name.trim()}
+            >
+              {isCreating ? (
+                <>
+                  <FaSpinner className="loading-spinner" size={14} />
+                  Criando...
+                </>
+              ) : (
+                <>
+                  <FaPlus size={14} />
+                  Criar Agente
+                </>
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Modal de Edição de Agente
+interface EditAgentModalProps {
+  isOpen: boolean;
+  agent: Agent | null;
+  onClose: () => void;
+  onUpdate: (agentId: string, identityData: any) => Promise<void>;
+}
+
+const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose, onUpdate }) => {
+  const [activeTab, setActiveTab] = useState<'identity' | 'files' | 'avatar'>('identity');
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
+  // Campos de identidade
+  const [emoji, setEmoji] = useState('');
+  const [model, setModel] = useState('');
+  const [description, setDescription] = useState('');
+  const [vibe, setVibe] = useState('');
+  
+  // Campos de arquivos
+  const [identityContent, setIdentityContent] = useState('');
+  const [soulContent, setSoulContent] = useState('');
+  
+  // Campos de avatar
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (agent) {
+      // Preencher campos de identidade
+      setEmoji(agent.identity?.emoji || '');
+      setModel(agent.identity?.model || '');
+      setDescription(agent.identity?.description || '');
+      setVibe(agent.identity?.vibe || '');
+      
+      // Preencher avatar preview
+      if (agent.avatarUrl) {
+        setAvatarPreview(agent.avatarUrl);
+      }
+      
+      // Carregar arquivos
+      loadAgentFiles();
+    }
+  }, [agent]);
+
+  const loadAgentFiles = async () => {
+    if (!agent) return;
+    
+    try {
+      // Carregar IDENTITY.md
+      const identityResponse = await api.getAgentFile(agent.id, 'IDENTITY.md');
+      if (identityResponse.data) {
+        setIdentityContent(identityResponse.data);
+      }
+      
+      // Carregar SOUL.md
+      const soulResponse = await api.getAgentFile(agent.id, 'SOUL.md');
+      if (soulResponse.data) {
+        setSoulContent(soulResponse.data);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar arquivos do agente:', error);
+    }
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveIdentity = async () => {
+    if (!agent) return;
+    
+    setIsSaving(true);
+    setError('');
+    setSuccess('');
+    
+    try {
+      const identityData = {
+        emoji: emoji.trim(),
+        model: model.trim(),
+        description: description.trim(),
+        vibe: vibe.trim()
+      };
+      
+      await onUpdate(agent.id, identityData);
+      setSuccess('Identidade atualizada com sucesso!');
+      
+      // Salvar arquivos se necessário
+      if (identityContent.trim()) {
+        await api.updateAgentFile(agent.id, 'IDENTITY.md', identityContent);
+      }
+      
+      if (soulContent.trim()) {
+        await api.updateAgentFile(agent.id, 'SOUL.md', soulContent);
+      }
+      
+      // Fechar modal após 2 segundos
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } catch (err: any) {
+      setError(err.message || 'Erro ao atualizar agente');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  if (!isOpen || !agent) return null;
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal" style={{ maxWidth: '700px' }}>
+        <div className="modal-header">
+          <h2 className="modal-title">Editar Agente: {agent.id}</h2>
+          <button className="modal-close" onClick={onClose}>
+            <FaTimes size={16} />
+          </button>
+        </div>
+        
+        <div className="modal-body">
+          {/* Tabs */}
+          <div className="tabs">
+            <button
+              className={`tab ${activeTab === 'identity' ? 'active' : ''}`}
+              onClick={() => setActiveTab('identity')}
+            >
+              <FaUserCircle size={14} /> Identidade
+            </button>
+            <button
+              className={`tab ${activeTab === 'files' ? 'active' : ''}`}
+              onClick={() => setActiveTab('files')}
+            >
+              <FaCode size={14} /> Arquivos
+            </button>
+            <button
+              className={`tab ${activeTab === 'avatar' ? 'active' : ''}`}
+              onClick={() => setActiveTab('avatar')}
+            >
+              <FaUpload size={14} /> Avatar
+            </button>
+          </div>
+          
+          {/* Tab: Identidade */}
+          <div className={`tab-content ${activeTab === 'identity' ? 'active' : ''}`}>
+            <div className="form-group">
+              <label className="form-label">Emoji</label>
+              <input
+                type="text"
+                className="form-input"
+                value={emoji}
+                onChange={(e) => setEmoji(e.target.value)}
+                placeholder="ex: 🤖, 👨‍💻, 👩‍💼"
+              />
+              <p className="form-help">Emoji que representa o agente</p>
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label">Modelo</label>
+              <input
+                type="text"
+                className="form-input"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                placeholder="ex: gpt-4, claude-3, gemini-pro"
+              />
+              <p className="form-help">Modelo de IA que o agente utiliza</p>
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label">Descrição</label>
+              <textarea
+                className="form-textarea"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Descreva o propósito e especialidade do agente..."
+                rows={3}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label">Vibe</label>
+              <input
+                type="text"
+                className="form-input"
+                value={vibe}
+                onChange={(e) => setVibe(e.target.value)}
+                placeholder="ex: Profissional, Criativo, Técnico, Amigável"
+              />
+              <p className="form-help">Tom e personalidade do agente</p>
+            </div>
+          </div>
+          
+          {/* Tab: Arquivos */}
+          <div className={`tab-content ${activeTab === 'files' ? 'active' : ''}`}>
+            <div className="form-group">
+              <label className="form-label">IDENTITY.md</label>
+              <textarea
+                className="form-textarea"
+                value={identityContent}
+                onChange={(e) => setIdentityContent(e.target.value)}
+                placeholder="# IDENTITY.md - Quem sou eu?"
+                rows={8}
+              />
+              <p className="form-help">Arquivo de identidade do agente (Markdown)</p>
+            </div>
+            
+            <div className="form-group">
+              <label className="form-label">SOUL.md</label>
+              <textarea
+                className="form-textarea"
+                value={soulContent}
+                onChange={(e) => setSoulContent(e.target.value)}
+                placeholder="# SOUL.md - Minha personalidade"
+                rows={8}
+              />
+              <p className="form-help">Arquivo de personalidade do agente (Markdown)</p>
+            </div>
+          </div>
+          
+          {/* Tab: Avatar */}
+          <div className={`tab-content ${activeTab === 'avatar' ? 'active' : ''}`}>
+            <div className="avatar-upload">
+              <div className="avatar-preview">
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar preview" className="avatar-preview" />
+                ) : (
+                  <div className="avatar-preview-placeholder">
+                    <FaRobot size={48} />
+                  </div>
+                )}
+              </div>
+              
+              <div className="form-group">
+                <label className="form-label">Upload de Avatar</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="form-input"
+                />
+                <p className="form-help">
+                  Envie uma imagem para o avatar do agente (JPG, PNG, GIF)
+                </p>

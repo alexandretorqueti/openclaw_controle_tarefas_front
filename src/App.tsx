@@ -14,6 +14,7 @@ import LogJarbas from './components/LogJarbas';
 import LogErros from './components/LogErros';
 import AgentManager from './components/AgentManager';
 import UserProfileEdit from './components/UserProfileEdit';
+import StageManager from './components/StageManager';
 import MainLayout from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
@@ -81,7 +82,7 @@ class ErrorBoundary extends Component<
   }
 }
 
-type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs' | 'agents' | 'recurrence';
+type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs' | 'agents' | 'recurrence' | 'stages';
 
 // Main app content that requires authentication
 const AppContent: React.FC = () => {
@@ -424,6 +425,11 @@ const AppContent: React.FC = () => {
       case 'agents':
         return (
           <AgentManager />
+        );
+
+      case 'stages':
+        return (
+          <StageManager />
         );
 
       case 'projects':
