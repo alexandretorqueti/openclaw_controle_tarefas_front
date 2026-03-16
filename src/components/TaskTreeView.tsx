@@ -6,6 +6,7 @@ import {
   FaClock, FaUser, FaTag, FaLink
 } from 'react-icons/fa';
 import api from '../services/api';
+import TaskCard from './TaskCard';
 
 interface Task {
   id: string;
@@ -55,9 +56,30 @@ interface TaskTreeViewProps {
   onBack?: () => void;
   onTaskSelect?: (task: Task) => void;
   onDeleteTask?: (id: string) => Promise<void>;
+  // Props for TaskCard functionality
+  users?: any[];
+  statuses?: any[];
+  priorities?: any[];
+  projects?: any[];
+  agents?: any[];
+  onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<any>;
+  onToggleCompletion?: (id: string) => Promise<void>;
 }
 
-const TaskTreeView: React.FC<TaskTreeViewProps> = ({ taskId, onBack, onTaskSelect, onDeleteTask }) => {
+const TaskTreeView: React.FC<TaskTreeViewProps> = ({ 
+  taskId, 
+  onBack, 
+  onTaskSelect, 
+  onDeleteTask,
+  // TaskCard props
+  users = [],
+  statuses = [],
+  priorities = [],
+  projects = [],
+  agents = [],
+  onUpdateTask,
+  onToggleCompletion
+}) => {
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [subtasks, setSubtasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -187,6 +209,14 @@ const TaskTreeView: React.FC<TaskTreeViewProps> = ({ taskId, onBack, onTaskSelec
     }
   };
 
+  // Wrapper function for TaskCard (expects only id)
+  const handleDeleteTaskForCard = async (taskId: string) => {
+    const taskToDelete = subtasks.find(t => t.id === taskId) || currentTask;
+    if (taskToDelete) {
+      await handleDeleteTask(taskId, taskToDelete.title);
+    }
+  };
+
   // Renderizar breadcrumb de navegação
   const renderBreadcrumb = () => {
     return (
@@ -258,31 +288,41 @@ const TaskTreeView: React.FC<TaskTreeViewProps> = ({ taskId, onBack, onTaskSelec
   };
 
   // Renderizar uma tarefa na árvore
-  const renderTaskNode = (task: Task, level: number = 0) => {
+    const renderTaskNode = (task: Task, level: number = 0) => {
     const hasSubtasks = task._count?.subtasks > 0;
     const isExpanded = expandedTasks.has(task.id);
     
+    // Prepare task data for TaskCard
+    const taskForCard = {
+      ...task,
+      // Ensure all required fields for TaskCard
+      statusId: task.status?.id || '',
+      priorityId: task.priority?.id || '',
+      assignedToId: task.assignedTo?.id || '',
+      createdById: task.createdBy?.id || '',
+      projectId: task.project?.id || ''
+    };
+    
     return (
-      <div key={task.id}>
-        {/* Linha da tarefa */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '12px 16px',
-          marginLeft: `${level * 24}px`,
-          backgroundColor: 'var(--bg-card)',
-          border: '1px solid var(--border-color)',
-          borderRadius: '8px',
-          marginBottom: '8px',
-          transition: 'all 0.2s',
-          cursor: 'pointer',
-          ':hover': {
-            backgroundColor: 'var(--bg-hover)',
-            borderColor: 'var(--primary-color)',
-            transform: 'translateX(4px)'
-          }
+      <div key={task.id} style={{ marginBottom: '12px' }}>
+        {/* Container principal com TaskCard */}
+        <div style={{ 
+          marginLeft: `${level * 32}px`,
+          position: 'relative'
         }}>
-          {/* Ícone de expansão */}
+          {/* Linha de conexão (opcional) */}
+          {level > 0 && (
+            <div style={{
+              position: 'absolute',
+              left: '-16px',
+              top: '0',
+              bottom: '0',
+              width: '2px',
+              backgroundColor: 'var(--border-color)'
+            }} />
+          )}
+          
+          {/* Ícone de expansão para tarefas com subtarefas */}
           {hasSubtasks && (
             <button
               onClick={(e) => {
@@ -290,199 +330,109 @@ const TaskTreeView: React.FC<TaskTreeViewProps> = ({ taskId, onBack, onTaskSelec
                 toggleExpand(task.id);
               }}
               style={{
+                position: 'absolute',
+                left: '-28px',
+                top: '24px',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
                 padding: '4px',
-                marginRight: '8px',
-                color: 'var(--text-secondary)'
+                color: 'var(--text-secondary)',
+                zIndex: 1
               }}
+              title={isExpanded ? "Recolher subtarefas" : "Expandir subtarefas"}
             >
-              {isExpanded ? <FaChevronDown size={12} /> : <FaChevronRight size={12} />}
+              {isExpanded ? <FaChevronDown size={14} /> : <FaChevronRight size={14} />}
             </button>
           )}
           
-          {/* Ícone da tarefa */}
-          <div style={{ marginRight: '12px' }}>
-            {hasSubtasks ? (
-              isExpanded ? <FaFolderOpen size={18} color="#f59e0b" /> : <FaFolder size={18} color="#f59e0b" />
-            ) : (
-              <FaTasks size={18} color={task.isCompleted ? '#10b981' : '#6b7280'} />
-            )}
+          {/* TaskCard com todas as informações e funcionalidades */}
+          <div 
+            onClick={() => onTaskSelect && onTaskSelect(task)}
+            style={{ cursor: 'pointer' }}
+          >
+            <TaskCard
+              task={taskForCard}
+              users={users}
+              statuses={statuses}
+              priorities={priorities}
+              projects={projects}
+              agents={agents}
+              onTaskClick={onTaskSelect}
+              onViewSubtasks={hasSubtasks ? () => toggleExpand(task.id) : undefined}
+              onUpdateTask={onUpdateTask}
+              onDeleteTask={handleDeleteTaskForCard}
+              onToggleCompletion={onToggleCompletion}
+              compact={false}
+            />
           </div>
           
-          {/* Informações da tarefa */}
-          <div style={{ flex: 1 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-              <h4 style={{ 
-                margin: 0, 
-                fontSize: '16px',
-                fontWeight: '600',
-                color: 'var(--text-primary)'
-              }}>
-                {task.title}
-              </h4>
-              
-              {/* Badges */}
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {/* Domínio */}
-                {task.domain && (
-                  <span style={{
-                    padding: '2px 8px',
-                    backgroundColor: task.domain === 'BACKEND' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(236, 72, 153, 0.1)',
-                    color: task.domain === 'BACKEND' ? '#3b82f6' : '#ec4899',
-                    borderRadius: '4px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}>
-                    {task.domain === 'BACKEND' ? <FaDatabase size={10} /> : <FaGlobe size={10} />}
-                    {task.domain}
-                  </span>
-                )}
-                
-                {/* Atômica */}
-                {task.isAtomic && (
-                  <span style={{
-                    padding: '2px 8px',
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    color: '#10b981',
-                    borderRadius: '4px',
-                    fontSize: '11px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}>
-                    <FaCheckCircle size={10} />
-                    Validada
-                  </span>
-                )}
-                
-                {/* Status */}
-                <span style={{
-                  padding: '2px 8px',
-                  backgroundColor: task.status.color + '20',
-                  color: task.status.color,
-                  borderRadius: '4px',
-                  fontSize: '11px',
-                  fontWeight: '600'
-                }}>
-                  {task.status.name}
-                </span>
-              </div>
-            </div>
-            
-            <div style={{ 
-              display: 'flex', 
-              gap: '16px', 
-              fontSize: '12px',
-              color: 'var(--text-secondary)'
-            }}>
-              {task.assignedTo && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <FaUser size={10} />
-                  {task.assignedTo.name}
-                </span>
-              )}
-              
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <FaClock size={10} />
-                Prazo: {new Date(task.deadline).toLocaleDateString('pt-BR')}
-              </span>
-              
-              {hasSubtasks && (
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <FaTasks size={10} />
-                  {task._count?.subtasks} subtarefa(s)
-                </span>
-              )}
-            </div>
-          </div>
-          
-          {/* Ações */}
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigateToTask(task);
-              }}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: 'transparent',
-                border: '1px solid var(--border-color)',
+          {/* Badges adicionais específicos para hierarquia */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '8px', 
+            marginTop: '8px',
+            marginLeft: '16px'
+          }}>
+            {/* Domínio */}
+            {task.domain && (
+              <span style={{
+                padding: '4px 10px',
+                backgroundColor: task.domain === 'BACKEND' ? 'rgba(59, 130, 246, 0.1)' : 'rgba(236, 72, 153, 0.1)',
+                color: task.domain === 'BACKEND' ? '#3b82f6' : '#ec4899',
                 borderRadius: '6px',
-                cursor: 'pointer',
-                color: 'var(--text-secondary)',
-                fontSize: '12px',
+                fontSize: '11px',
+                fontWeight: '600',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px'
-              }}
-              title="Ver detalhes"
-            >
-              <FaEye size={12} />
-              Ver
-            </button>
-            
-            {/* Botão Excluir */}
-            {onDeleteTask && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDeleteTask(task.id, task.title);
-                }}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#ef4444',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  color: 'white',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                title="Excluir tarefa"
-              >
-                <FaTrash size={12} />
-                Excluir
-              </button>
+              }}>
+                {task.domain === 'BACKEND' ? <FaDatabase size={12} /> : <FaGlobe size={12} />}
+                {task.domain}
+              </span>
             )}
             
+            {/* Atômica */}
+            {task.isAtomic && (
+              <span style={{
+                padding: '4px 10px',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                color: '#10b981',
+                borderRadius: '6px',
+                fontSize: '11px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <FaCheckCircle size={12} />
+                Validada
+              </span>
+            )}
+            
+            {/* Contador de subtarefas */}
             {hasSubtasks && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleExpand(task.id);
-                }}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: 'var(--primary-color)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  color: 'white',
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-                title="Ver subtarefas"
-              >
+              <span style={{
+                padding: '4px 10px',
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                color: '#8b5cf6',
+                borderRadius: '6px',
+                fontSize: '11px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
                 <FaTasks size={12} />
-                Subtarefas
-              </button>
+                {task._count?.subtasks} subtarefa(s)
+              </span>
             )}
           </div>
         </div>
         
         {/* Subtarefas (renderizadas recursivamente) */}
         {isExpanded && hasSubtasks && (
-          <div style={{ marginLeft: `${(level + 1) * 24}px` }}>
+          <div style={{ marginTop: '16px' }}>
             {subtasks
               .filter(subtask => {
                 const matches = subtask.parentTask?.id === task.id || subtask.parentTaskId === task.id;

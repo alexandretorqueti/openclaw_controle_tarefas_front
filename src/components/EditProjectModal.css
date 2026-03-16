@@ -1,0 +1,410 @@
+/* Estilos específicos para o modal de edição de projetos */
+.edit-project-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Container principal do modal */
+.edit-project-modal {
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 800px;
+  max-height: 90vh; /* Mantém altura máxima de 90% da viewport */
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid var(--border-color);
+  overflow: hidden; /* Esconde overflow do container principal */
+}
+
+.edit-project-modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-header);
+  border-radius: 12px 12px 0 0;
+  flex-shrink: 0; /* Impede que o header encolha */
+}
+
+.edit-project-modal-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.edit-project-modal-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.edit-project-modal-close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Container rolável */
+.edit-project-modal-scrollable {
+  flex: 1;
+  overflow-y: auto; /* Habilita rolagem vertical */
+  max-height: calc(90vh - 140px); /* Altura máxima menos header e footer */
+  padding: 0 24px; /* Padding lateral consistente */
+}
+
+.edit-project-modal-body {
+  padding: 20px 0; /* Padding vertical apenas */
+}
+
+.edit-project-modal-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.edit-project-modal-section {
+  background: var(--bg-section);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid var(--border-light);
+}
+
+.edit-project-modal-section-title {
+  margin: 0 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.edit-project-modal-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.edit-project-modal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.edit-project-modal-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.edit-project-modal-label-required::after {
+  content: "*";
+  color: var(--danger-color);
+  margin-left: 4px;
+}
+
+.edit-project-modal-input,
+.edit-project-modal-textarea,
+.edit-project-modal-select {
+  padding: 10px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.edit-project-modal-input:focus,
+.edit-project-modal-textarea:focus,
+.edit-project-modal-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.edit-project-modal-textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.edit-project-modal-help {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.edit-project-modal-radio-group {
+  display: flex;
+  gap: 20px;
+  margin-top: 4px;
+}
+
+.edit-project-modal-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.edit-project-modal-radio-label input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.edit-project-modal-readonly {
+  background: var(--bg-disabled);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+}
+
+.edit-project-modal-metadata {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.edit-project-modal-metadata-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edit-project-modal-metadata-label {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.edit-project-modal-metadata-value {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Ajustar footer para ficar fixo na parte inferior */
+.edit-project-modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-header);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-radius: 0 0 12px 12px;
+  flex-shrink: 0; /* Impede que o footer encolha */
+}
+
+.edit-project-modal-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.edit-project-modal-btn-primary {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.edit-project-modal-btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.edit-project-modal-btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.edit-project-modal-btn-secondary:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.edit-project-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.edit-project-modal-error {
+  background: var(--danger-bg);
+  color: var(--danger-color);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  border: 1px solid var(--danger-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-project-modal-success {
+  background: var(--success-bg);
+  color: var(--success-color);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  margin-top: 12px;
+  border: 1px solid var(--success-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Estilizar a barra de rolagem */
+.edit-project-modal-scrollable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.edit-project-modal-scrollable::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.edit-project-modal-scrollable::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.edit-project-modal-scrollable::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+/* Para Firefox */
+.edit-project-modal-scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--bg-secondary);
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media query para telas muito pequenas */
+@media (max-height: 600px) {
+  .edit-project-modal {
+    max-height: 95vh; /* Aumenta um pouco para telas muito pequenas */
+  }
+  
+  .edit-project-modal-scrollable {
+    max-height: calc(95vh - 140px);
+  }
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 768px) {
+  .edit-project-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .edit-project-modal-scrollable {
+    max-height: calc(95vh - 140px);
+    padding: 0 16px; /* Reduz padding lateral em telas pequenas */
+  }
+  
+  .edit-project-modal-body {
+    padding: 16px 0;
+  }
+  
+  .edit-project-modal-form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .edit-project-modal-metadata {
+    grid-template-columns: 1fr;
+  }
+  
+  .edit-project-modal-footer {
+    flex-direction: column;
+  }
+  
+  .edit-project-modal-btn {
+    width: 100%;
+  }
+}
+
+/* Ajustes para telas muito pequenas (mobile) */
+@media (max-width: 480px) {
+  .edit-project-modal {
+    width: 98%;
+    margin: 0 10px;
+  }
+  
+  .edit-project-modal-scrollable {
+    padding: 0 12px;
+  }
+  
+  .edit-project-modal-header {
+    padding: 16px 20px;
+  }
+  
+  .edit-project-modal-title {
+    font-size: 1.3rem;
+  }
+  
+  .edit-project-modal-section {
+    padding: 16px;
+  }
+  
+  .edit-project-modal-footer {
+    padding: 16px 20px;
+  }
+}

@@ -744,7 +744,7 @@ const TaskList: React.FC<TaskListProps> = ({
 
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
-                  Depende de (opcional)
+                  Tarefa Pai (opcional - define hierarquia)
                 </label>
                 <select
                   value={newTaskData.parentTaskId || ''}

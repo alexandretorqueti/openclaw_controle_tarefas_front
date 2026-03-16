@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fa';
 import api from '../services/api';
 import './ProjectsDashboard.css';
+import EditProjectModal from './EditProjectModal';
 
 // Interfaces
 interface Project {
@@ -72,12 +73,6 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   // Estados para formulários
-  const [editForm, setEditForm] = useState({
-    name: '',
-    description: '',
-    status: true
-  });
-
   const [createForm, setCreateForm] = useState({
     name: '',
     description: '',
@@ -163,11 +158,6 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
   // Handlers para ações de Projeto
   const handleEditProject = (project: Project) => {
     setSelectedProject(project);
-    setEditForm({
-      name: project.name,
-      description: project.description || '',
-      status: project.status
-    });
     setEditModalOpen(true);
   };
 
@@ -177,16 +167,14 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
   };
 
   // Funções de API para Modais
-  const handleUpdateProject = async () => {
-    if (!selectedProject) return;
-
+  const handleUpdateProject = async (projectId: string, projectData: any) => {
     try {
-      await api.updateProject(selectedProject.id, editForm);
+      await api.updateProject(projectId, projectData);
       await loadProjects();
-      setEditModalOpen(false);
       alert('Projeto atualizado com sucesso!');
     } catch (err: any) {
       alert(`Erro ao atualizar projeto: ${err.message}`);
+      throw err;
     }
   };
 
@@ -754,121 +742,18 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
         </div>
       )}
 
-      {/* Modal de Edição */}
-      {editModalOpen && selectedProject && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '30px',
-            width: '90%',
-            maxWidth: '500px'
-          }}>
-            <h2 style={{ marginTop: 0 }}>Editar Projeto</h2>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                Nome do Projeto
-              </label>
-              <input
-                type="text"
-                value={editForm.name}
-                onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  fontSize: '16px'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                Descrição
-              </label>
-              <textarea
-                value={editForm.description}
-                onChange={(e) => setEditForm({...editForm, description: e.target.value})}
-                rows={4}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  resize: 'vertical'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '30px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                Status
-              </label>
-              <div style={{ display: 'flex', gap: '20px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="radio"
-                    checked={editForm.status}
-                    onChange={() => setEditForm({...editForm, status: true})}
-                  />
-                  Ativo
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="radio"
-                    checked={!editForm.status}
-                    onChange={() => setEditForm({...editForm, status: false})}
-                  />
-                  Inativo
-                </label>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <button
-                onClick={() => setEditModalOpen(false)}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#6b7280',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleUpdateProject}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                Salvar Alterações
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal de Edição - Novo Componente */}
+      <EditProjectModal
+        isOpen={editModalOpen}
+        project={selectedProject}
+        onClose={() => {
+          setEditModalOpen(false);
+          setSelectedProject(null);
+        }}
+        onUpdate={handleUpdateProject}
+        projectTypes={projectTypes}
+        currentUser={null} // Poderia passar o usuário atual se necessário
+      />
 
       {/* Modal de Criação */}
       {createModalOpen && (

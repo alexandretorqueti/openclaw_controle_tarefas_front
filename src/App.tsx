@@ -401,6 +401,14 @@ const AppContent: React.FC = () => {
             onBack={handleBackFromTree}
             onTaskSelect={handleTaskSelect}
             onDeleteTask={handleDeleteTask}
+            // TaskCard props
+            users={users}
+            statuses={statuses}
+            priorities={priorities}
+            projects={projects}
+            agents={agents}
+            onUpdateTask={handleUpdateTask}
+            onToggleCompletion={handleToggleTaskCompletion}
           />
         );
 

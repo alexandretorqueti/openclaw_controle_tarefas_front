@@ -49,6 +49,12 @@ interface TaskData {
   agent?: string | null;
 }
 
+interface DependencyData {
+  taskId: string;
+  dependentTaskId: string;
+  type?: string;
+}
+
 interface UpdateTaskData {
   title?: string;
   description?: string;
@@ -306,6 +312,19 @@ class ApiService {
 
   async deleteTask(id: string) {
     return this.request(`/tasks/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
+  async createDependency(data: DependencyData) {
+    return this.request('/api/dependencies', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteDependency(taskId: string, dependentTaskId: string) {
+    return this.request(`/api/dependencies/${taskId}/${dependentTaskId}`, {
       method: 'DELETE',
     });
   }

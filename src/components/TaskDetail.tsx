@@ -1,8 +1,8 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TaskDetail.css';
 import api from '../services/api';
-import { Task, User, Status, Priority, Project, Agent } from '../types';
+import { Task, User, Status, Priority, Project, Agent, TaskDependency } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
@@ -25,7 +25,11 @@ import {
   FaHistory,
   FaClock,
   FaArrowUp,
-  FaFileAlt} from 'react-icons/fa';
+  FaFileAlt,
+  FaLink,
+  FaPlusCircle,
+  FaMinusCircle
+} from 'react-icons/fa';
 import RecurrenceConfig from './RecurrenceConfig';
 import CommentsSection from './CommentsSection';
 import TaskHistorySection from './TaskHistorySection';
@@ -85,6 +89,11 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   // Back to top functionality
   const [showBackToTop, setShowBackToTop] = useState(false);
 
+  // Dependencies management
+  const [dependencies, setDependencies] = useState<Task[]>([]);
+  const [selectedDependencyId, setSelectedDependencyId] = useState<string>('');
+  const [isLoadingDependencies, setIsLoadingDependencies] = useState(false);
+
   // Handle scroll to show/hide back to top button
   React.useEffect(() => {
     const handleScroll = () => {
@@ -95,8 +104,98 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Load task dependencies
+  useEffect(() => {
+    const loadDependencies = async () => {
+      if (!task.id) return;
+      
+      setIsLoadingDependencies(true);
+      try {
+        // Fetch task with dependencies
+        const response = await api.getTask(task.id);
+        const taskData = response.task || response.data || response;
+        
+        if (taskData.dependencies && Array.isArray(taskData.dependencies)) {
+          // Extract dependent tasks from dependencies
+          const dependentTasks = taskData.dependencies.map((dep: any) => {
+            // Find the dependent task in the tasks list
+            const dependentTask = tasks.find(t => t.id === dep.dependentTaskId);
+            return dependentTask;
+          }).filter(Boolean); // Remove undefined values
+          
+          setDependencies(dependentTasks as Task[]);
+        }
+      } catch (error) {
+        console.error('Error loading dependencies:', error);
+      } finally {
+        setIsLoadingDependencies(false);
+      }
+    };
+
+    loadDependencies();
+  }, [task.id, tasks]);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Add a dependency
+  const addDependency = async () => {
+    if (!selectedDependencyId || !onUpdateTask) return;
+    
+    try {
+      // Create dependency data
+      const dependencyData = {
+        taskId: task.id,
+        dependentTaskId: selectedDependencyId,
+        type: 'BLOCKING'
+      };
+      
+      // Call API to add dependency
+      await api.createDependency(dependencyData);
+      
+      // Find the added task
+      const addedTask = tasks.find(t => t.id === selectedDependencyId);
+      if (addedTask) {
+        setDependencies(prev => [...prev, addedTask]);
+        setSelectedDependencyId('');
+      }
+    } catch (error) {
+      console.error('Error adding dependency:', error);
+      alert('Erro ao adicionar dependência. Verifique se a dependência já existe.');
+    }
+  };
+
+  // Remove a dependency
+  const removeDependency = async (dependencyId: string) => {
+    if (!onUpdateTask) return;
+    
+    try {
+      // Find the dependency to remove
+      const dependencyToRemove = dependencies.find(d => d.id === dependencyId);
+      if (!dependencyToRemove) return;
+      
+      // Call API to remove dependency
+      // First, we need to find the dependency record ID
+      // For now, we'll use a simplified approach
+      await api.deleteDependency(task.id, dependencyId);
+      
+      // Update local state
+      setDependencies(prev => prev.filter(d => d.id !== dependencyId));
+    } catch (error) {
+      console.error('Error removing dependency:', error);
+      alert('Erro ao remover dependência.');
+    }
+  };
+
+  // Get available tasks for dependencies (excluding current task and existing dependencies)
+  const getAvailableTasksForDependencies = () => {
+    const currentDependencyIds = new Set(dependencies.map(d => d.id));
+    return tasks.filter(t => 
+      t.id !== task.id && // Not the current task
+      !currentDependencyIds.has(t.id) && // Not already a dependency
+      t.projectId === task.projectId // Same project
+    );
   };
 
   // Load agents from API
@@ -173,11 +272,9 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
         updateData.agent = editedTask.agent;
       }
       
-      // Campo parentTaskId - precisa ser sempre enviado quando está definido
-      // porque o usuário pode estar alterando a dependência
-      if (editedTask.parentTaskId !== undefined) {
-        updateData.parentTaskId = editedTask.parentTaskId;
-      }
+      // Campo parentTaskId - NÃO editável após criação
+      // A hierarquia pai/filho é definida apenas na criação da tarefa
+      // Não incluímos no updateData para evitar alterações
       
       // Campos de recorrência - precisam ser sempre enviados quando estão definidos
       // porque o usuário pode estar ativando ou desativando a recorrência
@@ -526,23 +623,29 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             Status
           </h3>
           {isEditing ? (
-            <select
-              value={editedTask.statusId || ''}
-              onChange={(e) => setEditedTask({ ...editedTask, statusId: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                fontSize: '14px'
-              }}
-            >
-              {statuses.map(s => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            <div style={{
+              padding: '12px',
+              backgroundColor: 'var(--bg-disabled)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '8px',
+              color: 'var(--text-secondary)',
+              fontSize: '14px'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🔒</span>
+                <strong>Campo não editável</strong>
+              </div>
+              <p style={{ margin: 0, fontSize: '13px' }}>
+                A hierarquia pai/filho não pode ser alterada após a criação da tarefa.
+                {task.parentTaskId ? (
+                  <span>
+                    Esta tarefa é filha de: <strong>{task.parentTask?.title || 'Tarefa desconhecida'}</strong>
+                  </span>
+                ) : (
+                  <span>Esta é uma tarefa independente (sem pai).</span>
+                )}
+              </p>
+            </div>
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{
@@ -881,7 +984,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
           boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
         }}>
           <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
-            Depende de
+            Tarefa Pai (Hierarquia)
           </h3>
           {isEditing ? (
             <select
@@ -900,7 +1003,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 fontSize: '14px'
               }}
             >
-              <option value="">Nenhuma (tarefa independente)</option>
+              <option value="">Nenhuma (tarefa principal)</option>
               {tasks
                 .filter(t => !t.isCompleted && t.projectId === task.projectId && t.id !== task.id)
                 .map(t => (
@@ -928,9 +1031,212 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                   {task.parentTask?.title || 'Nenhuma'}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }}>
-                  {task.parentTaskId ? `ID: ${task.parentTaskId}` : 'Tarefa independente'}
+                  {task.parentTaskId ? 'ID: ' + task.parentTaskId : 'Tarefa independente'}
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Dependencies Card */}
+        <div style={{
+          backgroundColor: 'white',
+          padding: '20px',
+          borderRadius: '12px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+        }}>
+          <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#333', marginBottom: '16px' }}>
+            Depende de (Precedência)
+          </h3>
+          <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>
+            <strong>Nota:</strong> Estas são tarefas que devem ser concluídas antes desta tarefa poder ser executada.
+            Diferente da hierarquia pai/filho acima.
+          </div>
+          
+          {isEditing ? (
+            <div>
+              {/* List of current dependencies */}
+              <div style={{ marginBottom: '16px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+                  Dependências atuais ({dependencies.length})
+                </h4>
+                {isLoadingDependencies ? (
+                  <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                    Carregando dependências...
+                  </div>
+                ) : dependencies.length === 0 ? (
+                  <div style={{ 
+                    padding: '12px', 
+                    backgroundColor: 'var(--bg-disabled)', 
+                    borderRadius: '6px',
+                    color: 'var(--text-secondary)',
+                    textAlign: 'center'
+                  }}>
+                    Nenhuma dependência definida
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {dependencies.map(dep => (
+                      <div key={dep.id} style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '10px 12px',
+                        backgroundColor: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        borderRadius: '6px'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <FaLink size={14} color="var(--accent-color)" />
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: 500, color: '#333' }}>
+                              {dep.title}
+                            </div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>
+                              Status: {dep.isCompleted ? '✅ Concluída' : '⏳ Pendente'}
+                            </div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => removeDependency(dep.id)}
+                          style={{
+                            padding: '6px 10px',
+                            backgroundColor: '#ef4444',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '12px'
+                          }}
+                          title="Remover dependência"
+                        >
+                          <FaMinusCircle size={12} />
+                          Remover
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Add new dependency */}
+              <div>
+                <h4 style={{ fontSize: '14px', fontWeight: 600, color: '#333', marginBottom: '8px' }}>
+                  Adicionar nova dependência
+                </h4>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <select
+                    value={selectedDependencyId}
+                    onChange={(e) => setSelectedDependencyId(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '10px',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      backgroundColor: 'var(--bg-input)',
+                      color: 'var(--text-primary)'
+                    }}
+                  >
+                    <option value="">Selecione uma tarefa...</option>
+                    {getAvailableTasksForDependencies().map(task => (
+                      <option key={task.id} value={task.id}>
+                        {task.title} {task.isCompleted ? '(✅ Concluída)' : '(⏳ Pendente)'}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={addDependency}
+                    disabled={!selectedDependencyId}
+                    style={{
+                      padding: '10px 16px',
+                      backgroundColor: selectedDependencyId ? 'var(--primary-color)' : 'var(--bg-disabled)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: selectedDependencyId ? 'pointer' : 'not-allowed',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '14px',
+                      fontWeight: 500
+                    }}
+                    title={selectedDependencyId ? "Adicionar dependência" : "Selecione uma tarefa"}
+                  >
+                    <FaPlusCircle size={14} />
+                    Adicionar
+                  </button>
+                </div>
+                {getAvailableTasksForDependencies().length === 0 && (
+                  <div style={{ 
+                    marginTop: '8px', 
+                    padding: '8px', 
+                    backgroundColor: 'var(--bg-disabled)', 
+                    borderRadius: '4px',
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)'
+                  }}>
+                    Não há tarefas disponíveis para adicionar como dependência.
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div>
+              {isLoadingDependencies ? (
+                <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                  Carregando dependências...
+                </div>
+              ) : dependencies.length === 0 ? (
+                <div style={{ 
+                  padding: '12px', 
+                  backgroundColor: 'var(--bg-disabled)', 
+                  borderRadius: '6px',
+                  color: 'var(--text-secondary)',
+                  textAlign: 'center'
+                }}>
+                  Esta tarefa não depende de nenhuma outra tarefa.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {dependencies.map(dep => (
+                    <div key={dep.id} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px',
+                      backgroundColor: 'var(--bg-card)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '8px'
+                    }}>
+                      <div style={{ 
+                        width: '36px', 
+                        height: '36px', 
+                        borderRadius: '50%', 
+                        backgroundColor: dep.isCompleted ? 'var(--success-color)' : 'var(--warning-color)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white',
+                        fontSize: '14px'
+                      }}>
+                        {dep.isCompleted ? '✓' : '!'}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '15px', fontWeight: 500, color: '#333' }}>
+                          {dep.title}
+                        </div>
+                        <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                          {dep.isCompleted ? '✅ Concluída - pode executar' : '⏳ Pendente - bloqueia execução'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
