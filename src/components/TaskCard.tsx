@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle } from 'react-icons/fa';
+import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle, FaTasks } from 'react-icons/fa';
 import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
 
 interface TaskCardProps {
@@ -14,6 +14,7 @@ interface TaskCardProps {
   agents?: Agent[];
   projects: Project[];
   onTaskClick: (task: Task) => void;
+  onViewSubtasks?: (task: Task) => void;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
   onDeleteTask?: (id: string) => Promise<void>;
   onToggleCompletion?: (id: string) => Promise<void>;
@@ -28,6 +29,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   agents = [] as Agent[], 
   projects,
   onTaskClick,
+  onViewSubtasks,
   onUpdateTask,
   onDeleteTask,
   onToggleCompletion,
@@ -753,6 +755,35 @@ if (compact) {
             >
               <FaCheck size={12} />
               {task.isCompleted ? 'Reabrir' : 'Concluir'}
+            </button>
+          )}
+          
+          {/* Botão Ver Subtarefas */}
+          {onViewSubtasks && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewSubtasks(task);
+              }}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: '#8b5cf6',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '12px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
+              title="Ver subtarefas desta tarefa"
+            >
+              <FaTasks size={12} />
+              Subtarefas
             </button>
           )}
           

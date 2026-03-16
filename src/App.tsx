@@ -15,6 +15,7 @@ import LogErros from './components/LogErros';
 import AgentManager from './components/AgentManager';
 import UserProfileEdit from './components/UserProfileEdit';
 import StageManager from './components/StageManager';
+import TaskTreeView from './components/TaskTreeView';
 import MainLayout from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
@@ -82,7 +83,7 @@ class ErrorBoundary extends Component<
   }
 }
 
-type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs' | 'agents' | 'recurrence' | 'stages';
+type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs' | 'agents' | 'recurrence' | 'stages' | 'task-tree';
 
 // Main app content that requires authentication
 const AppContent: React.FC = () => {
@@ -177,6 +178,11 @@ const AppContent: React.FC = () => {
     setViewMode('task-detail');
   };
 
+  const handleViewSubtasks = (task: Task) => {
+    setSelectedTask(task);
+    setViewMode('task-tree');
+  };
+
   const handleProjectSelect = (project: Project) => {
     setSelectedProject(project);
     setViewMode('tasks');
@@ -186,6 +192,10 @@ const AppContent: React.FC = () => {
   const handleBackToList = () => {
     setSelectedTask(null);
     setViewMode('tasks');
+  };
+
+  const handleBackFromTree = () => {
+    setViewMode('task-detail');
   };
 
   const handleBackToProjects = () => {
@@ -384,6 +394,16 @@ const AppContent: React.FC = () => {
           />
         );
 
+      case 'task-tree':
+        return (
+          <TaskTreeView
+            taskId={selectedTask!.id}
+            onBack={handleBackFromTree}
+            onTaskSelect={handleTaskSelect}
+            onDeleteTask={handleDeleteTask}
+          />
+        );
+
       case 'tasks':
         return (
           <TaskList
@@ -395,6 +415,7 @@ const AppContent: React.FC = () => {
             agents={agents}
             selectedProject={selectedProject}
             onTaskSelect={handleTaskSelect}
+            onViewSubtasks={handleViewSubtasks}
             onBackToProjects={handleBackToProjects}
             onCreateTask={handleCreateTask}
             onUpdateTask={handleUpdateTask}

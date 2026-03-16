@@ -17,6 +17,7 @@ interface TaskListProps {
   agents?: Agent[];
   selectedProject: Project | null;
   onTaskSelect: (task: Task) => void;
+  onViewSubtasks?: (task: Task) => void;
   onBackToProjects?: () => void;
   onCreateTask?: (taskData: Partial<Task>) => Promise<Task>;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
@@ -35,6 +36,7 @@ const TaskList: React.FC<TaskListProps> = ({
   agents = [] as Agent[],
   selectedProject,
   onTaskSelect,
+  onViewSubtasks,
   onBackToProjects,
   onCreateTask,
   onUpdateTask,
@@ -928,6 +930,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 priorities={priorities}
                 projects={projects}
                 onTaskClick={onTaskSelect}
+                onViewSubtasks={onViewSubtasks}
                 onUpdateTask={onUpdateTask}
                 onDeleteTask={onDeleteTask}
                 onToggleCompletion={onToggleCompletion}
