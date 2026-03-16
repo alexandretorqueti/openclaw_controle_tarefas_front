@@ -282,6 +282,8 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [bindingError, setBindingError] = useState('');
+  const [models, setModels] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
 
   useEffect(() => {
     if (agent) {
@@ -296,6 +298,25 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
       setBindings(agent.bindingsList || []);
     }
   }, [agent]);
+
+  useEffect(() => {
+    const loadModels = async () => {
+      setLoadingModels(true);
+      try {
+        const response = await apiService.request('/models');
+        setModels(response.models || []);
+      } catch (error) {
+        console.error('Erro ao carregar modelos:', error);
+        setModels([]);
+      } finally {
+        setLoadingModels(false);
+      }
+    };
+
+    if (isOpen) {
+      loadModels();
+    }
+  }, [isOpen]);
 
   const handleAddBinding = () => {
     if (!newBinding.trim()) {
@@ -449,14 +470,19 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
                   <label className="form-label">
                     Modelo
                   </label>
-                  <input
-                    type="text"
+                  <select
                     className="form-input"
                     value={identity.model}
                     onChange={(e) => setIdentity({...identity, model: e.target.value})}
-                    placeholder="Ex: gpt-4-turbo"
-                    disabled={loading}
-                  />
+                    disabled={loading || loadingModels}
+                  >
+                    <option value="">{loadingModels ? 'Carregando modelos...' : 'Selecione um modelo...'}</option>
+                    {models.map((modelName, index) => (
+                      <option key={index} value={modelName}>
+                        {modelName}
+                      </option>
+                    ))}
+                  </select>
                   <div className="form-help">
                     Modelo de IA que o agente usa (opcional)
                   </div>

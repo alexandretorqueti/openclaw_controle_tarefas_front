@@ -162,7 +162,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       }
     } catch (error) {
       console.error('Error adding dependency:', error);
-      alert('Erro ao adicionar dependência. Verifique se a dependência já existe.');
+      setError('Erro ao adicionar dependência. Verifique se a dependência já existe.');
     }
   };
 
@@ -184,7 +184,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       setDependencies(prev => prev.filter(d => d.id !== dependencyId));
     } catch (error) {
       console.error('Error removing dependency:', error);
-      alert('Erro ao remover dependência.');
+      setError('Erro ao remover dependência.');
     }
   };
 

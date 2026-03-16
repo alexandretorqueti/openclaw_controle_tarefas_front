@@ -27,6 +27,8 @@ interface Project {
   pastaBase?: string;
   agent?: string;
   programadorContratado?: string;
+  programadorFront?: string;
+  programadorBack?: string;
   frontendBuildCmd?: string;
   backendBuildCmd?: string;
   modeloAuxiliar?: string;
@@ -171,9 +173,8 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
     try {
       await api.updateProject(projectId, projectData);
       await loadProjects();
-      alert('Projeto atualizado com sucesso!');
     } catch (err: any) {
-      alert(`Erro ao atualizar projeto: ${err.message}`);
+      console.error(`Erro ao atualizar projeto: ${err.message}`);
       throw err;
     }
   };
@@ -184,9 +185,8 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
       await loadProjects();
       setCreateModalOpen(false);
       setCreateForm({ name: '', description: '', status: true, projectTypeId: '' });
-      alert('Projeto criado com sucesso!');
     } catch (err: any) {
-      alert(`Erro ao criar projeto: ${err.message}`);
+      console.error(`Erro ao criar projeto: ${err.message}`);
     }
   };
 
@@ -197,9 +197,8 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
       await api.deleteProject(selectedProject.id);
       await loadProjects();
       setDeleteConfirmOpen(false);
-      alert('Projeto excluído com sucesso!');
     } catch (err: any) {
-      alert(`Erro ao excluir projeto: ${err.message}`);
+      console.error(`Erro ao excluir projeto: ${err.message}`);
     }
   };
 
@@ -600,7 +599,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
                       fontWeight: '600',
                       textTransform: 'uppercase'
                     }}>
-                      {project.status ? 'Ativo' : 'Inativo'}
+                      {project.status ? 'Ativo para IA' : 'Pausado para IA'}
                     </span>
                   </div>
                 </div>
@@ -682,11 +681,11 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
                       e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.3)';
                     }}
                     onClick={() => {
-                      if (window.confirm(`Tem certeza que deseja excluir o projeto "${project.name}"?`)) {
-                        setProjects(prev => prev.filter(p => p.id !== project.id));
+                      if (window.confirm(`Tem certeza que deseja desativar o projeto "${project.name}"? Ele não aparecerá mais no dashboard.`)) {
+                        handleUpdateProject(project.id, { ativo: false });
                       }
                     }}
-                    title="Excluir"
+                    title="Desativar Projeto"
                   >
                     <FaTrash size={14} />
                   </button>

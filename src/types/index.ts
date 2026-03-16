@@ -38,10 +38,11 @@ export interface Project {
   repositoryUrl?: string;
   pastaBase?: string; // Campo pasta base (não obrigatório)
   agent?: string; // Agente padrão para tarefas do projeto
-  programadorContratado?: string; // Programador contratado para o projeto
   modeloAuxiliar?: string; // Modelo auxiliar para o projeto
   frontendBuildCmd?: string; // Comando de build do frontend
   backendBuildCmd?: string; // Comando de build do backend
+  programadorFront?: string; // Agente programador frontend
+  programadorBack?: string; // Agente programador backend
 }
 
 export interface ProjectType {

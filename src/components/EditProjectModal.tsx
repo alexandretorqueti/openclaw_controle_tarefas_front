@@ -57,7 +57,8 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   
   // Agentes e modelos
   const [agent, setAgent] = useState('');
-  const [programadorContratado, setProgramadorContratado] = useState('');
+  const [programadorFront, setProgramadorFront] = useState('');
+  const [programadorBack, setProgramadorBack] = useState('');
   const [modeloAuxiliar, setModeloAuxiliar] = useState('');
   
   // Comandos de build
@@ -70,6 +71,8 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const [success, setSuccess] = useState('');
   const [agents, setAgents] = useState<any[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(false);
+  const [models, setModels] = useState<string[]>([]);
+  const [loadingModels, setLoadingModels] = useState(false);
   
   // Inicializar formulário com dados do projeto
   useEffect(() => {
@@ -91,7 +94,8 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
       
       // Agentes e modelos
       setAgent(project.agent || '');
-      setProgramadorContratado(project.programadorContratado || '');
+      setProgramadorFront(project.programadorFront || '');
+      setProgramadorBack(project.programadorBack || '');
       setModeloAuxiliar(project.modeloAuxiliar || '');
       
       // Comandos de build
@@ -100,12 +104,12 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     }
   }, [project]);
 
-  // Carregar lista de agentes quando o modal abrir
+  // Carregar lista de agentes e modelos quando o modal abrir
   useEffect(() => {
     const loadAgents = async () => {
       setLoadingAgents(true);
       try {
-        const response = await api.get('/agents');
+        const response = await api.getAgents();
         setAgents(response.data || []);
       } catch (error) {
         console.error('Erro ao carregar agentes:', error);
@@ -115,8 +119,22 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
       }
     };
 
+    const loadModels = async () => {
+      setLoadingModels(true);
+      try {
+        const response = await api.request('/models');
+        setModels(response.models || []);
+      } catch (error) {
+        console.error('Erro ao carregar modelos:', error);
+        setModels([]);
+      } finally {
+        setLoadingModels(false);
+      }
+    };
+
     if (isOpen) {
       loadAgents();
+      loadModels();
     }
   }, [isOpen]);
 
@@ -149,7 +167,8 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         repositoryUrl: repositoryUrl.trim() || null,
         pastaBase: pastaBase.trim() || null,
         agent: agent || null,
-        programadorContratado: programadorContratado || null,
+        programadorFront: programadorFront || null,
+        programadorBack: programadorBack || null,
         modeloAuxiliar: modeloAuxiliar || null,
         frontendBuildCmd: frontendBuildCmd.trim() || null,
         backendBuildCmd: backendBuildCmd.trim() || null
@@ -271,51 +290,18 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     </div>
                     
                     <div className="edit-project-modal-form-group">
-                      <label className="edit-project-modal-label">
-                        Status do Projeto
+                      <label className="edit-project-modal-label" style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <input
+                          type="checkbox"
+                          checked={status}
+                          onChange={(e) => setStatus(e.target.checked)}
+                          style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                        />
+                        <span>Projeto Ativo para IA</span>
                       </label>
-                      <div className="edit-project-modal-radio-group">
-                        <label className="edit-project-modal-radio-label">
-                          <input
-                            type="radio"
-                            checked={status}
-                            onChange={() => setStatus(true)}
-                          />
-                          <span>Ativo</span>
-                        </label>
-                        <label className="edit-project-modal-radio-label">
-                          <input
-                            type="radio"
-                            checked={!status}
-                            onChange={() => setStatus(false)}
-                          />
-                          <span>Inativo</span>
-                        </label>
-                      </div>
-                    </div>
-                    
-                    <div className="edit-project-modal-form-group">
-                      <label className="edit-project-modal-label">
-                        Ativo no Sistema
-                      </label>
-                      <div className="edit-project-modal-radio-group">
-                        <label className="edit-project-modal-radio-label">
-                          <input
-                            type="radio"
-                            checked={ativo}
-                            onChange={() => setAtivo(true)}
-                          />
-                          <span>Sim</span>
-                        </label>
-                        <label className="edit-project-modal-radio-label">
-                          <input
-                            type="radio"
-                            checked={!ativo}
-                            onChange={() => setAtivo(false)}
-                          />
-                          <span>Não</span>
-                        </label>
-                      </div>
+                      <p className="edit-project-modal-help" style={{ marginLeft: '28px' }}>
+                        Se marcado, o monitor Jarbas processará as tarefas deste projeto.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -438,7 +424,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   <div className="edit-project-modal-form-grid">
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
-                        Agente Contratado
+                        Analista Contratado
                       </label>
                       <select
                         className="edit-project-modal-select"
@@ -446,7 +432,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         onChange={(e) => setAgent(e.target.value)}
                         disabled={loadingAgents}
                       >
-                        <option value="">{loadingAgents ? 'Carregando agentes...' : 'Selecione um agente...'}</option>
+                        <option value="">{loadingAgents ? 'Carregando agentes...' : 'Selecione um analista...'}</option>
                         {agents.map(agentItem => (
                           <option key={agentItem.id} value={agentItem.id}>
                             {agentItem.identity?.name || agentItem.id}
@@ -454,21 +440,21 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         ))}
                       </select>
                       <p className="edit-project-modal-help">
-                        Agente padrão para tarefas deste projeto
+                        Analista padrão para tarefas deste projeto
                       </p>
                     </div>
-                    
+
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
-                        Programador Contratado
+                        Programador Frontend
                       </label>
                       <select
                         className="edit-project-modal-select"
-                        value={programadorContratado}
-                        onChange={(e) => setProgramadorContratado(e.target.value)}
+                        value={programadorFront}
+                        onChange={(e) => setProgramadorFront(e.target.value)}
                         disabled={loadingAgents}
                       >
-                        <option value="">{loadingAgents ? 'Carregando agentes...' : 'Selecione um programador...'}</option>
+                        <option value="">{loadingAgents ? 'Carregando agentes...' : 'Selecione um programador front...'}</option>
                         {agents.map(agentItem => (
                           <option key={agentItem.id} value={agentItem.id}>
                             {agentItem.identity?.name || agentItem.id}
@@ -476,7 +462,29 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         ))}
                       </select>
                       <p className="edit-project-modal-help">
-                        Programador responsável pelo projeto
+                        Agente programador frontend para o projeto
+                      </p>
+                    </div>
+
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
+                        Programador Backend
+                      </label>
+                      <select
+                        className="edit-project-modal-select"
+                        value={programadorBack}
+                        onChange={(e) => setProgramadorBack(e.target.value)}
+                        disabled={loadingAgents}
+                      >
+                        <option value="">{loadingAgents ? 'Carregando agentes...' : 'Selecione um programador back...'}</option>
+                        {agents.map(agentItem => (
+                          <option key={agentItem.id} value={agentItem.id}>
+                            {agentItem.identity?.name || agentItem.id}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="edit-project-modal-help">
+                        Agente programador backend para o projeto
                       </p>
                     </div>
                     
@@ -484,13 +492,19 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                       <label className="edit-project-modal-label">
                         Modelo Auxiliar
                       </label>
-                      <input
-                        type="text"
-                        className="edit-project-modal-input"
+                      <select
+                        className="edit-project-modal-select"
                         value={modeloAuxiliar}
                         onChange={(e) => setModeloAuxiliar(e.target.value)}
-                        placeholder="ex: ollama/phi4:latest"
-                      />
+                        disabled={loadingModels}
+                      >
+                        <option value="">{loadingModels ? 'Carregando modelos...' : 'Selecione um modelo...'}</option>
+                        {models.map((modelName, index) => (
+                          <option key={index} value={modelName}>
+                            {modelName}
+                          </option>
+                        ))}
+                      </select>
                       <p className="edit-project-modal-help">
                         Modelo de IA auxiliar para o projeto
                       </p>
