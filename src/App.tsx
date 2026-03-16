@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Component, ErrorInfo } from 'react';
 import TaskList from './components/TaskList';
 import TaskDetail from './components/TaskDetail';
-import ProjectView from './components/ProjectView';
+import ProjectsDashboard from './components/ProjectsDashboard';
 import Login from './components/Login';
 import StatusManager from './components/StatusManager';
 import PriorityManager from './components/PriorityManager';
@@ -434,20 +434,7 @@ const AppContent: React.FC = () => {
 
       case 'projects':
       default:
-        return (
-          <ProjectView
-            projects={projects}
-            tasks={tasks}
-            users={users}
-            statuses={statuses}
-            priorities={priorities}
-            onTaskSelect={handleTaskSelect}
-            onProjectSelect={handleProjectSelect}
-            onCreateProject={handleCreateProject}
-            onUpdateProject={handleUpdateProject}
-            onDeleteProject={handleDeleteProject}
-          />
-        );
+        return <ProjectsDashboard onProjectSelect={handleProjectSelect} />;
     }
   };
 

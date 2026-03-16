@@ -3,6 +3,8 @@ export interface AgentIdentity {
   emoji?: string;
   avatar?: string;
   model?: string;
+  description?: string;
+  vibe?: string;
 }
 
 export interface Agent {
@@ -13,6 +15,7 @@ export interface Agent {
   workspace?: string;
   createdAt?: string;
   updatedAt?: string;
+  avatarUrl?: string;
 }
 
 export interface CreateAgentRequest {

@@ -602,6 +602,34 @@ class ApiService {
     });
   }
 
+  // Agent Files
+  async getAgentFile(agentId: string, filename: string) {
+    return this.request(`/agents/${agentId}/files/${filename}`);
+  }
+
+  async updateAgentFile(agentId: string, filename: string, content: string) {
+    return this.request(`/agents/${agentId}/files/${filename}`, {
+      method: 'PUT',
+      body: JSON.stringify({ content })
+    });
+  }
+
+  // Agent Avatar
+  async getAgentAvatar(agentId: string) {
+    return this.request(`/agents/${agentId}/avatar`);
+  }
+
+  async uploadAgentAvatar(agentId: string, file: File) {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    return this.request(`/agents/${agentId}/avatar`, {
+      method: 'POST',
+      body: formData,
+      skipJsonProcessing: true
+    });
+  }
+
   // Stage endpoints
   async getStages() {
     return this.request('/stages');
