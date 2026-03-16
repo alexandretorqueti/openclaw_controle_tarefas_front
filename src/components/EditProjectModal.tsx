@@ -42,49 +42,83 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   // Estados do formulário
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [regras, setRegras] = useState('');
   const [projectTypeId, setProjectTypeId] = useState('');
   const [status, setStatus] = useState(true);
   const [ativo, setAtivo] = useState(true);
   
   // Configurações técnicas
   const [frontendPath, setFrontendPath] = useState('');
+  const [frontendPort, setFrontendPort] = useState<number | undefined>(undefined);
   const [backendPath, setBackendPath] = useState('');
-  const [databasePath, setDatabasePath] = useState('');
-  const [deployPath, setDeployPath] = useState('');
+  const [backendPort, setBackendPort] = useState<number | undefined>(undefined);
+  const [repositoryUrl, setRepositoryUrl] = useState('');
+  const [pastaBase, setPastaBase] = useState('');
   
-  // Comandos
-  const [buildCommand, setBuildCommand] = useState('');
-  const [startCommand, setStartCommand] = useState('');
-  const [testCommand, setTestCommand] = useState('');
-  const [deployCommand, setDeployCommand] = useState('');
+  // Agentes e modelos
+  const [agent, setAgent] = useState('');
+  const [programadorContratado, setProgramadorContratado] = useState('');
+  const [modeloAuxiliar, setModeloAuxiliar] = useState('');
+  
+  // Comandos de build
+  const [frontendBuildCmd, setFrontendBuildCmd] = useState('');
+  const [backendBuildCmd, setBackendBuildCmd] = useState('');
   
   // Estados da UI
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [agents, setAgents] = useState<any[]>([]);
+  const [loadingAgents, setLoadingAgents] = useState(false);
   
   // Inicializar formulário com dados do projeto
   useEffect(() => {
     if (project) {
       setName(project.name || '');
       setDescription(project.description || '');
+      setRegras(project.regras || '');
       setProjectTypeId(project.projectTypeId || '');
       setStatus(project.status || true);
       setAtivo(project.ativo || true);
       
       // Configurações técnicas
       setFrontendPath(project.frontendPath || '');
+      setFrontendPort(project.frontendPort || undefined);
       setBackendPath(project.backendPath || '');
-      setDatabasePath(project.databasePath || '');
-      setDeployPath(project.deployPath || '');
+      setBackendPort(project.backendPort || undefined);
+      setRepositoryUrl(project.repositoryUrl || '');
+      setPastaBase(project.pastaBase || '');
       
-      // Comandos
-      setBuildCommand(project.buildCommand || '');
-      setStartCommand(project.startCommand || '');
-      setTestCommand(project.testCommand || '');
-      setDeployCommand(project.deployCommand || '');
+      // Agentes e modelos
+      setAgent(project.agent || '');
+      setProgramadorContratado(project.programadorContratado || '');
+      setModeloAuxiliar(project.modeloAuxiliar || '');
+      
+      // Comandos de build
+      setFrontendBuildCmd(project.frontendBuildCmd || '');
+      setBackendBuildCmd(project.backendBuildCmd || '');
     }
   }, [project]);
+
+  // Carregar lista de agentes quando o modal abrir
+  useEffect(() => {
+    const loadAgents = async () => {
+      setLoadingAgents(true);
+      try {
+        const response = await api.get('/agents');
+        setAgents(response.data || []);
+      } catch (error) {
+        console.error('Erro ao carregar agentes:', error);
+        setAgents([]);
+      } finally {
+        setLoadingAgents(false);
+      }
+    };
+
+    if (isOpen) {
+      loadAgents();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,17 +138,21 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
       const projectData = {
         name: name.trim(),
         description: description.trim() || null,
+        regras: regras.trim() || null,
         projectTypeId: projectTypeId || null,
         status: status,
         ativo: ativo,
         frontendPath: frontendPath.trim() || null,
+        frontendPort: frontendPort || null,
         backendPath: backendPath.trim() || null,
-        databasePath: databasePath.trim() || null,
-        deployPath: deployPath.trim() || null,
-        buildCommand: buildCommand.trim() || null,
-        startCommand: startCommand.trim() || null,
-        testCommand: testCommand.trim() || null,
-        deployCommand: deployCommand.trim() || null
+        backendPort: backendPort || null,
+        repositoryUrl: repositoryUrl.trim() || null,
+        pastaBase: pastaBase.trim() || null,
+        agent: agent || null,
+        programadorContratado: programadorContratado || null,
+        modeloAuxiliar: modeloAuxiliar || null,
+        frontendBuildCmd: frontendBuildCmd.trim() || null,
+        backendBuildCmd: backendBuildCmd.trim() || null
       };
       
       await onUpdate(project.id, projectData);
@@ -218,6 +256,22 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
+                        Regras (opcional)
+                      </label>
+                      <textarea
+                        className="edit-project-modal-textarea"
+                        value={regras}
+                        onChange={(e) => setRegras(e.target.value)}
+                        placeholder="Insira as regras específicas para este projeto..."
+                        rows={4}
+                      />
+                      <p className="edit-project-modal-help">
+                        Regras de negócio, restrições ou diretrizes especiais
+                      </p>
+                    </div>
+                    
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
                         Status do Projeto
                       </label>
                       <div className="edit-project-modal-radio-group">
@@ -291,6 +345,24 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
+                        Porta Frontend
+                      </label>
+                      <input
+                        type="number"
+                        className="edit-project-modal-input"
+                        value={frontendPort || ''}
+                        onChange={(e) => setFrontendPort(e.target.value ? parseInt(e.target.value) : undefined)}
+                        placeholder="ex: 3000"
+                        min="1"
+                        max="65535"
+                      />
+                      <p className="edit-project-modal-help">
+                        Porta para execução do frontend (1-65535)
+                      </p>
+                    </div>
+                    
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
                         <FaServer size={12} /> Caminho do Backend
                       </label>
                       <input
@@ -307,106 +379,161 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
-                        <FaDatabase size={12} /> Caminho do Banco de Dados
+                        Porta Backend
                       </label>
                       <input
-                        type="text"
+                        type="number"
                         className="edit-project-modal-input"
-                        value={databasePath}
-                        onChange={(e) => setDatabasePath(e.target.value)}
-                        placeholder="ex: /home/usuario/projetos/database"
+                        value={backendPort || ''}
+                        onChange={(e) => setBackendPort(e.target.value ? parseInt(e.target.value) : undefined)}
+                        placeholder="ex: 3001"
+                        min="1"
+                        max="65535"
                       />
                       <p className="edit-project-modal-help">
-                        Caminho para arquivos de banco de dados ou configurações
+                        Porta para execução do backend (1-65535)
                       </p>
                     </div>
                     
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
-                        <FaRocket size={12} /> Caminho de Deploy
+                        URL do Repositório
                       </label>
                       <input
                         type="text"
                         className="edit-project-modal-input"
-                        value={deployPath}
-                        onChange={(e) => setDeployPath(e.target.value)}
-                        placeholder="ex: /var/www/projeto"
+                        value={repositoryUrl}
+                        onChange={(e) => setRepositoryUrl(e.target.value)}
+                        placeholder="ex: https://github.com/usuario/projeto"
                       />
                       <p className="edit-project-modal-help">
-                        Caminho de destino para deploy da aplicação
+                        URL do repositório Git do projeto
+                      </p>
+                    </div>
+                    
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
+                        Pasta Base
+                      </label>
+                      <input
+                        type="text"
+                        className="edit-project-modal-input"
+                        value={pastaBase}
+                        onChange={(e) => setPastaBase(e.target.value)}
+                        placeholder="ex: /home/usuario/projetos/projeto/"
+                      />
+                      <p className="edit-project-modal-help">
+                        Caminho base do projeto no sistema de arquivos
                       </p>
                     </div>
                   </div>
                 </div>
                 
-                {/* Seção 3: Comandos de Execução */}
+                {/* Seção 3: Agentes e Modelos */}
                 <div className="edit-project-modal-section">
                   <h3 className="edit-project-modal-section-title">
-                    <FaHammer size={16} />
-                    Comandos de Execução
+                    <FaUser size={16} />
+                    Agentes e Modelos
                   </h3>
                   <div className="edit-project-modal-form-grid">
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
-                        <FaHammer size={12} /> Comando de Build
+                        Agente Contratado
+                      </label>
+                      <select
+                        className="edit-project-modal-select"
+                        value={agent}
+                        onChange={(e) => setAgent(e.target.value)}
+                        disabled={loadingAgents}
+                      >
+                        <option value="">{loadingAgents ? 'Carregando agentes...' : 'Selecione um agente...'}</option>
+                        {agents.map(agentItem => (
+                          <option key={agentItem.id} value={agentItem.id}>
+                            {agentItem.identity?.name || agentItem.id}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="edit-project-modal-help">
+                        Agente padrão para tarefas deste projeto
+                      </p>
+                    </div>
+                    
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
+                        Programador Contratado
+                      </label>
+                      <select
+                        className="edit-project-modal-select"
+                        value={programadorContratado}
+                        onChange={(e) => setProgramadorContratado(e.target.value)}
+                        disabled={loadingAgents}
+                      >
+                        <option value="">{loadingAgents ? 'Carregando agentes...' : 'Selecione um programador...'}</option>
+                        {agents.map(agentItem => (
+                          <option key={agentItem.id} value={agentItem.id}>
+                            {agentItem.identity?.name || agentItem.id}
+                          </option>
+                        ))}
+                      </select>
+                      <p className="edit-project-modal-help">
+                        Programador responsável pelo projeto
+                      </p>
+                    </div>
+                    
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
+                        Modelo Auxiliar
                       </label>
                       <input
                         type="text"
                         className="edit-project-modal-input"
-                        value={buildCommand}
-                        onChange={(e) => setBuildCommand(e.target.value)}
+                        value={modeloAuxiliar}
+                        onChange={(e) => setModeloAuxiliar(e.target.value)}
+                        placeholder="ex: ollama/phi4:latest"
+                      />
+                      <p className="edit-project-modal-help">
+                        Modelo de IA auxiliar para o projeto
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Seção 4: Comandos de Build */}
+                <div className="edit-project-modal-section">
+                  <h3 className="edit-project-modal-section-title">
+                    <FaHammer size={16} />
+                    Comandos de Build
+                  </h3>
+                  <div className="edit-project-modal-form-grid">
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
+                        Comando Build Frontend
+                      </label>
+                      <input
+                        type="text"
+                        className="edit-project-modal-input"
+                        value={frontendBuildCmd}
+                        onChange={(e) => setFrontendBuildCmd(e.target.value)}
                         placeholder="ex: npm run build"
                       />
                       <p className="edit-project-modal-help">
-                        Comando para build/compilação do projeto
+                        Comando para build/compilação do frontend
                       </p>
                     </div>
                     
                     <div className="edit-project-modal-form-group">
                       <label className="edit-project-modal-label">
-                        <FaPlay size={12} /> Comando de Start
+                        Comando Build Backend
                       </label>
                       <input
                         type="text"
                         className="edit-project-modal-input"
-                        value={startCommand}
-                        onChange={(e) => setStartCommand(e.target.value)}
-                        placeholder="ex: npm start"
+                        value={backendBuildCmd}
+                        onChange={(e) => setBackendBuildCmd(e.target.value)}
+                        placeholder="ex: npm run build"
                       />
                       <p className="edit-project-modal-help">
-                        Comando para iniciar a aplicação
-                      </p>
-                    </div>
-                    
-                    <div className="edit-project-modal-form-group">
-                      <label className="edit-project-modal-label">
-                        <FaVial size={12} /> Comando de Test
-                      </label>
-                      <input
-                        type="text"
-                        className="edit-project-modal-input"
-                        value={testCommand}
-                        onChange={(e) => setTestCommand(e.target.value)}
-                        placeholder="ex: npm test"
-                      />
-                      <p className="edit-project-modal-help">
-                        Comando para executar testes
-                      </p>
-                    </div>
-                    
-                    <div className="edit-project-modal-form-group">
-                      <label className="edit-project-modal-label">
-                        <FaRocket size={12} /> Comando de Deploy
-                      </label>
-                      <input
-                        type="text"
-                        className="edit-project-modal-input"
-                        value={deployCommand}
-                        onChange={(e) => setDeployCommand(e.target.value)}
-                        placeholder="ex: ./deploy.sh"
-                      />
-                      <p className="edit-project-modal-help">
-                        Comando para deploy da aplicação
+                        Comando para build/compilação do backend
                       </p>
                     </div>
                   </div>

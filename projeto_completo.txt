@@ -1,0 +1,740 @@
+
+
+// --- ARQUIVO: ./temp-check.js ---
+
+const React = require('react');
+
+
+
+
+import {
+  FaRobot,
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaLink,
+  FaUnlink,
+  FaSync,
+  FaCheck,
+  FaTimes,
+  FaUserCircle,
+  FaSpinner,
+  FaSearch,
+  FaTimesCircle,
+} from "react-icons/fa";
+
+
+const styles = {
+  "@keyframes spin": {
+    "0%": { transform: "rotate(0deg)" },
+    "100%": { transform: "rotate(360deg)" },
+  },
+  "@keyframes slideIn": {
+    "0%": { transform: "translateX(100%)", opacity: 0 },
+    "100%": { transform: "translateX(0)", opacity: 1 },
+  },
+};
+
+const AgentManager: React.FC = () => {
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  
+  const [searchName, setSearchName] = useState("");
+  const [searchModel, setSearchModel] = useState("");
+
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
+  const [showEditModal, setShowEditModal] = useState<boolean>(false);
+  const [showBindingsModal, setShowBindingsModal] = useState<boolean>(false);
+  const [newAgentName, setNewAgentName] = useState<string>("");
+  const [newAgentWorkspace, setNewAgentWorkspace] = useState<string>("");
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [editAgentName, setEditAgentName] = useState<string>("");
+  const [editAgentEmoji, setEditAgentEmoji] = useState<string>("");
+  const [editAgentAvatar, setEditAgentAvatar] = useState<string>("");
+  const [editAgentModel, setEditAgentModel] = useState<string>("");
+  const [editAgentWorkspace, setEditAgentWorkspace] = useState<string>("");
+  const [editAgentVibe, setEditAgentVibe] = useState<string>("");
+  const [editAgentSoul, setEditAgentSoul] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileLoading, setFileLoading] = useState(false);
+  const [newBinding, setNewBinding] = useState<string>("");
+  const [models, setModels] = useState<string[]>([]);
+
+  
+  const [processingToast, setProcessingToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: "processing" | "success" | "error";
+    steps?: string[];
+    currentStep?: number;
+  }>({
+    visible: false,
+    message: "",
+    type: "processing",
+  });
+
+  const loadAgents = async () => {
+    setLoading(true);
+    try {
+      const response = (await api.getAgents()) as AgentsResponse;
+      if (response.success) {
+        setAgents(response.data);
+      } else {
+        
+        setProcessingToast({
+          visible: true,
+          message: `Erro ao carregar agentes: ${response.error || "Erro desconhecido"}`,
+          type: "error",
+        });
+      }
+    } catch (err: any) {
+      
+      setProcessingToast({
+        visible: true,
+        message: `Erro ao conectar com o servidor: ${err.message || "Erro desconhecido"}`,
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAgents();
+
+
+
+// --- ARQUIVO: ./test-server.js ---
+
+import { createServer } from 'http';
+import { readFileSync, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join, extname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const MIME_TYPES = {
+  '.html': 'text/html',
+  '.js': 'application/javascript',
+  '.css': 'text/css',
+  '.json': 'application/json',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif',
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon'
+};
+
+const server = createServer((req, res) => {
+  console.log(`Request: ${req.url}`);
+  
+  try {
+    // Decodificar a URL para verificar se há problemas
+    const decodedUrl = decodeURI(req.url);
+    console.log(`Decoded URL: ${decodedUrl}`);
+    
+    // Remover query parameters
+    const pathname = decodedUrl.split('?')[0];
+    
+    // Determinar o caminho do arquivo
+    let filePath;
+    if (pathname === '/') {
+      filePath = join(__dirname, 'dist', 'index.html');
+    } else {
+      filePath = join(__dirname, 'dist', pathname);
+    }
+    
+    // Verificar se o arquivo existe
+    if (!existsSync(filePath)) {
+      console.log(`File not found: ${filePath}`);
+      res.writeHead(404);
+      res.end('Not found');
+      return;
+    }
+    
+    // Ler o arquivo
+    const content = readFileSync(filePath);
+    const ext = extname(filePath);
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    
+    res.writeHead(200, { 'Content-Type': contentType });
+    res.end(content);
+    
+  } catch (error) {
+    console.error(`Error processing ${req.url}:`, error.message);
+    res.writeHead(400);
+    res.end('Bad request');
+  }
+});
+
+server.listen(3001, () => {
+  console.log('Test server running on http://localhost:3001');
+  console.log('Serving files from dist/ directory');
+});
+
+// --- ARQUIVO: ./test_complete.js ---
+
+const fetch = require('node-fetch');
+
+async function testUsersLoading() {
+    console.log('Testing users API...');
+    
+    try {
+        // Test backend API directly
+        const response = await fetch('http://localhost:3001/api/users', {
+            headers: {
+                'Content-Type': 'application/json',
+                'Origin': 'http://localhost:3000'
+            },
+            credentials: 'include'
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log(`✅ Backend API success: ${data.count} users found`);
+        console.log('Users:', data.users.map(u => u.name).join(', '));
+        
+        // Test frontend API service
+        const apiService = require('./src/services/api.js').default;
+        
+        try {
+            const usersData = await apiService.getUsers();
+            console.log(`✅ Frontend API service success: ${usersData.users.length} users found`);
+        } catch (error) {
+            console.log('❌ Frontend API service error:', error.message);
+        }
+        
+    } catch (error) {
+        console.log('❌ Backend API error:', error.message);
+    }
+}
+
+testUsersLoading();
+
+
+// --- ARQUIVO: ./test-debug.js ---
+
+const { chromium } = require('playwright');
+
+(async () => {
+  const browser = await chromium.launch({ headless: false });
+  const page = await browser.newPage();
+  
+  console.log('Acessando http://localhost:3000...');
+  await page.goto('http://localhost:3000');
+  
+  console.log('Título da página:', await page.title());
+  
+  // Aguardar carregamento
+  await page.waitForLoadState('networkidle');
+  
+  // Verificar se há elementos com texto "Login"
+  const loginButtons = await page.getByText('Login').all();
+  console.log(`Encontrados ${loginButtons.length} botões com texto "Login"`);
+  
+  // Verificar se há elementos com role button
+  const allButtons = await page.getByRole('button').all();
+  console.log(`Total de botões na página: ${allButtons.length}`);
+  
+  // Tirar screenshot
+  await page.screenshot({ path: 'debug-home.png' });
+  console.log('Screenshot salvo em debug-home.png');
+  
+  // Fechar após 5 segundos
+  setTimeout(async () => {
+    await browser.close();
+  }, 5000);
+})();
+
+
+// --- ARQUIVO: ./nav-bar-fix.js ---
+
+const fs = require('fs');
+const path = require('path');
+
+const filePath = path.join(__dirname, 'src/App.tsx');
+let content = fs.readFileSync(filePath, 'utf8');
+
+const oldNavBar = `        {/* Navigation Bar */}
+        <div style={{
+          backgroundColor: '#fff',
+          padding: '0 24px',
+          borderBottom: '1px solid #e0e0e0',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
+        }}>
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: '64px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <FloatingMenu
+                onOpenStatus={() => setIsStatusModalOpen(true)}
+                onOpenPriority={() => setIsPriorityModalOpen(true)}
+                onOpenUser={() => setIsUserModalOpen(true)}
+                onOpenNextTask={() => setIsNextTaskModalOpen(true)}
+              />
+              <h1 style={{ fontSize: '20px', fontWeight: 700, color: '#333' }}>
+                Sistema de Gestão
+              </h1>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('error-logs');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: viewMode === 'error-logs' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'error-logs' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <FaExclamationTriangle size={14} />
+                Logs de Erros
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('logs');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: viewMode === 'logs' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'logs' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <FaTerminal size={14} />
+                Logs do Jarbas
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('recurrence');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: viewMode === 'recurrence' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'recurrence' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <FaSync size={14} />
+                Recorrência
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('projects');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: viewMode === 'projects' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'projects' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <FaFolder size={14} />
+                Projetos
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('tasks');
+                }}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: viewMode === 'tasks' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'tasks' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <FaTasks size={14} />
+                Todas as Tarefas
+              </button>
+            </div>
+
+            <UserDropdownMenu
+              onLogout={logout}
+              onEditProfile={() => setIsProfileEditModalOpen(true)}
+            />
+          </div>
+        </div>`;
+
+const newNavBar = `        {/* Navigation Bar */}
+        <div style={{
+          backgroundColor: '#fff',
+          padding: '0 16px',
+          borderBottom: '1px solid #e0e0e0',
+          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+          position: 'sticky',
+          top: 0,
+          zIndex: 100
+        }}>
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: '56px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <FloatingMenu
+                onOpenStatus={() => setIsStatusModalOpen(true)}
+                onOpenPriority={() => setIsPriorityModalOpen(true)}
+                onOpenUser={() => setIsUserModalOpen(true)}
+                onOpenNextTask={() => setIsNextTaskModalOpen(true)}
+              />
+              <h1 style={{ fontSize: '16px', fontWeight: 600, color: '#333', letterSpacing: '-0.3px' }}>
+                Sistema de Gestão
+              </h1>
+            </div>
+
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('projects');
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: viewMode === 'projects' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'projects' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                  fontWeight: 500
+                }}
+              >
+                <FaFolder size={12} />
+                Projetos
+              </button>
+
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('tasks');
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: viewMode === 'tasks' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'tasks' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                  fontWeight: 500
+                }}
+              >
+                <FaTasks size={12} />
+                Tarefas
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('recurrence');
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: viewMode === 'recurrence' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'recurrence' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                  fontWeight: 500
+                }}
+              >
+                <FaSync size={12} />
+                Recorrência
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('logs');
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: viewMode === 'logs' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'logs' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                  fontWeight: 500
+                }}
+              >
+                <FaTerminal size={12} />
+                Logs
+              </button>
+              
+              <button
+                onClick={() => {
+                  setSelectedProject(null);
+                  setSelectedTask(null);
+                  setViewMode('error-logs');
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: viewMode === 'error-logs' ? '#4ECDC4' : '#f8f9fa',
+                  color: viewMode === 'error-logs' ? '#fff' : '#333',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s',
+                  fontWeight: 500
+                }}
+              >
+                <FaExclamationTriangle size={12} />
+                Erros
+              </button>
+            </div>
+
+            <UserDropdownMenu
+              onLogout={logout}
+              onEditProfile={() => setIsProfileEditModalOpen(true)}
+            />
+          </div>
+        </div>`;
+
+if (content.includes(oldNavBar)) {
+  content = content.replace(oldNavBar, newNavBar);
+  fs.writeFileSync(filePath, content, 'utf8');
+  console.log('✅ Barra de navegação atualizada com sucesso!');
+} else {
+  console.log('❌ Não foi possível encontrar a barra de navegação original.');
+}
+
+
+// --- ARQUIVO: ./src/test-css-variables.js ---
+
+// Teste para verificar se as variáveis CSS estão funcionando
+function testCSSVariables() {
+  console.log('🔍 Testando variáveis CSS...');
+  
+  // Obter o elemento root
+  const root = document.documentElement;
+  const computedStyle = getComputedStyle(root);
+  
+  // Lista de variáveis para testar
+  const variables = [
+    '--bg-primary',
+    '--bg-secondary', 
+    '--bg-card',
+    '--bg-input',
+    '--text-primary',
+    '--text-secondary',
+    '--border-color',
+    '--accent-color',
+    '--accent-hover',
+    '--danger-color',
+    '--success-color'
+  ];
+  
+  let allPassed = true;
+  
+  variables.forEach(variable => {
+    const value = computedStyle.getPropertyValue(variable).trim();
+    if (value) {
+      console.log(`✅ ${variable}: ${value}`);
+    } else {
+      console.log(`❌ ${variable}: NÃO DEFINIDA`);
+      allPassed = false;
+    }
+  });
+  
+  if (allPassed) {
+    console.log('🎉 Todas as variáveis CSS estão definidas!');
+  } else {
+    console.log('⚠️ Algumas variáveis CSS não estão definidas');
+  }
+  
+  return allPassed;
+}
+
+// Executar teste quando a página carregar
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', testCSSVariables);
+} else {
+  testCSSVariables();
+}
+
+
+// --- ARQUIVO: ./test_conversion.js ---
+
+const { convertToSnakeCase } = require('./dist/types/index.js');
+
+// Test data
+const testData = {
+  statusId: "92f96651-12ed-4eea-b9fa-b3add27cc26d",
+  priorityId: "8ea78335-a697-466c-a268-ab70e2195106",
+  title: "Test Task",
+  description: "Test description"
+};
+
+console.log("Original (camelCase):", JSON.stringify(testData, null, 2));
+console.log("Converted (snake_case):", JSON.stringify(convertToSnakeCase(testData), null, 2));
+
+
+// --- ARQUIVO: ./test-menu-simple.js ---
+
+const playwright = require('@playwright/test');
+
+(async () => {
+  const browser = await playwright.chromium.launch({ headless: false });
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  
+  try {
+    console.log('1. Acessando http://localhost:3000...');
+    await page.goto('http://localhost:3000');
+    
+    console.log('2. Clicando na aba Login...');
+    const loginTab = page.getByRole('button', { name: 'Login', exact: true });
+    await loginTab.click();
+    
+    console.log('3. Preenchendo nickname...');
+    const nicknameInput = page.getByPlaceholder('Digite seu nickname');
+    await nicknameInput.fill('alexandre');
+    
+    console.log('4. Clicando em Entrar...');
+    const loginButton = page.getByRole('button', { name: 'Entrar com Nickname' });
+    await loginButton.click();
+    
+    console.log('5. Aguardando carregamento...');
+    await page.waitForLoadState('networkidle');
+    
+    console.log('6. Procurando ícone do menu...');
+    // Tentar diferentes seletores para o ícone do menu
+    const menuSelectors = [
+      'div[style*="background-color"] svg',
+      'div:has(svg)',
+      '.floating-menu',
+      '[data-testid="menu-icon"]'
+    ];
+    
+    let menuIcon = null;
+    for (const selector of menuSelectors) {
+      menuIcon = page.locator(selector).first();
+      if (await menuIcon.count() > 0) {
+        console.log(`   Encontrado com seletor: ${selector}`);
+        break;
+      }
+    }
+    
+    if (!menuIcon || await menuIcon.count() === 0) {
+      console.log('❌ Ícone do menu não encontrado');
+      await page.screenshot({ path: 'menu-not-found.png', fullPage: true });
+      console.log('HTML da página salvo em menu-not-found.html');
+      await page.content().then(html => {
+        require('fs').writeFileSync('menu-not-found.html', html);
+      });
+    } else {
+      console.log('✅ Ícone do menu encontrado');
+      await menuIcon.hover();
+      await page.waitForTimeout(2000);
+      await page.screenshot({ path: 'menu-hovered.png', fullPage: true });
+      
+      // Verificar se menu apareceu
+      const menuText = await page.textContent('body');
+      if (menuText.includes('Configurações')) {
+        console.log('✅ Menu "Configurações" encontrado');
+      } else {
+        console.log('❌ Menu "Configurações" NÃO encontrado');
+      }
+    }
+    
+  } catch (error) {
+    console.error('Erro:', error);
+    await page.screenshot({ path: 'error.png', fullPage: true });
+  } finally {
+    await browser.close();
+  }
+})();

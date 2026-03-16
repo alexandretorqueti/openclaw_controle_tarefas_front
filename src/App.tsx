@@ -154,10 +154,13 @@ const AppContent: React.FC = () => {
   const loadTasks = async (projectId?: string | null, filters = taskFilters) => {
     try {
       let tasksData;
+      // Adiciona o filtro parentTaskId: null por padrão para exibir apenas tarefas raiz
+      const defaultFilters = { ...filters, parentTaskId: null };
+
       if (projectId) {
-        tasksData = await apiService.getTasksByProject(projectId, filters);
+        tasksData = await apiService.getTasksByProject(projectId, defaultFilters);
       } else {
-        tasksData = await apiService.getTasks(filters);
+        tasksData = await apiService.getTasks(defaultFilters);
       }
       // @ts-expect-error tasksData é unknown
       setTasks(tasksData.tasks || []);
@@ -170,7 +173,8 @@ const AppContent: React.FC = () => {
   const updateTaskFilters = async (newFilters: { isCompleted?: boolean }) => {
     const updatedFilters = { ...taskFilters, ...newFilters };
     setTaskFilters(updatedFilters);
-    await loadTasks(selectedProject?.id, updatedFilters);
+    // Ao atualizar filtros, garantir que o filtro parentTaskId: null seja mantido para a lista principal
+    await loadTasks(selectedProject?.id, { ...updatedFilters, parentTaskId: null });
   };
 
   const handleTaskSelect = (task: Task) => {
