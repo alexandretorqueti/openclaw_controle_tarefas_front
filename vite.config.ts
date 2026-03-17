@@ -12,12 +12,12 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:4001',
         changeOrigin: true,
         secure: false
       },
       '/uploads': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:4001',
         changeOrigin: true,
         secure: false
       }

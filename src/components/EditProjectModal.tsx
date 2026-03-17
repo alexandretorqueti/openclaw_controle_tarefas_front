@@ -372,7 +372,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                         className="edit-project-modal-input"
                         value={backendPort || ''}
                         onChange={(e) => setBackendPort(e.target.value ? parseInt(e.target.value) : undefined)}
-                        placeholder="ex: 3001"
+                        placeholder="ex: 4001"
                         min="1"
                         max="65535"
                       />

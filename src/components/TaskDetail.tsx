@@ -111,22 +111,78 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       
       setIsLoadingDependencies(true);
       try {
+        console.log('🔍 [TaskDetail] Carregando dependências para task:', task.id);
+        
         // Fetch task with dependencies
         const response = await api.getTask(task.id);
         const taskData = response.task || response.data || response;
         
+        console.log('📦 [TaskDetail] Dados da tarefa:', {
+          id: taskData.id,
+          title: taskData.title,
+          dependencies: taskData.dependencies,
+          dependents: taskData.dependents
+        });
+        
         if (taskData.dependencies && Array.isArray(taskData.dependencies)) {
-          // Extract dependent tasks from dependencies
-          const dependentTasks = taskData.dependencies.map((dep: any) => {
-            // Find the dependent task in the tasks list
-            const dependentTask = tasks.find(t => t.id === dep.dependentTaskId);
-            return dependentTask;
-          }).filter(Boolean); // Remove undefined values
+          console.log('📋 [TaskDetail] Encontradas dependencies:', taskData.dependencies.length);
           
+          // Extract dependent tasks from dependencies - O backend já retorna o objeto completo!
+          const dependentTasks = taskData.dependencies
+            .map((dep: any) => {
+              console.log('🔗 [TaskDetail] Processando dependency:', {
+                id: dep.id,
+                dependentTaskId: dep.dependentTaskId,
+                hasDependentTask: !!dep.dependentTask,
+                dependentTask: dep.dependentTask
+              });
+              
+              // O backend já retorna dependentTask completo
+              if (dep.dependentTask) {
+                console.log('✅ [TaskDetail] Usando dependentTask do backend:', dep.dependentTask.title);
+                return dep.dependentTask;
+              }
+              // Fallback: buscar no array local de tasks
+              const foundTask = tasks.find(t => t.id === dep.dependentTaskId);
+              console.log('🔍 [TaskDetail] Fallback - Buscando no array tasks:', foundTask ? 'Encontrado' : 'Não encontrado');
+              return foundTask;
+            })
+            .filter(Boolean); // Remove undefined values
+          
+          console.log('📊 [TaskDetail] DependentTasks final:', dependentTasks.length, dependentTasks);
           setDependencies(dependentTasks as Task[]);
+        } else if (taskData.dependents && Array.isArray(taskData.dependents)) {
+          console.log('📋 [TaskDetail] Encontradas dependents:', taskData.dependents.length);
+          
+          // Alternative: extract tasks from dependents
+          const dependentTasks = taskData.dependents
+            .map((dep: any) => {
+              console.log('🔗 [TaskDetail] Processando dependent:', {
+                id: dep.id,
+                taskId: dep.taskId,
+                hasTask: !!dep.task,
+                task: dep.task
+              });
+              
+              // O backend já retorna task completo
+              if (dep.task) {
+                console.log('✅ [TaskDetail] Usando task do backend:', dep.task.title);
+                return dep.task;
+              }
+              // Fallback: buscar no array local de tasks
+              const foundTask = tasks.find(t => t.id === dep.task?.id);
+              console.log('🔍 [TaskDetail] Fallback - Buscando no array tasks:', foundTask ? 'Encontrado' : 'Não encontrado');
+              return foundTask;
+            })
+            .filter(Boolean); // Remove undefined values
+          
+          console.log('📊 [TaskDetail] DependentTasks final:', dependentTasks.length, dependentTasks);
+          setDependencies(dependentTasks as Task[]);
+        } else {
+          console.log('⚠️ [TaskDetail] Nenhuma dependência encontrada');
         }
       } catch (error) {
-        console.error('Error loading dependencies:', error);
+        console.error('❌ [TaskDetail] Error loading dependencies:', error);
       } finally {
         setIsLoadingDependencies(false);
       }
@@ -176,8 +232,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       if (!dependencyToRemove) return;
       
       // Call API to remove dependency
-      // First, we need to find the dependency record ID
-      // For now, we'll use a simplified approach
+      // The API expects taskId and dependentTaskId
       await api.deleteDependency(task.id, dependencyId);
       
       // Update local state

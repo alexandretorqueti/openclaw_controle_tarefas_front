@@ -42,3 +42,6 @@ yarn-error.log*
 *.backup*
 *.final
 *.orig
+*debug-.png
+screenshot*.png
+*.md

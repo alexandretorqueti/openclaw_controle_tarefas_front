@@ -18,14 +18,8 @@ export const getAvatarUrl = (avatarUrl?: string): string => {
   if (avatarUrl.startsWith('/')) {
     // In development, we need to prepend the backend URL
     // In production, relative URLs work since they're on the same domain
-    if (process.env.NODE_ENV === 'development') {
-      // Get backend URL from environment or use default
-      const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:3001';
+      const backendUrl = 'http://localhost:4001';
       return `${backendUrl}${avatarUrl}`;
-    }
-    
-    // In production, return relative URL as-is
-    return avatarUrl;
   }
 
   // If it's neither absolute nor relative (shouldn't happen), return as-is

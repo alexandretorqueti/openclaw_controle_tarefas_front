@@ -15,7 +15,6 @@ import LogErros from './components/LogErros';
 import AgentManager from './components/AgentManager';
 import UserProfileEdit from './components/UserProfileEdit';
 import StageManager from './components/StageManager';
-import TaskTreeView from './components/TaskTreeView';
 import MainLayout from './components/layout/MainLayout';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import apiService from './services/api';
@@ -83,12 +82,14 @@ class ErrorBoundary extends Component<
   }
 }
 
-type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs' | 'agents' | 'recurrence' | 'stages' | 'task-tree';
+type ViewMode = 'tasks' | 'projects' | 'task-detail' | 'logs' | 'error-logs' | 'agents' | 'recurrence' | 'stages';
 
 // Main app content that requires authentication
 const AppContent: React.FC = () => {
   const { user, logout } = useAuth();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedParentTask, setSelectedParentTask] = useState<Task | null>(null);
+  const [parentHierarchy, setParentHierarchy] = useState<Task[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('projects');
 
@@ -154,14 +155,23 @@ const AppContent: React.FC = () => {
   const loadTasks = async (projectId?: string | null, filters = taskFilters) => {
     try {
       let tasksData;
-      // Adiciona o filtro parentTaskId: null por padrão para exibir apenas tarefas raiz
-      const defaultFilters = { ...filters, parentTaskId: null };
+      
+      // LOGICA DE CONTEXTO REFORÇADA:
+      // Se estamos visualizando sub-tarefas (selectedParentTask existe), 
+      // ignoramos o parentTaskId: null dos filtros e mantemos o foco na sub-tarefa.
+      const currentParentId = selectedParentTask ? selectedParentTask.id : null;
+
+      const finalFilters = { 
+        ...filters,
+        parentTaskId: currentParentId
+      };
 
       if (projectId) {
-        tasksData = await apiService.getTasksByProject(projectId, defaultFilters);
+        tasksData = await apiService.getTasksByProject(projectId, finalFilters);
       } else {
-        tasksData = await apiService.getTasks(defaultFilters);
+        tasksData = await apiService.getTasks(finalFilters);
       }
+      
       // @ts-expect-error tasksData é unknown
       setTasks(tasksData.tasks || []);
     } catch (err) {
@@ -173,37 +183,102 @@ const AppContent: React.FC = () => {
   const updateTaskFilters = async (newFilters: { isCompleted?: boolean }) => {
     const updatedFilters = { ...taskFilters, ...newFilters };
     setTaskFilters(updatedFilters);
-    // Ao atualizar filtros, garantir que o filtro parentTaskId: null seja mantido para a lista principal
-    await loadTasks(selectedProject?.id, { ...updatedFilters, parentTaskId: null });
+    // Ao atualizar filtros, respeitar o selectedParentTask se ele existir
+    await loadTasks(selectedProject?.id, updatedFilters);
   };
 
+  const [previousViewMode, setPreviousViewMode] = useState<ViewMode | null>(null);
+
   const handleTaskSelect = (task: Task) => {
+    setPreviousViewMode(viewMode);
     setSelectedTask(task);
     setViewMode('task-detail');
   };
 
-  const handleViewSubtasks = (task: Task) => {
-    setSelectedTask(task);
-    setViewMode('task-tree');
+  const handleViewSubtasks = async (task: Task) => {
+    setPreviousViewMode(viewMode);
+    setSelectedParentTask(task);
+    
+    // Build hierarchy
+    const hierarchy: Task[] = [task];
+    let parentId = task.parentTaskId;
+    
+    while (parentId) {
+      try {
+        const parentResponse = await apiService.getTask(parentId);
+        const parentTask = parentResponse.task || parentResponse.data || parentResponse;
+        hierarchy.unshift(parentTask);
+        parentId = parentTask.parentTaskId;
+      } catch (err) {
+        console.error('Erro ao carregar tarefa pai:', err);
+        break;
+      }
+    }
+    setParentHierarchy(hierarchy);
+    
+    // Load subtasks
+    try {
+      const response = await apiService.getTasks({ parentTaskId: task.id });
+      setTasks(response.tasks || response.data?.tasks || response.data || []);
+    } catch (err) {
+      console.error('Erro ao carregar subtarefas:', err);
+      setTasks([]);
+    }
+    
+    setViewMode('tasks');
+  };
+
+  const handleBackToParent = async () => {
+    if (!selectedParentTask) {
+      handleBackToProjects();
+      return;
+    }
+
+    const parentId = selectedParentTask.parentTaskId;
+    if (!parentId) {
+      // Go back to project root
+      setSelectedParentTask(null);
+      setParentHierarchy([]);
+      if (selectedProject) {
+        loadTasks(selectedProject.id);
+      } else {
+        loadTasks();
+      }
+      return;
+    }
+
+    // Go back to grand-parent
+    try {
+      const parentResponse = await apiService.getTask(parentId);
+      const parentTask = parentResponse.task || parentResponse.data || parentResponse;
+      handleViewSubtasks(parentTask);
+    } catch (err) {
+      console.error('Erro ao carregar tarefa pai ao voltar:', err);
+    }
   };
 
   const handleProjectSelect = (project: Project) => {
+    setPreviousViewMode(viewMode);
     setSelectedProject(project);
+    setSelectedParentTask(null);
+    setParentHierarchy([]);
     setViewMode('tasks');
     loadTasks(project.id);
   };
 
   const handleBackToList = () => {
-    setSelectedTask(null);
-    setViewMode('tasks');
-  };
-
-  const handleBackFromTree = () => {
-    setViewMode('task-detail');
+    if (previousViewMode === 'task-tree') {
+      setViewMode('task-tree');
+    } else {
+      setSelectedTask(null);
+      setViewMode('tasks');
+    }
   };
 
   const handleBackToProjects = () => {
     setSelectedProject(null);
+    setSelectedParentTask(null);
+    setParentHierarchy([]);
     setSelectedTask(null);
     setViewMode('projects');
   };
@@ -284,16 +359,30 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const handleUpdateTask = async (id: string, taskData: any) => {
+  const handleUpdateTask = async (id: string, taskData: any): Promise<Task> => {
     try {
       const updatedTask = await apiService.updateTask(id, taskData);
-      setTasks(tasks.map(t => t.id === id ? updatedTask : t));
+      
+      // Garante que a tarefa atualizada tenha os objetos relacionados completos
+      const enhancedTask = {
+        ...updatedTask,
+        // Se a API retornar apenas IDs, adiciona os objetos completos das listas
+        status: updatedTask.status || statuses.find(s => s.id === updatedTask.statusId),
+        priority: updatedTask.priority || priorities.find(p => p.id === updatedTask.priorityId),
+        project: updatedTask.project || projects.find(p => p.id === updatedTask.projectId),
+        assignedTo: updatedTask.assignedTo || users.find(u => u.id === updatedTask.assignedToId),
+        createdBy: updatedTask.createdBy || users.find(u => u.id === updatedTask.createdById)
+      };
+      
+      setTasks(tasks.map(t => t.id === id ? enhancedTask : t));
       if (selectedTask?.id === id) {
-        setSelectedTask(updatedTask);
+        setSelectedTask(enhancedTask);
       }
       if (selectedProject) {
+        // Agora loadTasks já cuida de verificar o selectedParentTask sozinho
         loadTasks(selectedProject.id);
       }
+      return enhancedTask; // Retorna a tarefa atualizada com objetos relacionados
     } catch (err) {
       console.error('Failed to update task:', err);
       throw err;
@@ -398,24 +487,6 @@ const AppContent: React.FC = () => {
           />
         );
 
-      case 'task-tree':
-        return (
-          <TaskTreeView
-            taskId={selectedTask!.id}
-            onBack={handleBackFromTree}
-            onTaskSelect={handleTaskSelect}
-            onDeleteTask={handleDeleteTask}
-            // TaskCard props
-            users={users}
-            statuses={statuses}
-            priorities={priorities}
-            projects={projects}
-            agents={agents}
-            onUpdateTask={handleUpdateTask}
-            onToggleCompletion={handleToggleTaskCompletion}
-          />
-        );
-
       case 'tasks':
         return (
           <TaskList
@@ -426,9 +497,12 @@ const AppContent: React.FC = () => {
             projects={projects}
             agents={agents}
             selectedProject={selectedProject}
+            selectedParentTask={selectedParentTask}
+            parentHierarchy={parentHierarchy}
             onTaskSelect={handleTaskSelect}
             onViewSubtasks={handleViewSubtasks}
             onBackToProjects={handleBackToProjects}
+            onBackToParent={handleBackToParent}
             onCreateTask={handleCreateTask}
             onUpdateTask={handleUpdateTask}
             onDeleteTask={handleDeleteTask}

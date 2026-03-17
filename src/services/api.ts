@@ -137,14 +137,14 @@ const getApiBaseUrl = () => {
   const protocol = window.location.protocol;
   
   // Determine backend port based on frontend port
-  let backendPort = 3001; // Default to backend development port
+  let backendPort = 4001; // Default to backend development port
   
   if (port === '8090' || port === '8091') {
     // Production environment
     backendPort = 8091;
-  } else if (port === '3000' || port === '3001' || port === '3002') {
-    // Development environment - backend runs on port 3001
-    backendPort = 3001;
+  } else if (port === '4000') {
+    // Development environment - backend runs on port 4001
+    backendPort = 4001;
   } else if (!port) {
     // No port specified (default ports)
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
@@ -448,7 +448,7 @@ class ApiService {
 
   // Next task by nickname endpoint
   async getNextTaskByNickname(nickname: string) {
-    return this.request(`/users/nickname/${nickname}/next-task`);
+    return this.request(`/tasks/next/${nickname}`);
   }
 
   // Recurrence endpoints

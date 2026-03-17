@@ -53,7 +53,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
       const loadAgents = async () => {
         try {
           console.log('DEBUG: Carregando agentes...');
-          const response = await fetch('http://localhost:3001/api/agents');
+          const response = await fetch('http://localhost:4001/api/agents');
           if (response.ok) {
             const data = await response.json();
             const agentsList = data.data ? data.data : [];
@@ -79,7 +79,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
       try {
         setLoadingModels(true);
         console.log('DEBUG: Carregando modelos da API...');
-        const response = await fetch('http://localhost:3001/api/models');
+        const response = await fetch('http://localhost:4001/api/models');
         if (response.ok) {
           const data = await response.json();
           const modelsList = data.models || [];
@@ -444,7 +444,7 @@ const ProjectForm = forwardRef<ProjectFormHandle, ProjectFormProps>(({
               value={formData.backendPort || ''}
               onChange={(e) => handleChange('backendPort', e.target.value ? parseInt(e.target.value) : null)}
               className="form-input"
-              placeholder="3001"
+              placeholder="4001"
               min="1"
               max="65535"
             />

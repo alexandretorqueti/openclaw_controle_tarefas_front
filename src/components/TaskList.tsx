@@ -16,9 +16,12 @@ interface TaskListProps {
   projects: Project[];
   agents?: Agent[];
   selectedProject: Project | null;
+  selectedParentTask?: Task | null;
+  parentHierarchy?: Task[];
   onTaskSelect: (task: Task) => void;
   onViewSubtasks?: (task: Task) => void;
   onBackToProjects?: () => void;
+  onBackToParent?: () => void;
   onCreateTask?: (taskData: Partial<Task>) => Promise<Task>;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
   onDeleteTask?: (id: string) => Promise<void>;
@@ -35,9 +38,12 @@ const TaskList: React.FC<TaskListProps> = ({
   projects,
   agents = [] as Agent[],
   selectedProject,
+  selectedParentTask = null,
+  parentHierarchy = [],
   onTaskSelect,
   onViewSubtasks,
   onBackToProjects,
+  onBackToParent,
   onCreateTask,
   onUpdateTask,
   onDeleteTask,
@@ -88,8 +94,16 @@ const TaskList: React.FC<TaskListProps> = ({
     assignedToId: users.length > 0 ? users[0]?.id || '' : '',
     deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
     agent: typeof window !== 'undefined' ? localStorage.getItem('lastUsedAgent') || '' : '',
-    parentTaskId: null
+    parentTaskId: selectedParentTask?.id || null
   });
+
+  // Update parentTaskId when selectedParentTask changes
+  React.useEffect(() => {
+    setNewTaskData(prev => ({
+      ...prev,
+      parentTaskId: selectedParentTask?.id || null
+    }));
+  }, [selectedParentTask]);
 
   // Update defaults when data loads
   React.useEffect(() => {
@@ -217,7 +231,8 @@ const TaskList: React.FC<TaskListProps> = ({
         priorityId: defaultPriority,
         assignedToId: defaultUser,
         deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
-        agent: newTaskData.agent || '' // Keep the same model for next task
+        agent: newTaskData.agent || '', // Keep the same model for next task
+        parentTaskId: selectedParentTask?.id || null
       });
       setIsCreatingTask(false);
     } catch (error: any) {
@@ -248,21 +263,91 @@ const TaskList: React.FC<TaskListProps> = ({
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        
+        {/* Breadcrumb / Navigation */}
+        {(selectedProject || selectedParentTask) && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 16px',
+            backgroundColor: 'var(--bg-card)',
+            borderRadius: '8px',
+            border: '1px solid var(--border-color)',
+            flexWrap: 'wrap',
+            fontSize: '14px'
+          }}>
+            <span 
+              onClick={onBackToProjects}
+              style={{ cursor: 'pointer', color: 'var(--accent-color)', fontWeight: 500 }}
+            >
+              Projetos
+            </span>
+            
+            {selectedProject && (
+              <>
+                <span style={{ color: 'var(--text-tertiary)' }}>›</span>
+                <span 
+                  onClick={onBackToParent && selectedParentTask ? onBackToParent : undefined}
+                  style={{ 
+                    cursor: (onBackToParent && selectedParentTask) ? 'pointer' : 'default', 
+                    color: selectedParentTask ? 'var(--accent-color)' : 'var(--text-primary)',
+                    fontWeight: selectedParentTask ? 500 : 600
+                  }}
+                >
+                  {selectedProject.name}
+                </span>
+              </>
+            )}
+
+            {parentHierarchy.map((task, index) => (
+              <React.Fragment key={task.id}>
+                <span style={{ color: 'var(--text-tertiary)' }}>›</span>
+                <span 
+                  onClick={() => index < parentHierarchy.length - 1 && onTaskSelect(task)}
+                  style={{ 
+                    cursor: index < parentHierarchy.length - 1 ? 'pointer' : 'default',
+                    color: index < parentHierarchy.length - 1 ? 'var(--accent-color)' : 'var(--text-primary)',
+                    fontWeight: index < parentHierarchy.length - 1 ? 500 : 600
+                  }}
+                >
+                  {task.title}
+                </span>
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-              {selectedProject ? `Tarefas do Projeto: ${selectedProject.name}` : 'Todas as Tarefas'}
+              {selectedParentTask 
+                ? `Subtarefas de: ${selectedParentTask.title}`
+                : selectedProject 
+                  ? `Tarefas do Projeto: ${selectedProject.name}` 
+                  : 'Todas as Tarefas'}
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '8px 0 0' }}>
-              {selectedProject 
-                ? selectedProject.description
-                : 'Gerencie todas as tarefas de todos os projetos em um único lugar'}
+              {selectedParentTask
+                ? selectedParentTask.description
+                : selectedProject 
+                  ? selectedProject.description
+                  : 'Gerencie todas as tarefas de todos os projetos em um único lugar'}
             </p>
           </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
-            {selectedProject && onBackToProjects && (
+            {selectedParentTask && onBackToParent && (
+              <Button
+                variant="secondary"
+                icon={<FaArrowLeft size={14} />}
+                onClick={onBackToParent}
+              >
+                Voltar
+              </Button>
+            )}
+            {!selectedParentTask && selectedProject && onBackToProjects && (
               <Button
                 variant="secondary"
                 icon={<FaArrowLeft size={14} />}

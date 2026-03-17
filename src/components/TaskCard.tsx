@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle, FaTasks } from 'react-icons/fa';
+import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle, FaTasks, FaAtom } from 'react-icons/fa';
 import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
 
 interface TaskCardProps {
@@ -39,11 +39,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAssignedUser = () => users.find(user => user.id === task.assignedToId);
-  const getStatus = () => statuses.find(status => status.id === task.statusId);
-  const getPriority = () => priorities.find(priority => priority.id === task.priorityId);
-  const getCreator = () => users.find(user => user.id === task.createdById);
-  const getProject = () => projects.find(project => project.id === task.projectId);
+  const getAssignedUser = () => task.assignedTo || users.find(user => user.id === task.assignedToId);
+  const getStatus = () => task.status || statuses.find(status => status.id === task.statusId);
+  const getPriority = () => task.priority || priorities.find(priority => priority.id === task.priorityId);
+  const getCreator = () => task.createdBy || users.find(user => user.id === task.createdById);
+  const getProject = () => task.project || projects.find(project => project.id === task.projectId);
 
   const assignedUser = getAssignedUser();
   const status = getStatus();
@@ -54,6 +54,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const deadlineDate = safeParseDate(task.deadline);
   const isOverdue = !task.isCompleted && deadlineDate && deadlineDate < new Date();
   const formattedDeadline = safeFormatDate(task.deadline, "dd 'de' MMMM 'de' yyyy") || 'Sem prazo definido';
+  
+  const hasSubtasks = (task as any).subtasks?.length > 0 || (task as any)._count?.subtasks > 0;
 
   const handleToggleCompletion = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -334,6 +336,26 @@ if (compact) {
               }}>
                 {task.title || 'Sem título'}
               </h3>
+              
+              {task.isAtomic && (
+                <div 
+                  title="Tarefa Atômica"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    color: '#10b981',
+                    borderRadius: '50%',
+                    width: '16px',
+                    height: '16px',
+                    cursor: 'help',
+                    flexShrink: 0
+                  }}
+                >
+                  <FaAtom size={10} />
+                </div>
+              )}
             </div>
 
             <p style={{
@@ -499,6 +521,30 @@ if (compact) {
           }}>
             {task.title || 'Sem título'}
           </h3>
+          
+          {task.isAtomic && (
+            <div 
+              title="Tarefa Atômica: Uma tarefa indivisível, de escopo fechado, com objetivo e passos claros, pronta para execução."
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                padding: '4px 10px',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                color: '#10b981',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '16px',
+                fontSize: '11px',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                cursor: 'help'
+              }}
+            >
+              <FaAtom size={12} />
+              Atômica
+            </div>
+          )}
           
           {priority && (
             <div style={{
@@ -758,33 +804,69 @@ if (compact) {
             </button>
           )}
           
-          {/* Botão Ver Subtarefas */}
+          {/* Botões de Subtarefas (condicionais ao status de hasSubtasks) */}
           {onViewSubtasks && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onViewSubtasks(task);
-              }}
-              style={{
-                padding: '8px 12px',
-                backgroundColor: '#8b5cf6',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '12px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                transition: 'background-color 0.2s'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
-              title="Ver subtarefas desta tarefa"
-            >
-              <FaTasks size={12} />
-              Subtarefas
-            </button>
+            hasSubtasks ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewSubtasks(task);
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: '#8b5cf6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
+                title="Ver subtarefas desta tarefa"
+              >
+                <FaTasks size={12} />
+                Subtarefas ({(task as any).subtasks?.length || (task as any)._count?.subtasks || ''})
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onViewSubtasks(task);
+                }}
+                style={{
+                  padding: '8px 12px',
+                  backgroundColor: 'transparent',
+                  color: 'var(--text-secondary)',
+                  border: '1px dashed var(--border-color)',
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#8b5cf6';
+                  e.currentTarget.style.color = '#8b5cf6';
+                  e.currentTarget.style.backgroundColor = 'rgba(139, 92, 246, 0.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+                title="Criar subtarefas para esta tarefa"
+              >
+                <FaTasks size={12} />
+                Criar subtarefas
+              </button>
+            )
           )}
           
           <button

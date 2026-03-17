@@ -696,7 +696,7 @@ const NextTaskManager: React.FC<NextTaskManagerProps> = ({ isOpen, onClose }) =>
           textAlign: 'center'
         }}>
           <p style={{ margin: 0 }}>
-            Endpoint testado: <code>GET /api/users/nickname/:nickname/next-task</code>
+            Endpoint testado: <code>GET /api/tasks/next/:nickname</code>
           </p>
           <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: 'var(--text-secondary)' }}>
             Filtra tarefas pendentes com status habilitado para IA, ordenadas por prioridade e data
