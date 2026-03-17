@@ -256,7 +256,6 @@ if (compact) {
     return (
       <div 
         className="task-card-compact"
-        onClick={() => onTaskClick(task)}
         style={{
           border: '1px solid var(--border-color)',
           borderRadius: '8px',
@@ -427,14 +426,7 @@ if (compact) {
   return (
     <div 
       className="task-card"
-      onClick={(e) => {
-        // Only navigate to task details if we didn't click on an interactive element
-        const target = e.target as HTMLElement;
-        const isInteractive = target.tagName === 'SELECT' || target.tagName === 'BUTTON' || target.closest('select, button');
-        if (!isInteractive) {
-          onTaskClick(task);
-        }
-      }}
+      
       style={{
         border: `1px solid ${isOverdue ? 'var(--danger-color)' : 'var(--border-color)'}`,
         borderRadius: '12px',
