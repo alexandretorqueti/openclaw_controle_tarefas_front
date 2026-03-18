@@ -117,6 +117,125 @@ const AppContent: React.FC = () => {
     loadInitialData();
   }, []);
 
+  // Server-Sent Events (SSE) for real-time updates
+  useEffect(() => {
+    if (!user) return; // Only connect if user is logged in
+    
+    console.log('🔌 Conectando ao SSE para atualizações em tempo real...');
+    
+    // Create EventSource connection
+    const eventSource = new EventSource('http://localhost:4001/api/sse/events');
+    
+    // Handle task_updated events
+    eventSource.addEventListener('task_updated', (event) => {
+      try {
+        const updatedTask = JSON.parse(event.data);
+        console.log('🔄 Evento SSE: Tarefa atualizada:', updatedTask.id, updatedTask.title);
+        
+        // Update tasks state
+        setTasks(prevTasks => 
+          prevTasks.map(task => 
+            task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+          )
+        );
+        
+        // If we're viewing the updated task, update selectedTask
+        if (selectedTask && selectedTask.id === updatedTask.id) {
+          setSelectedTask(prev => ({ ...prev, ...updatedTask }));
+        }
+        
+        // If we're viewing subtasks of the updated task
+        if (selectedParentTask && selectedParentTask.id === updatedTask.id) {
+          setSelectedParentTask(prev => ({ ...prev, ...updatedTask }));
+        }
+      } catch (error) {
+        console.error('❌ Erro ao processar evento task_updated:', error);
+      }
+    });
+    
+    // Handle task_created events
+    eventSource.addEventListener('task_created', (event) => {
+      try {
+        const newTask = JSON.parse(event.data);
+        console.log('🆕 Evento SSE: Nova tarefa criada:', newTask.id, newTask.title);
+        
+        // Add new task to tasks state
+        setTasks(prevTasks => {
+          // Check if task already exists (avoid duplicates)
+          if (prevTasks.some(task => task.id === newTask.id)) {
+            return prevTasks;
+          }
+          return [...prevTasks, newTask];
+        });
+      } catch (error) {
+        console.error('❌ Erro ao processar evento task_created:', error);
+      }
+    });
+    
+    // Handle task_deleted events
+    eventSource.addEventListener('task_deleted', (event) => {
+      try {
+        const deletedTaskId = JSON.parse(event.data).id;
+        console.log('🗑️ Evento SSE: Tarefa deletada:', deletedTaskId);
+        
+        // Remove task from tasks state
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== deletedTaskId));
+        
+        // If we're viewing the deleted task, go back
+        if (selectedTask && selectedTask.id === deletedTaskId) {
+          setSelectedTask(null);
+        }
+        
+        // If we're viewing subtasks of the deleted task
+        if (selectedParentTask && selectedParentTask.id === deletedTaskId) {
+          setSelectedParentTask(null);
+          setSelectedTask(null);
+        }
+      } catch (error) {
+        console.error('❌ Erro ao processar evento task_deleted:', error);
+      }
+    });
+    
+    // Handle project_updated events
+    eventSource.addEventListener('project_updated', (event) => {
+      try {
+        const updatedProject = JSON.parse(event.data);
+        console.log('🏗️ Evento SSE: Projeto atualizado:', updatedProject.id, updatedProject.name);
+        
+        // Update projects state
+        setProjects(prevProjects => 
+          prevProjects.map(project => 
+            project.id === updatedProject.id ? { ...project, ...updatedProject } : project
+          )
+        );
+      } catch (error) {
+        console.error('❌ Erro ao processar evento project_updated:', error);
+      }
+    });
+    
+    // Handle connection open
+    eventSource.onopen = () => {
+      console.log('✅ Conexão SSE estabelecida com sucesso');
+    };
+    
+    // Handle errors
+    eventSource.onerror = (error) => {
+      console.error('❌ Erro na conexão SSE:', error);
+      
+      // Try to reconnect after 5 seconds
+      setTimeout(() => {
+        console.log('🔄 Tentando reconectar ao SSE...');
+        // The connection will automatically try to reconnect
+      }, 5000);
+    };
+    
+    // Cleanup function
+    return () => {
+      console.log('🔌 Fechando conexão SSE...');
+      eventSource.close();
+    };
+  }, [user, selectedTask, selectedParentTask]);
+
   const loadInitialData = async () => {
     try {
       setLoading(true);

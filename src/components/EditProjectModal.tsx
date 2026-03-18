@@ -28,6 +28,7 @@ interface EditProjectModalProps {
   onClose: () => void;
   onUpdate: (projectId: string, projectData: any) => Promise<void>;
   projectTypes: ProjectType[];
+  loadingProjectTypes?: boolean;
   currentUser: User | null;
 }
 
@@ -37,8 +38,29 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   onClose,
   onUpdate,
   projectTypes,
+  loadingProjectTypes = false,
   currentUser
 }) => {
+  console.log('🔍 EditProjectModal - projectTypes recebidos:', projectTypes);
+  console.log('🔍 EditProjectModal - Quantidade:', projectTypes.length);
+  console.log('🔍 EditProjectModal - Primeiro tipo:', projectTypes[0]);
+  
+  // Estado local para controlar se está carregando tipos
+  const [loadingTypes, setLoadingTypes] = useState(projectTypes.length === 0);
+  
+  // Monitorar quando os tipos são carregados
+  useEffect(() => {
+    if (loadingProjectTypes) {
+      setLoadingTypes(true);
+      console.log('⏳ Tipos de projeto ainda carregando (prop)...');
+    } else if (projectTypes.length > 0) {
+      setLoadingTypes(false);
+      console.log('✅ Tipos de projeto carregados no modal:', projectTypes.length);
+    } else {
+      setLoadingTypes(false);
+      console.log('⚠️ Nenhum tipo de projeto disponível');
+    }
+  }, [projectTypes, loadingProjectTypes]);
   // Estados do formulário
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -243,18 +265,33 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                       <label className="edit-project-modal-label">
                         Tipo de Projeto
                       </label>
-                      <select
-                        className="edit-project-modal-select"
-                        value={projectTypeId}
-                        onChange={(e) => setProjectTypeId(e.target.value)}
-                      >
-                        <option value="">Selecione um tipo (opcional)</option>
-                        {projectTypes.map(type => (
-                          <option key={type.id} value={type.id}>
-                            {type.name}
-                          </option>
-                        ))}
-                      </select>
+                      <div className="edit-project-modal-select-wrapper">
+                        <select
+                          className="edit-project-modal-select"
+                          value={projectTypeId}
+                          onChange={(e) => setProjectTypeId(e.target.value)}
+                          disabled={loadingTypes || projectTypes.length === 0}
+                        >
+                          <option value="">Selecione um tipo (opcional)</option>
+                          {loadingTypes ? (
+                            <option value="" disabled>Carregando tipos de projeto...</option>
+                          ) : projectTypes.length === 0 ? (
+                            <option value="" disabled>Nenhum tipo disponível</option>
+                          ) : (
+                            projectTypes.map(type => (
+                              <option key={type.id} value={type.id}>
+                                {type.name}
+                              </option>
+                            ))
+                          )}
+                        </select>
+                        {loadingTypes && (
+                          <div className="edit-project-modal-loading">
+                            <span className="edit-project-modal-spinner"></span>
+                            Carregando tipos...
+                          </div>
+                        )}
+                      </div>
                       <p className="edit-project-modal-help">
                         O tipo de projeto define regras e prompts específicos
                       </p>

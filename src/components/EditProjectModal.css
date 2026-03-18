@@ -143,6 +143,35 @@
   transition: all 0.2s;
 }
 
+.edit-project-modal-select-wrapper {
+  position: relative;
+}
+
+.edit-project-modal-loading {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.edit-project-modal-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: edit-project-modal-spin 1s linear infinite;
+}
+
+@keyframes edit-project-modal-spin {
+  to { transform: rotate(360deg); }
+}
+
 .edit-project-modal-input:focus,
 .edit-project-modal-textarea:focus,
 .edit-project-modal-select:focus {

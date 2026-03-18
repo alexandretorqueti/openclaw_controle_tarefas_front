@@ -61,6 +61,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectTypes, setProjectTypes] = useState<ProjectType[]>([]);
+  const [loadingProjectTypes, setLoadingProjectTypes] = useState(true);
   
   // Filtros
   const [search, setSearch] = useState('');
@@ -143,22 +144,39 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
   const loadProjectTypes = async () => {
     try {
       console.log('📡 Carregando tipos de projeto da API...');
+      setLoadingProjectTypes(true);
       const response = await api.getProjectTypes();
-      console.log('✅ Tipos de projeto:', response.data);
+      console.log('✅ Resposta completa da API:', response);
+      console.log('✅ response.data:', response.data);
+      console.log('✅ response.data.projectTypes:', response.data?.projectTypes);
       
-      if (response && response.data) {
-        setProjectTypes(response.data);
+      if (response && response.data && response.data.projectTypes) {
+        console.log('✅ Definindo projectTypes:', response.data.projectTypes);
+        setProjectTypes(response.data.projectTypes);
       } else {
+        console.log('⚠️ Nenhum tipo de projeto encontrado, definindo array vazio');
         setProjectTypes([]);
       }
     } catch (err) {
       console.error('❌ Erro ao carregar tipos de projeto:', err);
       setProjectTypes([]);
+    } finally {
+      setLoadingProjectTypes(false);
     }
   };
 
   // Handlers para ações de Projeto
   const handleEditProject = (project: Project) => {
+    console.log('📝 Abrindo modal de edição para projeto:', project.name);
+    console.log('📝 projectTypes disponíveis:', projectTypes.length);
+    console.log('📝 loadingProjectTypes:', loadingProjectTypes);
+    console.log('📝 projectTypes:', projectTypes);
+    
+    if (loadingProjectTypes) {
+      console.log('⚠️ Tipos de projeto ainda carregando, aguarde...');
+      // Poderia mostrar um toast ou mensagem aqui
+    }
+    
     setSelectedProject(project);
     setEditModalOpen(true);
   };
@@ -751,6 +769,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
         }}
         onUpdate={handleUpdateProject}
         projectTypes={projectTypes}
+        loadingProjectTypes={loadingProjectTypes}
         currentUser={null} // Poderia passar o usuário atual se necessário
       />
 

@@ -212,8 +212,8 @@ class ApiService {
     console.log('[DEBUG api.ts] Body antes snake_case:', config.body);
     if (config.body && typeof config.body === 'string' && !skipJsonProcessing) {
       try {
-        console.log('[DEBUG api.ts createComment] parsedBody:', parsedBody);
-      const parsedBody = JSON.parse(config.body);
+        const parsedBody = JSON.parse(config.body);
+        console.log('[DEBUG api.ts] parsedBody:', parsedBody);
         
         // Remove campos undefined para evitar problemas, mantendo booleanos (false)
         const cleanedBody = Object.fromEntries(
@@ -221,7 +221,7 @@ class ApiService {
         );
         
         const snakeCaseBody = convertToSnakeCase(cleanedBody);
-    console.log('[DEBUG api.ts] Body depois snake_case:', JSON.stringify(snakeCaseBody));
+        console.log('[DEBUG api.ts] Body depois snake_case:', JSON.stringify(snakeCaseBody));
         config.body = JSON.stringify(snakeCaseBody);
       } catch (error) {
         // If body is not valid JSON, leave it as is
