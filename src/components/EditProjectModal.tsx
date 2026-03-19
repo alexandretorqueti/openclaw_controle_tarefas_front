@@ -27,6 +27,7 @@ interface EditProjectModalProps {
   project: Project | null;
   onClose: () => void;
   onUpdate: (projectId: string, projectData: any) => Promise<void>;
+  onCreate?: (projectData: any) => Promise<void>; // Nova prop para criação
   projectTypes: ProjectType[];
   loadingProjectTypes?: boolean;
   currentUser: User | null;
@@ -37,6 +38,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   project,
   onClose,
   onUpdate,
+  onCreate,
   projectTypes,
   loadingProjectTypes = false,
   currentUser
@@ -44,6 +46,9 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   console.log('🔍 EditProjectModal - projectTypes recebidos:', projectTypes);
   console.log('🔍 EditProjectModal - Quantidade:', projectTypes.length);
   console.log('🔍 EditProjectModal - Primeiro tipo:', projectTypes[0]);
+  
+  // Determinar modo: criação (project === null) ou edição (project !== null)
+  const isNew = !project;
   
   // Estado local para controlar se está carregando tipos
   const [loadingTypes, setLoadingTypes] = useState(projectTypes.length === 0);
@@ -97,8 +102,10 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   const [loadingModels, setLoadingModels] = useState(false);
   
   // Inicializar formulário com dados do projeto
+  // Inicializar formulário com dados do projeto ou valores padrão
   useEffect(() => {
     if (project) {
+      // Modo edição - preencher com dados existentes
       setName(project.name || '');
       setDescription(project.description || '');
       setRegras(project.regras || '');
@@ -123,6 +130,32 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
       // Comandos de build
       setFrontendBuildCmd(project.frontendBuildCmd || '');
       setBackendBuildCmd(project.backendBuildCmd || '');
+    } else {
+      // Modo criação - valores padrão
+      setName('');
+      setDescription('');
+      setRegras('');
+      setProjectTypeId('');
+      setStatus(true); // Ativo por padrão
+      setAtivo(true); // Ativo por padrão
+      
+      // Configurações técnicas - vazias
+      setFrontendPath('');
+      setFrontendPort(undefined);
+      setBackendPath('');
+      setBackendPort(undefined);
+      setRepositoryUrl('');
+      setPastaBase('');
+      
+      // Agentes e modelos - vazios
+      setAgent('');
+      setProgramadorFront('');
+      setProgramadorBack('');
+      setModeloAuxiliar('');
+      
+      // Comandos de build - vazios
+      setFrontendBuildCmd('');
+      setBackendBuildCmd('');
     }
   }, [project]);
 
@@ -162,9 +195,8 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!project) return;
     
-    // Validação
+    // Validação (mantida para ambos os casos)
     if (!name.trim()) {
       setError('O nome do projeto é obrigatório');
       return;
@@ -196,15 +228,22 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         backendBuildCmd: backendBuildCmd.trim() || null
       };
       
-      await onUpdate(project.id, projectData);
-      setSuccess('Projeto atualizado com sucesso!');
+      if (isNew) {
+        // Modo criação - chamar API diretamente
+        await api.createProject(projectData);
+        setSuccess('Projeto criado com sucesso!');
+      } else if (project) {
+        // Modo edição - chamar API diretamente
+        await api.updateProject(project.id, projectData);
+        setSuccess('Projeto atualizado com sucesso!');
+      }
       
       // Fechar modal após 2 segundos
       setTimeout(() => {
         onClose();
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Erro ao atualizar projeto');
+      setError(err.message || 'Erro ao salvar projeto');
     } finally {
       setIsSaving(false);
     }
@@ -224,7 +263,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         <div className="edit-project-modal-header">
           <h2 className="edit-project-modal-title">
             <FaEdit size={20} />
-            Editar Projeto: {project.name}
+            {isNew ? 'Novo Projeto' : `Editar Projeto: ${project?.name || ''}`}
           </h2>
           <button className="edit-project-modal-close" onClick={onClose}>
             <FaTimes size={16} />
@@ -270,13 +309,12 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                           className="edit-project-modal-select"
                           value={projectTypeId}
                           onChange={(e) => setProjectTypeId(e.target.value)}
-                          disabled={loadingTypes || projectTypes.length === 0}
                         >
                           <option value="">Selecione um tipo (opcional)</option>
                           {loadingTypes ? (
-                            <option value="" disabled>Carregando tipos de projeto...</option>
+                            <option value="">Carregando tipos de projeto...</option>
                           ) : projectTypes.length === 0 ? (
-                            <option value="" disabled>Nenhum tipo disponível</option>
+                            <option value="">Nenhum tipo disponível</option>
                           ) : (
                             projectTypes.map(type => (
                               <option key={type.id} value={type.id}>
@@ -674,10 +712,15 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                     <FaSpinner className="loading-spinner" size={14} />
                     Salvando...
                   </>
+                ) : isNew ? (
+                  <>
+                    <FaCheck size={14} />
+                    Criar Projeto
+                  </>
                 ) : (
                   <>
                     <FaCheck size={14} />
-                    Salvar Alterações
+                    Atualizar Projeto
                   </>
                 )}
               </button>

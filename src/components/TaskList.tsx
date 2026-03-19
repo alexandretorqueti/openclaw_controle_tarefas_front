@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import api from '../services/api';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
 import TaskCard from './TaskCard';
@@ -62,6 +62,14 @@ const TaskList: React.FC<TaskListProps> = ({
   const showCompleted = onToggleShowCompleted ? propShowCompleted : localShowCompleted;
   // Back to top functionality
   const [showBackToTop, setShowBackToTop] = useState(false);
+  
+  // Estados para terminais em tempo real
+  const [analistaTerminal, setAnalistaTerminal] = useState<string>('');
+  const [programadorTerminal, setProgramadorTerminal] = useState<string>('');
+  const [isTypingAnalista, setIsTypingAnalista] = useState(false);
+  const [isTypingProgramador, setIsTypingProgramador] = useState(false);
+  const analistaRef = useRef<HTMLDivElement>(null);
+  const programadorRef = useRef<HTMLDivElement>(null);
 
   // Handle scroll to show/hide back to top button
   React.useEffect(() => {
@@ -72,6 +80,92 @@ const TaskList: React.FC<TaskListProps> = ({
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Inicializar terminais com conteúdo da primeira tarefa
+  useEffect(() => {
+    if (tasks.length > 0) {
+      const firstTask = tasks[0];
+      if (firstTask.arquitetosTerminalContent) {
+        setAnalistaTerminal(firstTask.arquitetosTerminalContent);
+      }
+      if (firstTask.programadorTerminalContent) {
+        setProgramadorTerminal(firstTask.programadorTerminalContent);
+      }
+    }
+  }, [tasks]);
+
+  // SSE para atualização em tempo real dos terminais
+  useEffect(() => {
+    const eventSource = new EventSource('http://localhost:4001/api/sse/events');
+    
+    eventSource.addEventListener('terminal_update', (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('📡 Terminal update received:', data);
+        
+        if (data.type === 'analista' && data.content) {
+          setIsTypingAnalista(true);
+          setAnalistaTerminal(prev => prev + data.content);
+          
+          // Efeito de digitação
+          setTimeout(() => {
+            setIsTypingAnalista(false);
+            // Scroll automático para o final
+            if (analistaRef.current) {
+              analistaRef.current.scrollTop = analistaRef.current.scrollHeight;
+            }
+          }, data.content.length * 30); // 30ms por caractere
+        }
+        
+        if (data.type === 'programador' && data.content) {
+          setIsTypingProgramador(true);
+          setProgramadorTerminal(prev => prev + data.content);
+          
+          // Efeito de digitação
+          setTimeout(() => {
+            setIsTypingProgramador(false);
+            // Scroll automático para o final
+            if (programadorRef.current) {
+              programadorRef.current.scrollTop = programadorRef.current.scrollHeight;
+            }
+          }, data.content.length * 30); // 30ms por caractere
+        }
+        
+        if (data.type === 'terminal_clear') {
+          if (data.target === 'analista' || data.target === 'both') {
+            setAnalistaTerminal('');
+          }
+          if (data.target === 'programador' || data.target === 'both') {
+            setProgramadorTerminal('');
+          }
+        }
+        
+      } catch (error) {
+        console.error('❌ Erro ao processar evento terminal_update:', error);
+      }
+    });
+
+    eventSource.addEventListener('task_updated', (event) => {
+      try {
+        const updatedTask = JSON.parse(event.data);
+        // Atualizar terminais se a tarefa atualizada for a primeira da lista
+        if (tasks.length > 0 && updatedTask.id === tasks[0].id) {
+          if (updatedTask.arquitetosTerminalContent !== undefined) {
+            setAnalistaTerminal(updatedTask.arquitetosTerminalContent || '');
+          }
+          if (updatedTask.programadorTerminalContent !== undefined) {
+            setProgramadorTerminal(updatedTask.programadorTerminalContent || '');
+          }
+        }
+      } catch (error) {
+        console.error('❌ Erro ao processar task_updated para terminal:', error);
+      }
+    });
+
+    return () => {
+      eventSource.close();
+    };
+  }, [tasks]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -262,6 +356,22 @@ const TaskList: React.FC<TaskListProps> = ({
 
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+      <style>
+        {`
+          @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+          }
+          @keyframes typewriter {
+            from { width: 0; }
+            to { width: 100%; }
+          }
+        `}
+      </style>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
         {/* Breadcrumb / Navigation */}
@@ -363,6 +473,306 @@ const TaskList: React.FC<TaskListProps> = ({
             >
               Nova Tarefa
             </Button>
+          </div>
+        </div>
+
+        {/* Quadros de Terminal - Analista e Programador */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: '1fr 1fr', 
+          gap: '20px', 
+          marginBottom: '24px'
+        }}>
+          {/* Quadro do Analista */}
+          <div style={{
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '12px',
+            padding: '20px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '300px'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '16px',
+              paddingBottom: '12px',
+              borderBottom: '2px solid #8b5cf6'
+            }}>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#8b5cf6',
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span>🧠</span> Analista (Terminal)
+              </h3>
+              <div style={{
+                fontSize: '12px',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                padding: '4px 8px',
+                borderRadius: '4px'
+              }}>
+                Arquitetos AI
+              </div>
+            </div>
+            
+            <div 
+              ref={analistaRef}
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                backgroundColor: '#1a1a1a',
+                borderRadius: '8px',
+                padding: '16px',
+                fontFamily: 'monospace',
+                fontSize: '13px',
+                lineHeight: '1.5',
+                color: '#e0e0e0',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                position: 'relative'
+              }}
+            >
+              {analistaTerminal ? (
+                <>
+                  <div style={{ 
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '10px',
+                    color: isTypingAnalista ? '#8b5cf6' : '#666',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    zIndex: 10
+                  }}>
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: isTypingAnalista ? '#8b5cf6' : '#666',
+                      animation: isTypingAnalista ? 'pulse 1s infinite' : 'none'
+                    }} />
+                    {isTypingAnalista ? 'Digitando...' : 'Online'}
+                  </div>
+                  <div style={{
+                    opacity: isTypingAnalista ? 0.9 : 1,
+                    transition: 'opacity 0.3s'
+                  }}>
+                    {analistaTerminal}
+                    {isTypingAnalista && (
+                      <span style={{
+                        display: 'inline-block',
+                        width: '8px',
+                        height: '16px',
+                        backgroundColor: '#8b5cf6',
+                        marginLeft: '2px',
+                        verticalAlign: 'middle',
+                        animation: 'blink 1s infinite'
+                      }} />
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div style={{ color: '#888', fontStyle: 'italic', textAlign: 'center', padding: '40px 0' }}>
+                  Nenhum conteúdo do terminal do analista disponível
+                </div>
+              )}
+            </div>
+            
+            <div style={{
+              fontSize: '11px',
+              color: 'var(--text-tertiary)',
+              marginTop: '12px',
+              textAlign: 'right',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <button
+                onClick={() => setAnalistaTerminal('')}
+                style={{
+                  background: 'none',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '10px',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#8b5cf6';
+                  e.currentTarget.style.color = '#8b5cf6';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }}
+              >
+                Limpar terminal
+              </button>
+              <span>
+                {analistaTerminal ? 'Atualizando em tempo real' : 'Aguardando dados'}
+              </span>
+            </div>
+          </div>
+
+          {/* Quadro do Programador */}
+          <div style={{
+            backgroundColor: 'var(--bg-card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '12px',
+            padding: '20px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+            height: '300px'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '16px',
+              paddingBottom: '12px',
+              borderBottom: '2px solid #10b981'
+            }}>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                color: '#10b981',
+                margin: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span>💻</span> Programador (Terminal)
+              </h3>
+              <div style={{
+                fontSize: '12px',
+                color: 'var(--text-secondary)',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                padding: '4px 8px',
+                borderRadius: '4px'
+              }}>
+                Programador AI
+              </div>
+            </div>
+            
+            <div 
+              ref={programadorRef}
+              style={{
+                flex: 1,
+                overflowY: 'auto',
+                backgroundColor: '#1a1a1a',
+                borderRadius: '8px',
+                padding: '16px',
+                fontFamily: 'monospace',
+                fontSize: '13px',
+                lineHeight: '1.5',
+                color: '#e0e0e0',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                position: 'relative'
+              }}
+            >
+              {programadorTerminal ? (
+                <>
+                  <div style={{ 
+                    position: 'absolute',
+                    top: '16px',
+                    right: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontSize: '10px',
+                    color: isTypingProgramador ? '#10b981' : '#666',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: '4px 8px',
+                    borderRadius: '4px',
+                    zIndex: 10
+                  }}>
+                    <div style={{
+                      width: '8px',
+                      height: '8px',
+                      borderRadius: '50%',
+                      backgroundColor: isTypingProgramador ? '#10b981' : '#666',
+                      animation: isTypingProgramador ? 'pulse 1s infinite' : 'none'
+                    }} />
+                    {isTypingProgramador ? 'Digitando...' : 'Online'}
+                  </div>
+                  <div style={{
+                    opacity: isTypingProgramador ? 0.9 : 1,
+                    transition: 'opacity 0.3s'
+                  }}>
+                    {programadorTerminal}
+                    {isTypingProgramador && (
+                      <span style={{
+                        display: 'inline-block',
+                        width: '8px',
+                        height: '16px',
+                        backgroundColor: '#10b981',
+                        marginLeft: '2px',
+                        verticalAlign: 'middle',
+                        animation: 'blink 1s infinite'
+                      }} />
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div style={{ color: '#888', fontStyle: 'italic', textAlign: 'center', padding: '40px 0' }}>
+                  Nenhum conteúdo do terminal do programador disponível
+                </div>
+              )}
+            </div>
+            
+            <div style={{
+              fontSize: '11px',
+              color: 'var(--text-tertiary)',
+              marginTop: '12px',
+              textAlign: 'right',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <button
+                onClick={() => setProgramadorTerminal('')}
+                style={{
+                  background: 'none',
+                  border: '1px solid var(--border-color)',
+                  color: 'var(--text-secondary)',
+                  fontSize: '10px',
+                  padding: '4px 8px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = '#10b981';
+                  e.currentTarget.style.color = '#10b981';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'var(--border-color)';
+                  e.currentTarget.style.color = 'var(--text-secondary)';
+                }}
+              >
+                Limpar terminal
+              </button>
+              <span>
+                {programadorTerminal ? 'Atualizando em tempo real' : 'Aguardando dados'}
+              </span>
+            </div>
           </div>
         </div>
 

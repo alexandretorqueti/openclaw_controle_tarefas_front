@@ -72,16 +72,10 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   // Estados para formulários
-  const [createForm, setCreateForm] = useState({
-    name: '',
-    description: '',
-    status: true,
-    projectTypeId: ''
-  });
+  // Nota: createForm removido - agora usamos EditProjectModal para criação
 
   // Carregar dados
   useEffect(() => {
@@ -197,14 +191,14 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
     }
   };
 
-  const handleCreateProject = async () => {
+  const handleCreateProjectSubmit = async (projectData: any) => {
     try {
-      await api.createProject(createForm);
+      const response = await api.createProject(projectData);
       await loadProjects();
-      setCreateModalOpen(false);
-      setCreateForm({ name: '', description: '', status: true, projectTypeId: '' });
+      return response.data;
     } catch (err: any) {
       console.error(`Erro ao criar projeto: ${err.message}`);
+      throw err;
     }
   };
 
@@ -347,7 +341,10 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
             }}
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-dark)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--primary-color)'}
-            onClick={() => setCreateModalOpen(true)}
+            onClick={() => {
+              setSelectedProject(null);
+              setEditModalOpen(true);
+            }}
           >
             <FaPlus size={14} />
             Novo Projeto
@@ -768,152 +765,13 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
           setSelectedProject(null);
         }}
         onUpdate={handleUpdateProject}
+        onCreate={handleCreateProjectSubmit}
         projectTypes={projectTypes}
         loadingProjectTypes={loadingProjectTypes}
         currentUser={null} // Poderia passar o usuário atual se necessário
       />
 
-      {/* Modal de Criação */}
-      {createModalOpen && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            padding: '30px',
-            width: '90%',
-            maxWidth: '500px'
-          }}>
-            <h2 style={{ marginTop: 0 }}>Criar Novo Projeto</h2>
-            
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                Nome do Projeto *
-              </label>
-              <input
-                type="text"
-                value={createForm.name}
-                onChange={(e) => setCreateForm({...createForm, name: e.target.value})}
-                placeholder="Digite o nome do projeto"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  fontSize: '16px'
-                }}
-              />
-            </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                Descrição
-              </label>
-              <textarea
-                value={createForm.description}
-                onChange={(e) => setCreateForm({...createForm, description: e.target.value})}
-                placeholder="Descreva o projeto"
-                rows={4}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  fontSize: '16px',
-                  resize: 'vertical'
-                }}
-              />
-            </div>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                Tipo de Projeto
-              </label>
-              <select
-                value={createForm.projectTypeId}
-                onChange={(e) => setCreateForm({...createForm, projectTypeId: e.target.value})}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  fontSize: '16px'
-                }}
-              >
-                <option value="">Selecione um tipo</option>
-                {projectTypes.map(type => (
-                  <option key={type.id} value={type.id}>
-                    {type.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div style={{ marginBottom: '30px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                Status
-              </label>
-              <div style={{ display: 'flex', gap: '20px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="radio"
-                    checked={createForm.status}
-                    onChange={() => setCreateForm({...createForm, status: true})}
-                  />
-                  Ativo
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <input
-                    type="radio"
-                    checked={!createForm.status}
-                    onChange={() => setCreateForm({...createForm, status: false})}
-                  />
-                  Inativo
-                </label>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-              <button
-                onClick={() => setCreateModalOpen(false)}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#6b7280',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={handleCreateProject}
-                style={{
-                  padding: '10px 20px',
-                  backgroundColor: '#4f46e5',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer'
-                }}
-              >
-                Criar Projeto
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal de Confirmação de Exclusão */}
       {deleteConfirmOpen && selectedProject && (

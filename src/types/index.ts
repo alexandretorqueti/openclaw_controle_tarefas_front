@@ -86,6 +86,10 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
   agent?: string | null;
+  domain?: string | null;
+  isDecomposed?: boolean;
+  isAtomic?: boolean;
+  isExecuting?: boolean;
   
   // Recurrence fields
   isRecurring?: boolean;

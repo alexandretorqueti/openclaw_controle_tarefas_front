@@ -271,14 +271,15 @@ const AppContent: React.FC = () => {
     }
   };
 
-  const loadTasks = async (projectId?: string | null, filters = taskFilters) => {
+  const loadTasks = async (projectId?: string | null, filters = taskFilters, forceRoot = false) => {
     try {
       let tasksData;
       
       // LOGICA DE CONTEXTO REFORÇADA:
       // Se estamos visualizando sub-tarefas (selectedParentTask existe), 
       // ignoramos o parentTaskId: null dos filtros e mantemos o foco na sub-tarefa.
-      const currentParentId = selectedParentTask ? selectedParentTask.id : null;
+      // A menos que forceRoot seja true (quando voltamos para a raiz do projeto).
+      const currentParentId = (forceRoot || !selectedParentTask) ? null : selectedParentTask.id;
 
       const finalFilters = { 
         ...filters,
@@ -292,7 +293,21 @@ const AppContent: React.FC = () => {
       }
       
       // @ts-expect-error tasksData é unknown
-      setTasks(tasksData.tasks || []);
+      const tasksList = tasksData.tasks || [];
+      
+      // DEBUG: Verificar se isExecuting está presente
+      if (tasksList.length > 0) {
+        const firstTask = tasksList[0];
+        console.log('🔍 DEBUG loadTasks - Primeira tarefa:', {
+          id: firstTask.id,
+          title: firstTask.title,
+          hasIsExecuting: 'isExecuting' in firstTask,
+          isExecutingValue: firstTask.isExecuting,
+          allFields: Object.keys(firstTask)
+        });
+      }
+      
+      setTasks(tasksList);
     } catch (err) {
       console.error('Failed to load tasks:', err);
       setTasks([]);
@@ -359,9 +374,9 @@ const AppContent: React.FC = () => {
       setSelectedParentTask(null);
       setParentHierarchy([]);
       if (selectedProject) {
-        loadTasks(selectedProject.id);
+        loadTasks(selectedProject.id, taskFilters, true); // forceRoot = true
       } else {
-        loadTasks();
+        loadTasks(undefined, taskFilters, true); // forceRoot = true
       }
       return;
     }
@@ -382,7 +397,7 @@ const AppContent: React.FC = () => {
     setSelectedParentTask(null);
     setParentHierarchy([]);
     setViewMode('tasks');
-    loadTasks(project.id);
+    loadTasks(project.id, taskFilters, true); // forceRoot = true
   };
 
   const handleBackToList = () => {
@@ -469,7 +484,7 @@ const AppContent: React.FC = () => {
       // @ts-expect-error newTask is unknown
       setTasks([...tasks, newTask]);
       if (selectedProject) {
-        loadTasks(selectedProject.id);
+        loadTasks(selectedProject.id, taskFilters, !selectedParentTask); // forceRoot = !selectedParentTask
       }
       return newTask;
     } catch (err) {
@@ -499,7 +514,7 @@ const AppContent: React.FC = () => {
       }
       if (selectedProject) {
         // Agora loadTasks já cuida de verificar o selectedParentTask sozinho
-        loadTasks(selectedProject.id);
+        loadTasks(selectedProject.id, taskFilters, !selectedParentTask); // forceRoot = !selectedParentTask
       }
       return enhancedTask; // Retorna a tarefa atualizada com objetos relacionados
     } catch (err) {
@@ -517,7 +532,7 @@ const AppContent: React.FC = () => {
         setViewMode('tasks');
       }
       if (selectedProject) {
-        loadTasks(selectedProject.id);
+        loadTasks(selectedProject.id, taskFilters, !selectedParentTask); // forceRoot = !selectedParentTask
       }
     } catch (err) {
       console.error('Failed to delete task:', err);

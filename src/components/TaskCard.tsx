@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle, FaTasks, FaAtom } from 'react-icons/fa';
+import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle, FaTasks, FaAtom, FaSpinner, FaCircle } from 'react-icons/fa';
 import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
 
 interface TaskCardProps {
@@ -21,19 +21,19 @@ interface TaskCardProps {
   compact?: boolean;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ 
-  task, 
-  users, 
-  statuses, 
+const TaskCard: React.FC<TaskCardProps> = ({
+  task,
+  users,
+  statuses,
   priorities,
-  agents = [] as Agent[], 
+  agents = [] as Agent[],
   projects,
   onTaskClick,
   onViewSubtasks,
   onUpdateTask,
   onDeleteTask,
   onToggleCompletion,
-  compact = false 
+  compact = false
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -54,26 +54,27 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const deadlineDate = safeParseDate(task.deadline);
   const isOverdue = !task.isCompleted && deadlineDate && deadlineDate < new Date();
   const formattedDeadline = safeFormatDate(task.deadline, "dd 'de' MMMM 'de' yyyy") || 'Sem prazo definido';
-  
+
   const hasSubtasks = (task as any).subtasks?.length > 0 || (task as any)._count?.subtasks > 0;
 
   const handleToggleCompletion = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
     if (onToggleCompletion) {
       setError(null); // Limpa erros anteriores
-      
+
       try {
         await onToggleCompletion(task.id);
       } catch (error: any) {
         console.error('Failed to toggle task completion:', error);
-        
+
         // Extrai mensagem de erro amigável
         let errorMessage = 'Erro ao alterar status da tarefa.';
-        
+
         if (error.message) {
           errorMessage = error.message;
         }
-        
+
         setError(errorMessage);
       }
     }
@@ -81,24 +82,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
+
     if (!onDeleteTask) return;
-    
+
     if (window.confirm('Tem certeza que deseja excluir esta tarefa?')) {
       setIsDeleting(true);
       setError(null); // Limpa erros anteriores
-      
+
       try {
         await onDeleteTask(task.id);
       } catch (error: any) {
         console.error('Failed to delete task:', error);
-        
+
         // Extrai mensagem de erro amigável
         let errorMessage = 'Erro ao excluir tarefa.';
-        
+
         if (error.message) {
           errorMessage = error.message;
         }
-        
+
         setError(errorMessage);
         setIsDeleting(false);
       }
@@ -107,34 +109,35 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   const handleStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
+
     if (!onUpdateTask) return;
-    
+
     setIsUpdating(true);
     setError(null); // Limpa erros anteriores
-    
+
     try {
       await onUpdateTask(task.id, { statusId: e.target.value });
     } catch (error: any) {
       console.error('Failed to update task status:', error);
-      
+
       // Extrai mensagem de erro amigável
       let errorMessage = 'Erro ao atualizar status da tarefa.';
-      
+
       if (error.message) {
         errorMessage = error.message;
       }
-      
+
       // Tenta extrair detalhes da resposta da API
       if (error.details && Array.isArray(error.details)) {
-        const validationErrors = error.details.map((detail: any) => 
+        const validationErrors = error.details.map((detail: any) =>
           detail.message || `${detail.path?.join('.')}: ${detail.code}`
         ).join(', ');
-        
+
         if (validationErrors) {
           errorMessage = `Erros de validação: ${validationErrors}`;
         }
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsUpdating(false);
@@ -144,35 +147,36 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   const handleAssignedToChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
+
     if (!onUpdateTask) return;
-    
+
     setIsUpdating(true);
-    setError(null); // Limpa erros anteriores
-    
+    setError(null); // Limpa erros anterior
+
     try {
       const newValue = e.target.value === '' ? null : e.target.value;
       await onUpdateTask(task.id, { assignedToId: newValue });
     } catch (error: any) {
       console.error('Failed to update task assigned user:', error);
-      
+
       // Extrai mensagem de erro amigável
       let errorMessage = 'Erro ao atualizar usuário atribuído da tarefa.';
-      
+
       if (error.message) {
         errorMessage = error.message;
       }
-      
+
       // Tenta extrair detalhes da resposta da API
       if (error.details && Array.isArray(error.details)) {
-        const validationErrors = error.details.map((detail: any) => 
+        const validationErrors = error.details.map((detail: any) =>
           detail.message || `${detail.path?.join('.')}: ${detail.code}`
         ).join(', ');
-        
+
         if (validationErrors) {
           errorMessage = `Erros de validação: ${validationErrors}`;
         }
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsUpdating(false);
@@ -181,6 +185,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   const handlePriorityChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
+    
     if (!onUpdateTask) return;
     
     setIsUpdating(true);
@@ -197,7 +202,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       if (error.message) {
         errorMessage = error.message;
       }
-      
+
       // Tenta extrair detalhes da resposta da API
       if (error.details && Array.isArray(error.details)) {
         const validationErrors = error.details.map((detail: any) => 
@@ -218,34 +223,34 @@ const TaskCard: React.FC<TaskCardProps> = ({
     const handleAgentChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
     e.stopPropagation();
     if (!onUpdateTask) return;
-    
+
     setIsUpdating(true);
     setError(null); // Limpa erros anteriores
-    
+
     try {
       const newValue = e.target.value === '' ? null : e.target.value;
       await onUpdateTask(task.id, { agent: newValue });
     } catch (error: any) {
       console.error('Failed to update task agent:', error);
-      
+
       // Extrai mensagem de erro amigável
       let errorMessage = 'Erro ao atualizar agente da tarefa.';
-      
+
       if (error.message) {
         errorMessage = error.message;
       }
-      
+
       // Tenta extrair detalhes da resposta da API
       if (error.details && Array.isArray(error.details)) {
-        const validationErrors = error.details.map((detail: any) => 
+        const validationErrors = error.details.map((detail: any) =>
           detail.message || `${detail.path?.join('.')}: ${detail.code}`
         ).join(', ');
-        
+
         if (validationErrors) {
           errorMessage = `Erros de validação: ${validationErrors}`;
         }
       }
-      
+
       setError(errorMessage);
     } finally {
       setIsUpdating(false);
@@ -254,7 +259,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
 if (compact) {
     return (
-      <div 
+      <div
         className="task-card-compact"
         style={{
           border: '1px solid var(--border-color)',
@@ -325,19 +330,64 @@ if (compact) {
               >
                 {task.isCompleted && <FaCheck size={10} color="white" />}
               </button>
-              <h3 style={{
-                fontSize: '14px',
-                fontWeight: 600,
-                color: 'var(--text-primary)',
-                margin: 0,
-                textDecoration: task.isCompleted ? 'line-through' : 'none',
-                opacity: task.isCompleted ? 0.7 : 1
-              }}>
-                {task.title || 'Sem título'}
-              </h3>
-              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                <h3 style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  margin: 0,
+                  textDecoration: task.isCompleted ? 'line-through' : 'none',
+                  opacity: task.isCompleted ? 0.7 : 1
+                }}>
+                  {task.title || 'Sem título'}
+                </h3>
+                
+                {task.isExecuting && (
+                  <div 
+                    title="Esta tarefa está sendo processada"
+                    style={{
+                      backgroundColor: 'var(--accent-color)',
+                      color: 'white',
+                      padding: '2px 6px',
+                      borderRadius: '3px',
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                      animation: 'pulse 1.5s infinite'
+                    }}
+                  >
+                    <FaSpinner size={8} style={{ animation: 'spin 1s linear infinite' }} />
+                    <span>EXEC</span>
+                  </div>
+                )}
+
+                {task.hasChildExecuting && !task.isExecuting && (
+                  <div 
+                    title="Filhos em execução"
+                    style={{
+                      backgroundColor: '#ff9800', // Laranja
+                      color: 'white',
+                      padding: '2px 6px',
+                      borderRadius: '3px',
+                      fontSize: '9px',
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                      animation: 'pulse 1.5s infinite'
+                    }}
+                  >
+                    <FaCircle size={6} />
+                    <span>FILHO</span>
+                  </div>
+                )}
+                
+              </div>
+
               {task.isAtomic && (
-                <div 
+                <div
                   title="Tarefa Atômica"
                   style={{
                     display: 'flex',
@@ -422,22 +472,38 @@ if (compact) {
     );
   }
 
+  // Estilos inline para animação do spinner
+  const spinAnimation = `
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.7; }
+      100% { opacity: 1; }
+    }
+  `;
+
   // Full version
   return (
-    <div 
-      className="task-card"
-      
-      style={{
-        border: `1px solid ${isOverdue ? 'var(--danger-color)' : 'var(--border-color)'}`,
-        borderRadius: '12px',
-        padding: '20px',
-        backgroundColor: 'var(--bg-card)',
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        position: 'relative',
-        borderLeft: `4px solid ${status?.colorCode || 'var(--text-secondary)'}`
-      }}
+    <>
+      <style>{spinAnimation}</style>
+      <div
+        className="task-card"
+
+        style={{
+          border: `1px solid ${isOverdue ? 'var(--danger-color)' : 'var(--border-color)'}`,
+          borderRadius: '12px',
+          padding: '20px',
+          backgroundColor: 'var(--bg-card)',
+          cursor: 'pointer', // Cursor alterado
+          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          position: 'relative',
+          borderLeft: `4px solid ${status?.colorCode || 'var(--text-secondary)'}`
+        }}
       onMouseEnter={(e) => {
         e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -466,56 +532,27 @@ if (compact) {
         </div>
       )}
 
-      {/* Completion toggle */}
-      <div style={{ position: 'absolute', top: '20px', right: '20px' }}>
-        <button
-          onClick={handleToggleCompletion}
-          style={{
-            width: '24px',
-            height: '24px',
-            borderRadius: '6px',
-            border: `2px solid ${task.isCompleted ? 'var(--success-color)' : 'var(--border-color)'}`,
-            backgroundColor: task.isCompleted ? 'var(--success-color)' : 'transparent',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-          onMouseEnter={(e) => {
-            if (!task.isCompleted) {
-              e.currentTarget.style.borderColor = 'var(--accent-color)';
-              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!task.isCompleted) {
-              e.currentTarget.style.borderColor = 'var(--border-color)';
-              e.currentTarget.style.backgroundColor = 'transparent';
-            }
-          }}
-        >
-          {task.isCompleted && <FaCheck size={14} color="white" />}
-        </button>
-      </div>
+      
 
       {/* Task header */}
       <div style={{ marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <h3 style={{
-            fontSize: '18px',
-            fontWeight: 700,
-            color: 'var(--text-primary)',
-            margin: 0,
-            textDecoration: task.isCompleted ? 'line-through' : 'none',
-            opacity: task.isCompleted ? 0.7 : 1,
-            flex: 1
-          }}>
-            {task.title || 'Sem título'}
-          </h3>
-          
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1 }}>
+            <h3 style={{
+              fontSize: '18px',
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+              margin: 0,
+              textDecoration: task.isCompleted ? 'line-through' : 'none',
+              opacity: task.isCompleted ? 0.7 : 1
+            }}>
+              {task.title || 'Sem título'}
+            </h3>
+            
+          </div>
+
           {task.isAtomic && (
-            <div 
+            <div
               title="Tarefa Atômica: Uma tarefa indivisível, de escopo fechado, com objetivo e passos claros, pronta para execução."
               style={{
                 display: 'flex',
@@ -537,7 +574,49 @@ if (compact) {
               Atômica
             </div>
           )}
-          
+
+          {task.isExecuting && (
+            <div 
+              title="Esta tarefa está sendo processada pelo monitor no momento"
+              style={{
+                backgroundColor: 'var(--accent-color)',
+                color: 'white',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                animation: 'pulse 1.5s infinite'
+              }}
+            >
+              <FaSpinner size={10} style={{ animation: 'spin 1s linear infinite' }} />
+              <span>EM EXECUÇÃO</span>
+            </div>
+          )}
+
+          {task.hasChildExecuting && !task.isExecuting && (
+            <div 
+              title="Um ou mais filhos desta tarefa estão sendo processados"
+              style={{
+                backgroundColor: '#ff9800', // Laranja
+                color: 'white',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                animation: 'pulse 1.5s infinite'
+              }}
+            >
+              <FaCircle size={8} />
+              <span>FILHO EXECUTANDO</span>
+            </div>
+          )}
+
           {priority && (
             <div style={{
               padding: '4px 12px',
@@ -698,8 +777,8 @@ if (compact) {
           ) : (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {assignedUser?.avatarUrl ? (
-                <img 
-                  src={assignedUser.avatarUrl} 
+                <img
+                  src={assignedUser.avatarUrl}
                   alt={assignedUser.name}
                   style={{
                     width: '24px',
@@ -738,7 +817,7 @@ if (compact) {
         borderTop: '1px solid var(--border-color)'
       }}>
         <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-          Criado por: {creator?.name || 'Desconhecido'} • 
+          Criado por: {creator?.name || 'Desconhecido'} •
           {safeFormatDate(task.createdAt, " dd/MM/yyyy") || 'Data inválida'}
         </div>
 
@@ -771,7 +850,7 @@ if (compact) {
               {isDeleting ? 'Excluindo...' : 'Excluir'}
             </button>
           )}
-          
+
           {onToggleCompletion && (
             <button
               onClick={handleToggleCompletion}
@@ -795,7 +874,7 @@ if (compact) {
               {task.isCompleted ? 'Reabrir' : 'Concluir'}
             </button>
           )}
-          
+
           {/* Botões de Subtarefas (condicionais ao status de hasSubtasks) */}
           {onViewSubtasks && (
             hasSubtasks ? (
@@ -860,7 +939,7 @@ if (compact) {
               </button>
             )
           )}
-          
+
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -888,6 +967,7 @@ if (compact) {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
