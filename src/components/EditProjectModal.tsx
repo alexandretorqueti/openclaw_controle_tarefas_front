@@ -254,7 +254,7 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     return new Date(dateString).toLocaleString('pt-BR');
   };
 
-  if (!isOpen || !project) return null;
+  if (!isOpen) return null;
 
   return (
     <div className="edit-project-modal-overlay">
@@ -628,54 +628,56 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                   </div>
                 </div>
                 
-                {/* Seção 4: Metadados (somente leitura) */}
-                <div className="edit-project-modal-section">
-                  <h3 className="edit-project-modal-section-title">
-                    <FaInfoCircle size={16} />
-                    Metadados
-                  </h3>
-                  <div className="edit-project-modal-metadata">
-                    <div className="edit-project-modal-metadata-item">
-                      <span className="edit-project-modal-metadata-label">
-                        <FaCalendar size={12} /> Criado em
-                      </span>
-                      <span className="edit-project-modal-metadata-value">
-                        {formatDate(project.createdAt)}
-                      </span>
-                    </div>
-                    
-                    <div className="edit-project-modal-metadata-item">
-                      <span className="edit-project-modal-metadata-label">
-                        <FaCalendar size={12} /> Última atualização
-                      </span>
-                      <span className="edit-project-modal-metadata-value">
-                        {formatDate(project.updatedAt)}
-                      </span>
-                    </div>
-                    
-                    {project.createdBy && (
+                {/* Seção 4: Metadados (somente leitura) - Apenas no modo edição */}
+                {!isNew && project && (
+                  <div className="edit-project-modal-section">
+                    <h3 className="edit-project-modal-section-title">
+                      <FaInfoCircle size={16} />
+                      Metadados
+                    </h3>
+                    <div className="edit-project-modal-metadata">
                       <div className="edit-project-modal-metadata-item">
                         <span className="edit-project-modal-metadata-label">
-                          <FaUser size={12} /> Criado por
+                          <FaCalendar size={12} /> Criado em
                         </span>
                         <span className="edit-project-modal-metadata-value">
-                          {project.createdBy.name}
+                          {formatDate(project.createdAt)}
                         </span>
                       </div>
-                    )}
-                    
-                    {project.projectType && (
+                      
                       <div className="edit-project-modal-metadata-item">
                         <span className="edit-project-modal-metadata-label">
-                          <FaTag size={12} /> Tipo Atual
+                          <FaCalendar size={12} /> Última atualização
                         </span>
                         <span className="edit-project-modal-metadata-value">
-                          {project.projectType.name}
+                          {formatDate(project.updatedAt)}
                         </span>
                       </div>
-                    )}
+                      
+                      {project.createdBy && (
+                        <div className="edit-project-modal-metadata-item">
+                          <span className="edit-project-modal-metadata-label">
+                            <FaUser size={12} /> Criado por
+                          </span>
+                          <span className="edit-project-modal-metadata-value">
+                            {project.createdBy.name}
+                          </span>
+                        </div>
+                      )}
+                      
+                      {project.projectType && (
+                        <div className="edit-project-modal-metadata-item">
+                          <span className="edit-project-modal-metadata-label">
+                            <FaTag size={12} /> Tipo Atual
+                          </span>
+                          <span className="edit-project-modal-metadata-value">
+                            {project.projectType.name}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
                 
                 {/* Mensagens de erro/sucesso */}
                 {error && (

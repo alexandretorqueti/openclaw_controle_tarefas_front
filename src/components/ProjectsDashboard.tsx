@@ -141,12 +141,12 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
       setLoadingProjectTypes(true);
       const response = await api.getProjectTypes();
       console.log('✅ Resposta completa da API:', response);
-      console.log('✅ response.data:', response.data);
-      console.log('✅ response.data.projectTypes:', response.data?.projectTypes);
+      console.log('✅ response:', response);
+      console.log('✅ response.projectTypes:', response?.projectTypes);
       
-      if (response && response.data && response.data.projectTypes) {
-        console.log('✅ Definindo projectTypes:', response.data.projectTypes);
-        setProjectTypes(response.data.projectTypes);
+      if (response && response.projectTypes) {
+        console.log('✅ Definindo projectTypes:', response.projectTypes);
+        setProjectTypes(response.projectTypes);
       } else {
         console.log('⚠️ Nenhum tipo de projeto encontrado, definindo array vazio');
         setProjectTypes([]);
