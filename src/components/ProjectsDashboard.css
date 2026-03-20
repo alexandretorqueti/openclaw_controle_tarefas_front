@@ -12,6 +12,7 @@
   --status-completed: #3b82f6;
   --status-on-hold: #f59e0b;
   --status-cancelled: #ef4444;
+  --status-inactive: #6b7280;
   
   /* Cores de prioridade */
   --priority-high: #ef4444;
@@ -456,7 +457,7 @@
 
 .badge-status.inactive {
   background-color: rgba(107, 114, 128, 0.1);
-  color: #6b7280;
+  color: var(--status-inactive);
 }
 
 .badge-priority {

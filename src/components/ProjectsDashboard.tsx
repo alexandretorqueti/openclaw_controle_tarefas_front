@@ -608,7 +608,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
                       display: 'inline-block',
                       padding: '4px 8px',
                       backgroundColor: project.status ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)',
-                      color: project.status ? '#10b981' : '#ef4444',
+                      color: project.status ? 'var(--status-active)' : 'var(--status-cancelled)',
                       borderRadius: '4px',
                       fontSize: '11px',
                       fontWeight: '600',
@@ -680,7 +680,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
                       borderRadius: '6px',
                       border: '1px solid rgba(239, 68, 68, 0.3)',
                       backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                      color: '#ef4444',
+                      color: 'var(--status-cancelled)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
@@ -794,7 +794,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
             width: '90%',
             maxWidth: '400px'
           }}>
-            <h2 style={{ marginTop: 0, color: '#ef4444' }}>Confirmar Exclusão</h2>
+            <h2 style={{ marginTop: 0, color: 'var(--danger-color)' }}>Confirmar Exclusão</h2>
             
             <p style={{ marginBottom: '20px' }}>
               Tem certeza que deseja excluir o projeto <strong>{selectedProject.name}</strong>?
