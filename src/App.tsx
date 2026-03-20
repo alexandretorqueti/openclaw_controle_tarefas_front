@@ -159,13 +159,24 @@ const AppContent: React.FC = () => {
         const newTask = JSON.parse(event.data);
         console.log('🆕 Evento SSE: Nova tarefa criada:', newTask.id, newTask.title);
         
-        // Add new task to tasks state
+        // Add new task to tasks state ONLY IF it belongs to the current view
         setTasks(prevTasks => {
-          // Check if task already exists (avoid duplicates)
+          // Check if task already exists
           if (prevTasks.some(task => task.id === newTask.id)) {
             return prevTasks;
           }
-          return [...prevTasks, newTask];
+          
+          // Verify if it belongs to the current active project and the active parent
+          const matchesProject = selectedProject && newTask.projectId === selectedProject.id;
+          const matchesParent = selectedParentTask 
+            ? newTask.parentTaskId === selectedParentTask.id 
+            : !newTask.parentTaskId; // If no parent selected, only add root tasks
+            
+          if (matchesProject && matchesParent) {
+            return [...prevTasks, newTask];
+          }
+          
+          return prevTasks;
         });
       } catch (error) {
         console.error('❌ Erro ao processar evento task_created:', error);
