@@ -78,16 +78,33 @@ const TaskList: React.FC<TaskListProps> = ({
     }
   };
 
+  // Criar versões em string das props para comparação estável
+  const propTasksString = JSON.stringify(propTasks);
+  const propUsersString = JSON.stringify(propUsers);
+  const propStatusesString = JSON.stringify(propStatuses);
+  const propPrioritiesString = JSON.stringify(propPriorities);
+  const propProjectsString = JSON.stringify(propProjects);
+  const propSelectedProjectString = JSON.stringify(propSelectedProject);
+  
+  // Criar versões em string dos estados locais para comparação estável
+  const tasksString = JSON.stringify(tasks);
+  const usersString = JSON.stringify(users);
+  const statusesString = JSON.stringify(statuses);
+  const prioritiesString = JSON.stringify(priorities);
+  const projectsString = JSON.stringify(projects);
+  const selectedProjectString = JSON.stringify(selectedProject);
+  const selectedParentTaskString = JSON.stringify(selectedParentTask);
+  
   // Buscar dados se não forem fornecidos via props - EVITAR LOOPS
   useEffect(() => {
     console.log('🔄 TaskList: useEffect executando');
-    console.log('🔄 Dependências:', { 
-      propTasksLength: propTasks.length,
-      propUsersLength: propUsers.length, 
-      propStatusesLength: propStatuses.length,
-      propPrioritiesLength: propPriorities.length,
-      propProjectsLength: propProjects.length,
-      propSelectedProject: !!propSelectedProject,
+    console.log('🔄 Dependências (strings):', { 
+      propTasksStringLength: propTasksString.length,
+      propUsersStringLength: propUsersString.length, 
+      propStatusesStringLength: propStatusesString.length,
+      propPrioritiesStringLength: propPrioritiesString.length,
+      propProjectsStringLength: propProjectsString.length,
+      propSelectedProjectStringLength: propSelectedProjectString.length,
       projectId 
     });
     
@@ -189,7 +206,7 @@ const TaskList: React.FC<TaskListProps> = ({
     return () => {
       console.log('🔄 TaskList: useEffect cleanup');
     };
-  }, [propTasks, propUsers, propStatuses, propPriorities, propProjects, propSelectedProject, projectId]);
+  }, [propTasksString, propUsersString, propStatusesString, propPrioritiesString, propProjectsString, propSelectedProjectString, projectId]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
@@ -231,7 +248,7 @@ const TaskList: React.FC<TaskListProps> = ({
         setProgramadorTerminal(firstTask.programadorTerminalContent);
       }
     }
-  }, [tasks]);
+  }, [tasksString]);
 
   // SSE para atualização em tempo real dos terminais
   useEffect(() => {
@@ -304,7 +321,7 @@ const TaskList: React.FC<TaskListProps> = ({
     return () => {
       eventSource.close();
     };
-  }, [tasks]);
+  }, [tasksString]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -336,7 +353,7 @@ const TaskList: React.FC<TaskListProps> = ({
       ...prev,
       parentTaskId: selectedParentTask?.id || null
     }));
-  }, [selectedParentTask]);
+  }, [selectedParentTaskString]);
 
   // Update defaults when data loads
   React.useEffect(() => {
@@ -350,7 +367,7 @@ const TaskList: React.FC<TaskListProps> = ({
       priorityId: defaultPriority || prev.priorityId || '',
       assignedToId: defaultUser || prev.assignedToId || ''
     }));
-  }, [statuses, priorities, users]);
+  }, [statusesString, prioritiesString, usersString]);
 
   // Update projectId when selectedProject changes
   React.useEffect(() => {
@@ -368,7 +385,7 @@ const TaskList: React.FC<TaskListProps> = ({
         }));
       }
     }
-  }, [selectedProject]);
+  }, [selectedProjectString]);
 
   // Load last used agent from localStorage (fallback if no programadorContratado)
   React.useEffect(() => {
@@ -379,7 +396,7 @@ const TaskList: React.FC<TaskListProps> = ({
         agent: lastModel
       }));
     }
-  }, [selectedProject]);
+  }, [selectedProjectString]);
 
   const shouldFilterByCompletion = !onToggleShowCompleted;
   const filteredTasks = tasks?.filter(task => {
