@@ -6,6 +6,7 @@ import {
   FaFilter, FaSort, FaSortUp, FaSortDown 
 } from 'react-icons/fa';
 import api from '../services/api';
+import { getBackendBaseUrl } from '../config/api';
 import './ProjectsDashboard.css';
 import EditProjectModal from './EditProjectModal';
 
@@ -95,7 +96,9 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
     const testAPI = async () => {
       try {
         console.log('🔍 TESTE: Chamando API diretamente com fetch...');
-        const response = await fetch('http://localhost:4001/api/projects');
+        // Use centralized configuration
+        const backendUrl = getBackendBaseUrl();
+        const response = await fetch(`${backendUrl}/api/projects`);
         const data = await response.json();
         console.log('🔍 TESTE: Resposta direta:', data);
         console.log('🔍 TESTE: data.projects:', data.projects);

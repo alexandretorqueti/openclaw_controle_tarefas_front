@@ -1,4 +1,5 @@
 import { convertToCamelCase, convertToSnakeCase } from '../types';
+import { getApiUrl } from '../config/api';
 
 // Type definitions for API parameters
 interface ProjectData {
@@ -130,51 +131,9 @@ interface CommentData {
   parentCommentId?: string | null;
 }
 
-// Use relative URL or detect environment
+// Use centralized configuration
 const getApiBaseUrl = () => {
-  const hostname = window.location.hostname;
-  const port = window.location.port;
-  const protocol = window.location.protocol;
-  
-  // Determine backend port based on frontend port
-  let backendPort = 4001; // Default to backend development port
-  
-  if (port === '8090' || port === '8091') {
-    // Production environment
-    backendPort = 8091;
-  } else if (port === '4000') {
-    // Development environment - backend runs on port 4001
-    backendPort = 4001;
-  } else if (!port) {
-    // No port specified (default ports)
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      // Default to development for localhost without port
-      backendPort = 3000;
-    } else {
-      // For other hosts without port, assume production
-      backendPort = 8091;
-    }
-  }
-  
-  console.log(`🌐 Frontend: ${hostname}:${port} → Backend: ${hostname}:${backendPort}`);
-  
-  // For localhost (development or production)
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return `http://localhost:${backendPort}/api`;
-  }
-  // For IP address access (network)
-  else if (hostname === '192.168.1.70') {
-    return `http://192.168.1.70:${backendPort}/api`;
-  }
-  // For domain access (tarefas.local)
-  else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
-    return `http://api.tarefas.local:${backendPort}/api`;
-  }
-  // For any other hostname
-  else {
-    // Use same host with calculated backend port
-    return `http://${hostname}:${backendPort}/api`;
-  }
+  return getApiUrl();
 };
 
 class ApiService {

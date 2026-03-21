@@ -1,9 +1,11 @@
-// @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
+import { getBackendBaseUrl } from '../config/api';
 import TaskCard from './TaskCard';
+import TaskDetail from './TaskDetail'; // Adicionar import do TaskDetail
+import FormModal from './shared/FormModal'; // Adicionar import do FormModal
 import Card from './shared/Card';
 import Button from './shared/Button';
 import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle, FaArrowUp } from 'react-icons/fa';
@@ -20,7 +22,6 @@ interface TaskListProps {
   statuses: Status[];
   priorities: Priority[];
   projects: Project[];
-  agents?: Agent[];
   selectedProject: Project | null;
   selectedParentTask?: Task | null;
   parentHierarchy?: Task[];
@@ -42,7 +43,6 @@ const TaskList: React.FC<TaskListProps> = ({
   statuses: propStatuses = [], 
   priorities: propPriorities = [], 
   projects: propProjects = [],
-  agents = [] as Agent[],
   selectedProject: propSelectedProject = null,
   selectedParentTask = null,
   parentHierarchy = [],
@@ -77,6 +77,11 @@ const TaskList: React.FC<TaskListProps> = ({
   const [selectedProject, setSelectedProject] = useState<Project | null>(propSelectedProject);
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
+  const [agents, setAgents] = useState<Agent[]>([]);
+
+  // Estado para controle do modal de detalhes da tarefa
+  const [selectedTaskDetail, setSelectedTaskDetail] = useState<Task | null>(null);
+  const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
   
   // Refs para controlar loops
   const isFetchingRef = useRef(false);
@@ -281,6 +286,7 @@ const TaskList: React.FC<TaskListProps> = ({
       console.log('🔄 TaskList: useEffect cleanup');
     };
   }, [propTasksString, propUsersString, propStatusesString, propPrioritiesString, propProjectsString, propSelectedProjectString, projectId, selectedParentTaskString]);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
@@ -306,7 +312,11 @@ const TaskList: React.FC<TaskListProps> = ({
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 300);
     };
-
+    const carregarAgentes = async () => {
+      const response = await api.getAgents();
+      setAgents(response.data || []);
+    }
+    carregarAgentes();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -326,7 +336,9 @@ const TaskList: React.FC<TaskListProps> = ({
 
   // SSE para atualização em tempo real dos terminais
   useEffect(() => {
-    const eventSource = new EventSource('http://localhost:4001/api/sse/events');
+    // Get backend URL from centralized configuration
+    const backendUrl = getBackendBaseUrl();
+    const eventSource = new EventSource(`${backendUrl}/api/sse/events`);
     
     eventSource.addEventListener('terminal_update', (event) => {
       try {
@@ -656,9 +668,9 @@ const TaskList: React.FC<TaskListProps> = ({
 
   const handleTaskSelect = (task: Task) => {
     console.log('🔍 TaskList: handleTaskSelect (fallback) chamado', { task });
-    // Implementação básica: mostrar detalhes em um alerta
-    // Pode ser substituída por um modal ou navegação
-    alert(`Detalhes da tarefa:\n\nTítulo: ${task.title}\nDescrição: ${task.description || 'Sem descrição'}\nStatus: ${task.statusId}\nPrioridade: ${task.priorityId}\nPrazo: ${task.deadline || 'Sem prazo'}`);
+    // Abrir modal com detalhes da tarefa
+    setSelectedTaskDetail(task);
+    setShowTaskDetailModal(true);
   };
 
   const handleViewSubtasks = (task: Task) => {
@@ -1908,6 +1920,32 @@ const TaskList: React.FC<TaskListProps> = ({
           </button>
         )}
       </div>
+
+      {/* Modal de detalhes da tarefa */}
+      <FormModal
+        isOpen={showTaskDetailModal}
+        onClose={() => setShowTaskDetailModal(false)}
+        title="Detalhes da Tarefa"
+        subtitle={selectedTaskDetail?.title}
+        size="xl"
+        hideFooter={true}
+      >
+        {selectedTaskDetail && (
+          <TaskDetail
+            task={selectedTaskDetail}
+            tasks={tasks} // Passar lista de tarefas
+            users={users}
+            statuses={statuses}
+            priorities={priorities}
+            projects={projects}
+            currentUser={null} // Pode ser null se não houver usuário atual
+            onBack={() => setShowTaskDetailModal(false)} // Usar onBack para fechar
+            onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
+            onToggleCompletion={handleToggleCompletion}
+          />
+        )}
+      </FormModal>
     </div>
   );
 };

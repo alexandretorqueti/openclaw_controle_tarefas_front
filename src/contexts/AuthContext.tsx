@@ -1,45 +1,11 @@
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import apiService from '../services/api';
 import { User } from '../types';
+import { getBackendBaseUrl } from '../config/api';
 
 // Helper function to get backend URL based on current frontend URL
 const getBackendUrl = (): string => {
-  const hostname = window.location.hostname;
-  const port = window.location.port;
-  
-  // Determine backend port based on frontend port
-  let backendPort = 4001; // Default to backend development port
-  
-  if (port === '8090' || port === '8091') {
-    // Production environment
-    backendPort = 8091;
-  } else if (port === '4000') {
-    // Development environment - backend runs on port 3000
-    backendPort = 4001;
-  } else if (!port) {
-    // No port specified (default ports)
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-      // Default to development for localhost without port
-      backendPort = 4001;
-    } else {
-      // For other hosts without port, assume production
-      backendPort = 8091;
-    }
-  }
-  
-  console.log(`🌐 AuthContext: Frontend ${hostname}:${port} → Backend port ${backendPort}`);
-  
-  // Build backend URL
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    return `http://localhost:${backendPort}`;
-  } else if (hostname === '192.168.1.70') {
-    return `http://192.168.1.70:${backendPort}`;
-  } else if (hostname === 'tarefas.local' || hostname === 'web.tarefas.local') {
-    return `http://api.tarefas.local:${backendPort}`;
-  } else {
-    // For any other hostname
-    return `http://${hostname}:${backendPort}`;
-  }
+  return getBackendBaseUrl();
 };
 
 interface AuthContextType {

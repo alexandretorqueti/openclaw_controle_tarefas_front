@@ -4,6 +4,8 @@
  * In development, prepends backend URL for relative paths
  * In production, relative paths work since frontend and backend share same domain
  */
+import { getBackendBaseUrl } from '../config/api';
+
 export const getAvatarUrl = (avatarUrl?: string): string => {
   if (!avatarUrl) {
     return 'https://i.pravatar.cc/150?img=1'; // Default avatar
@@ -18,8 +20,8 @@ export const getAvatarUrl = (avatarUrl?: string): string => {
   if (avatarUrl.startsWith('/')) {
     // In development, we need to prepend the backend URL
     // In production, relative URLs work since they're on the same domain
-      const backendUrl = 'http://localhost:4001';
-      return `${backendUrl}${avatarUrl}`;
+    const backendUrl = getBackendBaseUrl();
+    return `${backendUrl}${avatarUrl}`;
   }
 
   // If it's neither absolute nor relative (shouldn't happen), return as-is

@@ -257,12 +257,10 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   React.useEffect(() => {
     const loadAgents = async () => {
       try {
-        const data = await api.request('/agents');
-        // Store full agent objects to access model information
-        const agentsList = data.data ? data.data : [];
-        setAgents(agentsList);
+         const response = await api.getAgents();
+          setAgents(response.data || []);
       } catch (error) {
-        console.error('Error loading agents:', error);
+        console.error('❌ TaskDetail: Erro ao carregar agentes:', error);
       }
     };
     loadAgents();
