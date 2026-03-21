@@ -6,7 +6,6 @@ import {
   FaTerminal, 
   FaExclamationTriangle, 
   FaRobot, 
-  FaCog, 
   FaListAlt, 
   FaFlag, 
   FaUser, 
@@ -15,58 +14,49 @@ import {
   FaTimes,
   FaHome,
   FaSignOutAlt, FaChevronLeft, FaChevronRight,
-  FaLayerGroup
+  FaLayerGroup,
+  FaCog
 } from 'react-icons/fa';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
-interface MainLayoutProps {
-  children: ReactNode;
-  currentView: string;
-  onViewChange: (view: string) => void;
-  onOpenStatus: () => void;
-  onOpenPriority: () => void;
-  onOpenUser: () => void;
-  onOpenProjectType: () => void;
-  onOpenNextTask: () => void;
-  onOpenAgents: () => void;
-  onOpenErrorLogs: () => void;
-  onLogout: () => void;
-  user?: { name: string; email: string; avatarUrl?: string };
-}
-
-const MainLayout: React.FC<MainLayoutProps> = ({
-  children,
-  currentView,
-  onViewChange,
-  onOpenStatus,
-  onOpenPriority,
-  onOpenUser,
-  onOpenProjectType,
-  onOpenNextTask,
-  onOpenAgents,
-  onOpenErrorLogs,
-  onLogout,
-  user
-}) => {
+const MainLayout: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const mainViews = [
-    { id: 'projects', label: 'Projetos', icon: <FaFolder size={16} /> },
-    { id: 'tasks', label: 'Tarefas', icon: <FaTasks size={16} /> },
-    { id: 'recurrence', label: 'Recorrência', icon: <FaSync size={16} /> },
-    { id: 'logs', label: 'Logs', icon: <FaTerminal size={16} /> },
-    { id: 'error-logs', label: 'Logs de Erro', icon: <FaExclamationTriangle size={16} /> },
-    { id: 'agents', label: 'Agentes', icon: <FaRobot size={16} /> },
+    { id: 'projects', label: 'Projetos', icon: <FaFolder size={16} />, path: '/projects' },
+    { id: 'recurrence', label: 'Recorrência', icon: <FaSync size={16} />, path: '/recurrence' },
+    { id: 'logs', label: 'Logs', icon: <FaTerminal size={16} />, path: '/logs' },
+    { id: 'error-logs', label: 'Logs de Erro', icon: <FaExclamationTriangle size={16} />, path: '/error-logs' },
+    { id: 'agents', label: 'Agentes', icon: <FaRobot size={16} />, path: '/agents' },
   ];
 
   const managementViews = [
-    { id: 'status', label: 'Status', icon: <FaListAlt size={16} />, action: onOpenStatus },
-    { id: 'priority', label: 'Prioridades', icon: <FaFlag size={16} />, action: onOpenPriority },
-    { id: 'users', label: 'Usuários', icon: <FaUser size={16} />, action: onOpenUser },
-    { id: 'project-types', label: 'Tipos de Projeto', icon: <FaProjectDiagram size={16} />, action: onOpenProjectType },
-    { id: 'next-task', label: 'Próximas Tarefas', icon: <FaTasks size={16} />, action: onOpenNextTask },
-    { id: 'stages', label: 'Etapas', icon: <FaLayerGroup size={16} />, action: () => onViewChange('stages') },
+    { id: 'status', label: 'Status', icon: <FaListAlt size={16} />, path: '/status' },
+    { id: 'priority', label: 'Prioridades', icon: <FaFlag size={16} />, path: '/priorities' },
+    { id: 'users', label: 'Usuários', icon: <FaUser size={16} />, path: '/users' },
+    { id: 'project-types', label: 'Tipos de Projeto', icon: <FaProjectDiagram size={16} />, path: '/project-types' },
+    { id: 'next-task', label: 'Próximas Tarefas', icon: <FaTasks size={16} />, path: '/next-task' },
+    { id: 'stages', label: 'Etapas', icon: <FaLayerGroup size={16} />, path: '/stages' },
+    { id: 'profile', label: 'Meu Perfil', icon: <FaCog size={16} />, path: '/profile' },
   ];
+
+  // Determinar se um link está ativo (inclui rotas aninhadas)
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div style={{
@@ -141,13 +131,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           gap: '8px'
         }}>
           {mainViews.map(view => (
-            <button
+            <Link
               key={view.id}
-              onClick={() => onViewChange(view.id)}
+              to={view.path}
               style={{
                 padding: '10px 16px',
-                backgroundColor: currentView === view.id ? 'var(--accent-color)' : 'transparent',
-                color: currentView === view.id ? 'white' : 'var(--text-secondary)',
+                backgroundColor: isActive(view.path) ? 'var(--accent-color)' : 'transparent',
+                color: isActive(view.path) ? 'white' : 'var(--text-secondary)',
                 border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -157,12 +147,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 gap: '8px',
                 transition: 'all 0.2s',
                 fontWeight: 500,
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                textDecoration: 'none'
               }}
             >
               {view.icon}
               {view.label}
-            </button>
+            </Link>
           ))}
         </nav>
 
@@ -190,7 +181,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
             </div>
           )}
           <button
-            onClick={onLogout}
+            onClick={handleLogout}
             style={{
               padding: '8px 16px',
               backgroundColor: 'transparent',
@@ -274,13 +265,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               Gerenciamento
             </h3>
             {managementViews.map(item => (
-              <button
+              <Link
                 key={item.id}
-                onClick={item.action}
+                to={item.path}
                 style={{
                   width: '100%',
                   padding: '12px',
-                  backgroundColor: 'transparent',
+                  backgroundColor: isActive(item.path) ? 'var(--bg-input)' : 'transparent',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -289,7 +280,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   gap: '12px',
                   marginBottom: '4px',
                   transition: 'all 0.2s',
-                  color: 'var(--text-primary)',
+                  color: isActive(item.path) ? 'var(--accent-color)' : 'var(--text-primary)',
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
                   overflow: 'hidden'
@@ -298,7 +289,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   e.currentTarget.style.backgroundColor = 'var(--bg-input)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
+                  if (!isActive(item.path)) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
                 }}
               >
                 <div style={{ flexShrink: 0 }}>
@@ -314,7 +307,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 }}>
                   {item.label}
                 </span>
-              </button>
+              </Link>
             ))}
           </div>
         </aside>
@@ -365,16 +358,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               Navegação
             </h3>
             {mainViews.map(view => (
-              <button
+              <Link
                 key={view.id}
-                onClick={() => {
-                  onViewChange(view.id);
-                  setMobileOpen(false);
-                }}
+                to={view.path}
+                onClick={() => setMobileOpen(false)}
                 style={{
                   width: '100%',
                   padding: '12px',
-                  backgroundColor: currentView === view.id ? 'var(--bg-input)' : 'transparent',
+                  backgroundColor: isActive(view.path) ? 'var(--bg-input)' : 'transparent',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -383,7 +374,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   gap: '12px',
                   marginBottom: '4px',
                   transition: 'all 0.2s',
-                  color: currentView === view.id ? 'var(--accent-color)' : 'var(--text-primary)',
+                  color: isActive(view.path) ? 'var(--accent-color)' : 'var(--text-primary)',
                   textDecoration: 'none'
                 }}
               >
@@ -391,7 +382,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 <span style={{ fontSize: '14px', fontWeight: 500 }}>
                   {view.label}
                 </span>
-              </button>
+              </Link>
             ))}
 
             <h3 style={{
@@ -407,16 +398,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({
               Gerenciamento
             </h3>
             {managementViews.map(item => (
-              <button
+              <Link
                 key={item.id}
-                onClick={() => {
-                  item.action();
-                  setMobileOpen(false);
-                }}
+                to={item.path}
+                onClick={() => setMobileOpen(false)}
                 style={{
                   width: '100%',
                   padding: '12px',
-                  backgroundColor: 'transparent',
+                  backgroundColor: isActive(item.path) ? 'var(--bg-input)' : 'transparent',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer',
@@ -425,7 +414,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                   gap: '12px',
                   marginBottom: '4px',
                   transition: 'all 0.2s',
-                  color: 'var(--text-primary)',
+                  color: isActive(item.path) ? 'var(--accent-color)' : 'var(--text-primary)',
                   textDecoration: 'none'
                 }}
               >
@@ -433,7 +422,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 <span style={{ fontSize: '14px', fontWeight: 500 }}>
                   {item.label}
                 </span>
-              </button>
+              </Link>
             ))}
           </div>
         </aside>
@@ -445,7 +434,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           padding: '24px',
           maxWidth: '100%'
         }}>
-          {children}
+          <Outlet /> {/* Renderiza o conteúdo da rota filha */}
         </main>
       </div>
 

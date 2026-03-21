@@ -39,11 +39,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getAssignedUser = () => task.assignedTo || users.find(user => user.id === task.assignedToId);
-  const getStatus = () => task.status || statuses.find(status => status.id === task.statusId);
-  const getPriority = () => task.priority || priorities.find(priority => priority.id === task.priorityId);
-  const getCreator = () => task.createdBy || users.find(user => user.id === task.createdById);
-  const getProject = () => task.project || projects.find(project => project.id === task.projectId);
+  const getAssignedUser = () => task.assignedTo || users?.find(user => user.id === task.assignedToId);
+  const getStatus = () => task.status || statuses?.find(status => status.id === task.statusId);
+  const getPriority = () => task.priority || priorities?.find(priority => priority.id === task.priorityId);
+  const getCreator = () => task.createdBy || users?.find(user => user.id === task.createdById);
+  const getProject = () => task.project || projects?.find(project => project.id === task.projectId);
 
   const assignedUser = getAssignedUser();
   const status = getStatus();

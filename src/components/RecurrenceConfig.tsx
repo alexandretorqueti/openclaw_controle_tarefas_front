@@ -261,7 +261,7 @@ const RecurrenceConfig: React.FC<RecurrenceConfigProps> = ({
             )}
             {recurrenceType === 'weekly' && recurrenceDays.length > 0 && (
               <p className="text-sm text-gray-600">
-                Repete semanalmente nas {recurrenceDays.map(d => weekDays.find(w => w.id === d)?.label).join(', ')} às {recurrenceTimes.join(', ')}
+                Repete semanalmente nas {recurrenceDays?.map(d => weekDays?.find(w => w.id === d)?.label).join(', ')} às {recurrenceTimes?.join(', ')}
               </p>
             )}
             {recurrenceType === 'monthly' && (

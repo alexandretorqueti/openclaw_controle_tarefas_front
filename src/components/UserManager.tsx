@@ -1,936 +1,517 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { FaTimes, FaPlus, FaEdit, FaTrash, FaSave, FaUser, FaEnvelope, FaImage, FaUserTag, FaCalendarAlt, FaKey } from 'react-icons/fa';
-import apiService from '../services/api';
+import api from '../services/api';
 import { User } from '../types';
 import AvatarUpload from './shared/AvatarUpload';
 import { getAvatarUrl } from '../utils/avatarUrl';
+import './UserManager.css';
 
-interface UserManagerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onUserUpdate?: () => void;
-}
-
-const UserManager: React.FC<UserManagerProps> = ({ isOpen, onClose, onUserUpdate }) => {
+const UserManager: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [uploadingAvatarFor, setUploadingAvatarFor] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  
-  const [formData, setFormData] = useState({
+  // Form state for new user
+  const [newUser, setNewUser] = useState({
     name: '',
     email: '',
     nickname: '',
-    avatarUrl: '',
+    password: '',
+    confirmPassword: '',
     role: 'Viewer' as 'Admin' | 'Viewer' | 'Editor'
   });
 
+  // Avatar state
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
-  // Opções de role
+  // Role options
   const roleOptions = [
-    { value: 'Admin', label: 'Administrador', description: 'Acesso total ao sistema' },
-    { value: 'Editor', label: 'Editor', description: 'Pode criar e editar tarefas' },
-    { value: 'Viewer', label: 'Visualizador', description: 'Somente leitura' }
+    { value: 'Admin', label: 'Administrador', description: 'Acesso total ao sistema', color: '#9D4EDD' },
+    { value: 'Editor', label: 'Editor', description: 'Pode criar e editar tarefas', color: '#10B981' },
+    { value: 'Viewer', label: 'Visualizador', description: 'Somente leitura', color: '#118AB2' }
   ];
 
-  // Carregar usuários ao abrir o modal
   useEffect(() => {
-    if (isOpen) {
-      loadUsers();
-    }
-  }, [isOpen]);
+    loadUsers();
+  }, []);
 
   const loadUsers = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await apiService.getUsers();
-      setUsers(response.users || []);
-      
-    } catch (err) {
-      console.error('Erro ao carregar usuários:', err);
+      const response = await api.getUsers();
+      const data = (response as any).data || response;
+      const usersArray = Array.isArray(data) ? data : (data.users || []);
+      setUsers(usersArray);
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
       setError('Não foi possível carregar os usuários. Verifique a conexão com o servidor.');
-      setUsers([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleAvatarChange = (file: File | null, previewUrl: string) => {
-    setAvatarFile(file);
-    // If we have a previewUrl from a file, don't update formData.avatarUrl yet
-    // We'll update it after successful upload
-    if (!file && previewUrl === '') {
-      // User removed avatar
-      setFormData(prev => ({ ...prev, avatarUrl: '' }));
-    }
-  };
-
-  const handleRoleChange = (role: 'Admin' | 'Viewer' | 'Editor') => {
-    setFormData(prev => ({ ...prev, role }));
-  };
-
-  const validateForm = (): boolean => {
-    if (!formData.name.trim()) {
+  const handleCreate = async () => {
+    // Validation
+    if (!newUser.name.trim()) {
       setError('O nome do usuário é obrigatório');
-      return false;
+      return;
     }
-    if (!formData.email.trim()) {
+    if (!newUser.email.trim()) {
       setError('O email do usuário é obrigatório');
-      return false;
+      return;
     }
-    // Email básico validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!emailRegex.test(newUser.email)) {
       setError('Por favor, insira um email válido');
-      return false;
+      return;
     }
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
+    if (!newUser.password) {
+      setError('A senha é obrigatória');
+      return;
+    }
+    if (newUser.password !== newUser.confirmPassword) {
+      setError('As senhas não coincidem');
+      return;
+    }
+    if (newUser.password.length < 6) {
+      setError('A senha deve ter pelo menos 6 caracteres');
       return;
     }
 
     try {
       setError(null);
-      let finalAvatarUrl = formData.avatarUrl;
-
-      // Upload avatar file if selected
-      if (avatarFile && editingId) {
-        setIsUploadingAvatar(true);
-        try {
-          const uploadResponse = await apiService.uploadAvatar(editingId, avatarFile);
-          finalAvatarUrl = uploadResponse.avatarUrl;
-        } catch (uploadErr: any) {
-          console.error('Erro ao fazer upload do avatar:', uploadErr);
-          const uploadErrorMessage = uploadErr?.response?.data?.error || uploadErr?.message || 'Erro ao fazer upload do avatar.';
-          setError(`Erro no upload do avatar: ${uploadErrorMessage}`);
-          setIsUploadingAvatar(false);
-          return;
-        } finally {
-          setIsUploadingAvatar(false);
-        }
-      }
-
-      // Prepare user data
       const userData = {
-        ...formData,
-        avatarUrl: finalAvatarUrl || undefined
+        name: newUser.name,
+        email: newUser.email,
+        nickname: newUser.nickname || undefined,
+        role: newUser.role,
+        password: newUser.password
       };
 
-      if (editingId) {
-        // Atualizar usuário existente
-        await apiService.updateUser(editingId, userData);
-      } else {
-        // Criar novo usuário
-        const newUser = await apiService.createUser(userData);
-        
-        // If we have an avatar file for a new user, upload it after creation
-        if (avatarFile && newUser.id) {
-          setIsUploadingAvatar(true);
-          try {
-            const uploadResponse = await apiService.uploadAvatar(newUser.id, avatarFile);
-            // Update the new user with the avatar URL
-            await apiService.updateUser(newUser.id, { avatarUrl: uploadResponse.avatarUrl });
-          } catch (uploadErr: any) {
-            console.error('Erro ao fazer upload do avatar para novo usuário:', uploadErr);
-            // Don't fail the entire operation if avatar upload fails
-          } finally {
-            setIsUploadingAvatar(false);
-          }
+      const createdUser = await api.createUser(userData);
+      
+      // Upload avatar if selected
+      if (avatarFile && createdUser.id) {
+        try {
+          await api.uploadAvatar(createdUser.id, avatarFile);
+        } catch (uploadErr) {
+          console.error('Erro ao fazer upload do avatar:', uploadErr);
+          // Don't fail the entire operation if avatar upload fails
         }
       }
-      
-      // Recarregar lista
-      await loadUsers();
-      
-      // Limpar formulário
-      resetForm();
-      
-      // Notificar componente pai
-      if (onUserUpdate) {
-        onUserUpdate();
-      }
-      
-    } catch (err: any) {
-      console.error('Erro ao salvar usuário:', err);
-      const errorMessage = err?.response?.data?.message || err?.message || 'Erro ao salvar usuário. Verifique os dados e tente novamente.';
-      setError(errorMessage);
+
+      // Reset form
+      setNewUser({
+        name: '',
+        email: '',
+        nickname: '',
+        password: '',
+        confirmPassword: '',
+        role: 'Viewer'
+      });
+      setAvatarFile(null);
+      setAvatarPreview(null);
+
+      // Reload users
+      loadUsers();
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      setError('Erro ao criar usuário. Verifique os dados e tente novamente.');
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!editingUser) return;
+    
+    try {
+      setError(null);
+      const { id, ...updateData } = editingUser;
+      await api.updateUser(id, updateData);
+      setEditingUser(null);
+      loadUsers();
+    } catch (error) {
+      console.error('Erro ao atualizar usuário:', error);
+      setError('Erro ao atualizar usuário. Verifique os dados e tente novamente.');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm('Tem certeza que deseja excluir este usuário?\nEsta ação não poderá ser desfeita.')) return;
+    
+    try {
+      setError(null);
+      await api.deleteUser(id);
+      loadUsers();
+    } catch (error) {
+      console.error('Erro ao excluir usuário:', error);
+      setError('Erro ao excluir usuário. Verifique se o usuário não está associado a projetos ou tarefas.');
     }
   };
 
   const handleEdit = (user: User) => {
-    setFormData({
-      name: user.name,
-      email: user.email,
-      nickname: user.nickname || '',
-      avatarUrl: user.avatarUrl || '',
-      role: user.role
-    });
-    setAvatarFile(null); // Reset avatar file when editing
-    setEditingId(user.id);
-    setIsEditing(true);
+    setEditingUser(user);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir este usuário?\nEsta ação não poderá ser desfeita.')) {
-      return;
-    }
+  const handleCancelEdit = () => {
+    setEditingUser(null);
+  };
 
+  const handleNewUserChange = (field: keyof typeof newUser, value: string) => {
+    setNewUser(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleEditUserChange = (field: keyof User, value: string) => {
+    if (editingUser) {
+      setEditingUser(prev => prev ? { ...prev, [field]: value } : null);
+    }
+  };
+
+  const handleRoleSelect = (role: 'Admin' | 'Viewer' | 'Editor', isEdit: boolean = false) => {
+    if (isEdit && editingUser) {
+      setEditingUser({ ...editingUser, role });
+    } else {
+      setNewUser(prev => ({ ...prev, role }));
+    }
+  };
+
+  const handleAvatarUpload = async (userId: string, file: File) => {
     try {
-      await apiService.deleteUser(id);
-      await loadUsers();
-      
-      if (onUserUpdate) {
-        onUserUpdate();
-      }
-    } catch (err: any) {
-      console.error('Erro ao excluir usuário:', err);
-      const errorMessage = err?.response?.data?.message || err?.message || 'Erro ao excluir usuário. Verifique se o usuário não está associado a projetos ou tarefas.';
-      setError(errorMessage);
+      setUploadingAvatarFor(userId);
+      await api.uploadAvatar(userId, file);
+      loadUsers();
+    } catch (error) {
+      console.error('Erro ao fazer upload do avatar:', error);
+      setError('Erro ao fazer upload do avatar. Verifique o formato e tamanho do arquivo.');
+    } finally {
+      setUploadingAvatarFor(null);
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      email: '',
-      nickname: '',
-      avatarUrl: '',
-      role: 'Viewer' as 'Admin' | 'Viewer' | 'Editor'
-    });
-    setAvatarFile(null);
-    setEditingId(null);
-    setIsEditing(false);
-    setError(null);
-    setIsUploadingAvatar(false);
+  const handleAvatarFileSelect = (file: File | null, previewUrl: string) => {
+    setAvatarFile(file);
+    setAvatarPreview(previewUrl);
   };
 
-  const handleClose = () => {
-    resetForm();
-    onClose();
+  // Função para obter iniciais do nome
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
-  if (!isOpen) return null;
+  // Função para obter cor baseada na role
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case 'Admin': return '#9D4EDD';
+      case 'Editor': return '#10B981';
+      case 'Viewer': return '#118AB2';
+      default: return '#6B7280';
+    }
+  };
+
+  // Função para obter label da role
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case 'Admin': return 'Administrador';
+      case 'Editor': return 'Editor';
+      case 'Viewer': return 'Visualizador';
+      default: return role;
+    }
+  };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 2000,
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '1000px',
-        maxHeight: '90vh',
-        display: 'flex',
-        flexDirection: 'column',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-        overflow: 'hidden'
-      }}>
-        {/* Cabeçalho */}
-        <div style={{
-          padding: '24px',
-          backgroundColor: 'var(--bg-input)',
-          borderBottom: '1px solid var(--border-color)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              backgroundColor: 'var(--accent-color)',
-              borderRadius: '12px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <FaUser size={24} color="white" />
-            </div>
-            <div>
-              <h2 style={{
-                fontSize: '24px',
-                fontWeight: 700,
-                color: '#333',
-                margin: 0
-              }}>
-                Gerenciar Usuários
-              </h2>
-              <p style={{
-                fontSize: '14px',
-                color: 'var(--text-secondary)',
-                margin: '4px 0 0 0'
-              }}>
-                Cadastre e gerencie os usuários do sistema
-              </p>
-            </div>
-          </div>
-          
+    <div className="user-manager">
+      <div className="user-header">
+        <h1>Gerenciar Usuários</h1>
+      </div>
+
+      {/* Error message */}
+      {error && (
+        <div className="error-message">
+          {error}
           <button
-            onClick={handleClose}
+            onClick={() => setError(null)}
             style={{
-              width: '40px',
-              height: '40px',
-              backgroundColor: 'transparent',
-              border: '1px solid var(--border-color)',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              marginLeft: '12px',
+              padding: '4px 12px',
+              backgroundColor: 'var(--danger-color)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
               cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-              e.currentTarget.style.borderColor = 'var(--danger-color)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = 'var(--border-color)';
+              fontSize: '12px'
             }}
           >
-            <FaTimes size={18} color="var(--text-secondary)" />
+            Fechar
           </button>
         </div>
+      )}
 
-        {/* Conteúdo */}
-        <div style={{
-          display: 'flex',
-          flex: 1,
-          overflow: 'hidden'
-        }}>
-          {/* Lista de usuários */}
-          <div style={{
-            flex: 1,
-            padding: '24px',
-            borderRight: '1px solid var(--text-primary)',
-            overflowY: 'auto'
-          }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '20px'
-            }}>
-              <h3 style={{
-                fontSize: '18px',
-                fontWeight: 600,
-                color: '#333',
-                margin: 0
-              }}>
-                Usuários Cadastrados
-              </h3>
-              <span style={{
-                fontSize: '14px',
-                color: 'var(--text-secondary)',
-                backgroundColor: 'var(--bg-input)',
-                padding: '4px 12px',
-                borderRadius: '20px'
-              }}>
-                {users.length} usuários
-              </span>
+      {/* Create form */}
+      <div className="user-form">
+        <div className="form-group">
+          <label>Nome Completo *</label>
+          <input
+            type="text"
+            value={newUser.name}
+            onChange={(e) => handleNewUserChange('name', e.target.value)}
+            placeholder="Ex: João da Silva"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Email *</label>
+          <input
+            type="email"
+            value={newUser.email}
+            onChange={(e) => handleNewUserChange('email', e.target.value)}
+            placeholder="Ex: joao@empresa.com"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Apelido (Opcional)</label>
+          <input
+            type="text"
+            value={newUser.nickname}
+            onChange={(e) => handleNewUserChange('nickname', e.target.value)}
+            placeholder="Ex: joaosilva"
+          />
+          <div className="field-hint">
+            Deixe em branco para gerar automaticamente a partir do email
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Senha *</label>
+          <input
+            type="password"
+            value={newUser.password}
+            onChange={(e) => handleNewUserChange('password', e.target.value)}
+            placeholder="Mínimo 6 caracteres"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Confirmar Senha *</label>
+          <input
+            type="password"
+            value={newUser.confirmPassword}
+            onChange={(e) => handleNewUserChange('confirmPassword', e.target.value)}
+            placeholder="Digite a senha novamente"
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Permissão de Acesso</label>
+          <div className="role-palette">
+            {roleOptions.map(option => (
+              <div
+                key={option.value}
+                className={`role-option ${newUser.role === option.value ? 'selected' : ''}`}
+                style={{ backgroundColor: option.color }}
+                onClick={() => handleRoleSelect(option.value)}
+                title={option.description}
+              >
+                <div className="role-option-label">{option.label}</div>
+                <div className="role-option-description">{option.description}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>Avatar (Opcional)</label>
+          <div className="avatar-upload-section">
+            <AvatarUpload
+              currentAvatarUrl={avatarPreview || ''}
+              onAvatarChange={handleAvatarFileSelect}
+              disabled={false}
+            />
+          </div>
+        </div>
+
+        <button 
+          onClick={handleCreate}
+          disabled={!newUser.name.trim() || !newUser.email.trim() || !newUser.password || loading}
+        >
+          Criar Usuário
+        </button>
+      </div>
+
+      {/* Edit form */}
+      {editingUser && (
+        <div className="user-edit-form">
+          <div className="user-edit-form-header">
+            <h3>Editar Usuário</h3>
+          </div>
+          
+          <div className="user-edit-form-fields">
+            <div className="form-group">
+              <label>Nome Completo *</label>
+              <input
+                type="text"
+                value={editingUser.name}
+                onChange={(e) => handleEditUserChange('name', e.target.value)}
+                placeholder="Ex: João da Silva"
+              />
             </div>
 
-            {loading ? (
-              <div style={{
-                padding: '40px',
-                textAlign: 'center',
-                color: 'var(--text-secondary)'
-              }}>
-                Carregando usuários...
-              </div>
-            ) : error ? (
-              <div style={{
-                padding: '20px',
-                backgroundColor: 'var(--bg-card)',
-                border: '1px solid var(--danger-color)',
-                borderRadius: '8px',
-                color: 'var(--danger-color)',
-                marginBottom: '20px'
-              }}>
-                {error}
-                <button
-                  onClick={loadUsers}
-                  style={{
-                    marginTop: '10px',
-                    padding: '8px 16px',
-                    backgroundColor: 'var(--danger-color)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    display: 'block'
-                  }}
-                >
-                  Tentar Novamente
-                </button>
-              </div>
-            ) : users.length === 0 ? (
-              <div style={{
-                padding: '40px',
-                textAlign: 'center',
-                backgroundColor: 'var(--bg-input)',
-                borderRadius: '8px',
-                color: 'var(--text-secondary)'
-              }}>
-                <FaUser size={48} color='var(--border-color)' style={{ marginBottom: '16px' }} />
-                <p style={{ margin: 0 }}>Nenhum usuário cadastrado</p>
-                <p style={{ fontSize: '14px', marginTop: '8px' }}>
-                  Use o formulário ao lado para criar o primeiro usuário
-                </p>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {users.map(user => (
+            <div className="form-group">
+              <label>Email *</label>
+              <input
+                type="email"
+                value={editingUser.email}
+                onChange={(e) => handleEditUserChange('email', e.target.value)}
+                placeholder="Ex: joao@empresa.com"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Apelido (Opcional)</label>
+              <input
+                type="text"
+                value={editingUser.nickname || ''}
+                onChange={(e) => handleEditUserChange('nickname', e.target.value)}
+                placeholder="Ex: joaosilva"
+              />
+            </div>
+
+            <div className="form-group">
+              <label>Permissão de Acesso</label>
+              <div className="role-palette">
+                {roleOptions.map(option => (
                   <div
-                    key={user.id}
-                    style={{
-                      padding: '16px',
-                      backgroundColor: 'white',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '16px',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--accent-color)';
-                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(157, 78, 221, 0.1)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--text-primary)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
+                    key={option.value}
+                    className={`role-option ${editingUser.role === option.value ? 'selected' : ''}`}
+                    style={{ backgroundColor: option.color }}
+                    onClick={() => handleRoleSelect(option.value, true)}
+                    title={option.description}
                   >
-                    <div style={{
-                      width: '48px',
-                      height: '48px',
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                      backgroundColor: 'var(--bg-card)',
-                      flexShrink: 0
-                    }}>
-                      <img 
-                        src={getAvatarUrl(user.avatarUrl)} 
-                        alt={user.name}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    </div>
-                    
-                    <div style={{ flex: 1 }}>
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        marginBottom: '4px'
-                      }}>
-                        <span style={{
-                          fontSize: '16px',
-                          fontWeight: 600,
-                          color: '#333'
-                        }}>
-                          {user.name}
-                        </span>
-                        <span style={{
-                          fontSize: '12px',
-                          backgroundColor: user.role === 'Admin' ? 'var(--accent-color)' : 
-                                         user.role === 'Editor' ? 'var(--success-color)' : '#118AB2',
-                          color: 'white',
-                          padding: '2px 8px',
-                          borderRadius: '4px'
-                        }}>
-                          {user.role === 'Admin' ? 'Administrador' : 
-                           user.role === 'Editor' ? 'Editor' : 'Visualizador'}
-                        </span>
-                      </div>
-                      <div style={{
-                        fontSize: '14px',
-                        color: 'var(--text-secondary)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '4px',
-                        marginBottom: '4px'
-                      }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <FaEnvelope size={12} />
-                          {user.email}
-                        </span>
-                        {user.nickname && (
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <FaUserTag size={10} />
-                            Apelido: {user.nickname}
-                          </span>
-                        )}
-                      </div>
-                      <div style={{
-                        fontSize: '12px',
-                        color: 'var(--text-secondary)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                      }}>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <FaCalendarAlt size={10} />
-                          Criado em: {user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button
-                        onClick={() => handleEdit(user)}
-                        style={{
-                          padding: '8px 12px',
-                          backgroundColor: 'var(--bg-card)',
-                          color: 'var(--accent-color)',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          fontSize: '12px'
-                        }}
-                      >
-                        <FaEdit size={12} />
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        style={{
-                          padding: '8px 12px',
-                          backgroundColor: 'var(--bg-card)',
-                          color: 'var(--danger-color)',
-                          border: 'none',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          fontSize: '12px'
-                        }}
-                      >
-                        <FaTrash size={12} />
-                        Excluir
-                      </button>
-                    </div>
+                    <div className="role-option-label">{option.label}</div>
+                    <div className="role-option-description">{option.description}</div>
                   </div>
                 ))}
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Formulário */}
-          <div style={{
-            flex: 1,
-            padding: '24px',
-            backgroundColor: 'var(--bg-input)',
-            overflowY: 'auto'
-          }}>
-            <h3 style={{
-              fontSize: '18px',
-              fontWeight: 600,
-              color: '#333',
-              marginBottom: '20px'
-            }}>
-              {isEditing ? 'Editar Usuário' : 'Novo Usuário'}
-            </h3>
-            {isEditing && editingId && (
-              <div style={{
-                fontSize: '14px',
-                color: 'var(--text-secondary)',
-                marginBottom: '20px',
-                padding: '12px 16px',
-                backgroundColor: 'var(--bg-input)',
-                borderRadius: '8px',
-                border: '1px solid var(--border-color)',
-                fontFamily: 'monospace',
-                wordBreak: 'break-all'
-              }}>
-                <strong>ID do usuário:</strong> {editingId}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              {/* Nome do Usuário */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#333',
-                  marginBottom: '8px'
-                }}>
-                  Nome Completo *
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <FaUser size={16} style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--text-secondary)'
-                  }} />
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Ex: João da Silva"
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px 12px 40px',
-                      border: `1px solid ${error && !formData.name.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                      boxSizing: 'border-box',
-                      transition: 'all 0.2s'
-                    }}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Email do Usuário */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#333',
-                  marginBottom: '8px'
-                }}>
-                  Email *
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <FaEnvelope size={16} style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--text-secondary)'
-                  }} />
-                  <input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    placeholder="Ex: joao@empresa.com"
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px 12px 40px',
-                      border: `1px solid ${error && !formData.email.trim() ? 'var(--danger-color)' : 'var(--border-color)'}`,
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                      boxSizing: 'border-box',
-                      transition: 'all 0.2s'
-                    }}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Nickname do Usuário (Opcional) */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#333',
-                  marginBottom: '8px'
-                }}>
-                  Apelido (Opcional)
-                </label>
-                <div style={{ position: 'relative' }}>
-                  <FaUserTag size={16} style={{
-                    position: 'absolute',
-                    left: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--text-secondary)'
-                  }} />
-                  <input
-                    type="text"
-                    value={formData.nickname}
-                    onChange={(e) => handleInputChange('nickname', e.target.value)}
-                    placeholder="Ex: joaosilva (será gerado a partir do email se não informado)"
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px 12px 40px',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                      boxSizing: 'border-box',
-                      transition: 'all 0.2s'
-                    }}
-                  />
-                </div>
-                <div style={{
-                  fontSize: '12px',
-                  color: 'var(--text-secondary)',
-                  marginTop: '4px'
-                }}>
-                  Deixe em branco para gerar automaticamente a partir do email
-                </div>
-              </div>
-
-              {/* Upload do Avatar */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#333',
-                  marginBottom: '12px'
-                }}>
-                  Avatar (Opcional)
-                </label>
+            <div className="form-group">
+              <label>Avatar</label>
+              <div className="avatar-upload-section">
                 <AvatarUpload
-                  currentAvatarUrl={formData.avatarUrl}
-                  onAvatarChange={handleAvatarChange}
-                  userId={editingId || undefined}
-                  disabled={isUploadingAvatar}
-                />
-              </div>
-
-              {/* Role do Usuário */}
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{
-                  display: 'block',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  color: '#333',
-                  marginBottom: '12px'
-                }}>
-                  Permissão de Acesso
-                </label>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {roleOptions.map(option => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => handleRoleChange(option.value as 'Admin' | 'Viewer' | 'Editor')}
-                      style={{
-                        padding: '16px',
-                        backgroundColor: formData.role === option.value ? 
-                          (option.value === 'Admin' ? 'var(--accent-color)' : 
-                           option.value === 'Editor' ? 'var(--success-color)' : '#118AB2') : 'white',
-                        color: formData.role === option.value ? 'white' : '#333',
-                        border: `1px solid ${formData.role === option.value ? 'transparent' : 'var(--border-color)'}`,
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        textAlign: 'left',
-                        transition: 'all 0.2s',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (formData.role !== option.value) {
-                          e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                          e.currentTarget.style.borderColor = 'var(--accent-color)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (formData.role !== option.value) {
-                          e.currentTarget.style.backgroundColor = 'white';
-                          e.currentTarget.style.borderColor = 'var(--border-color)';
-                        }
-                      }}
-                    >
-                      <div style={{
-                        width: '40px',
-                        height: '40px',
-                        backgroundColor: 'var(--bg-input)',
-                        borderRadius: '8px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}>
-                        <FaUserTag size={18} color={formData.role === option.value ? 
-                          (option.value === 'Admin' ? 'var(--accent-color)' : 
-                           option.value === 'Editor' ? 'var(--success-color)' : '#118AB2') : 'var(--text-secondary)'} />
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{
-                          fontSize: '16px',
-                          fontWeight: 600,
-                          marginBottom: '2px'
-                        }}>
-                          {option.label}
-                        </div>
-                        <div style={{
-                          fontSize: '12px',
-                          opacity: formData.role === option.value ? 0.9 : 0.7
-                        }}>
-                          {option.description}
-                        </div>
-                      </div>
-                      {formData.role === option.value && (
-                        <div style={{
-                          width: '20px',
-                          height: '20px',
-                          backgroundColor: 'white',
-                          borderRadius: '50%',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          flexShrink: 0
-                        }}>
-                          <div style={{
-                            width: '10px',
-                            height: '10px',
-                            backgroundColor: option.value === 'Admin' ? 'var(--accent-color)' : 
-                                           option.value === 'Editor' ? 'var(--success-color)' : '#118AB2',
-                            borderRadius: '50%'
-                          }} />
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Mensagem de erro */}
-              {error && (
-                <div style={{
-                  padding: '12px 16px',
-                  backgroundColor: 'var(--bg-card)',
-                  border: '1px solid var(--danger-color)',
-                  borderRadius: '8px',
-                  color: 'var(--danger-color)',
-                  marginBottom: '20px',
-                  fontSize: '14px'
-                }}>
-                  {error}
-                </div>
-              )}
-
-              {/* Botões de ação */}
-              <div style={{
-                display: 'flex',
-                gap: '12px',
-                marginTop: '24px'
-              }}>
-                <button
-                  type="submit"
-                  style={{
-                    flex: 1,
-                    padding: '14px',
-                    backgroundColor: 'var(--accent-color)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '16px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '10px',
-                    transition: 'all 0.2s'
+                  currentAvatarUrl={editingUser.avatarUrl || ''}
+                  onAvatarChange={(file, previewUrl) => {
+                    if (file) {
+                      handleAvatarUpload(editingUser.id, file);
+                    }
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
-                >
-                  <FaSave size={18} />
-                  {isEditing ? 'Atualizar Usuário' : 'Criar Usuário'}
-                </button>
-
-                {isEditing && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    style={{
-                      padding: '14px 24px',
-                      backgroundColor: 'var(--bg-input)',
-                      color: 'var(--text-secondary)',
-                      border: '1px solid var(--border-color)',
-                      borderRadius: '8px',
-                      fontSize: '16px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '10px',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = '#e9ecef';
-                      e.currentTarget.style.borderColor = 'var(--text-secondary)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                      e.currentTarget.style.borderColor = 'var(--border-color)';
-                    }}
-                  >
-                    <FaTimes size={18} />
-                    Cancelar
-                  </button>
+                  disabled={uploadingAvatarFor === editingUser.id}
+                />
+                {uploadingAvatarFor === editingUser.id && (
+                  <div className="uploading-indicator">Enviando avatar...</div>
                 )}
               </div>
-            </form>
-
-            {/* Informações */}
-            <div style={{
-              marginTop: '32px',
-              padding: '16px',
-              backgroundColor: 'white',
-              borderRadius: '8px',
-              border: '1px solid var(--border-color)'
-            }}>
-              <h4 style={{
-                fontSize: '14px',
-                fontWeight: 600,
-                color: '#333',
-                marginBottom: '8px'
-              }}>
-                💡 Dicas sobre Usuários
-              </h4>
-              <ul style={{
-                fontSize: '12px',
-                color: 'var(--text-secondary)',
-                margin: 0,
-                paddingLeft: '20px',
-                lineHeight: 1.6
-              }}>
-                <li>Administradores têm acesso total ao sistema</li>
-                <li>Editores podem criar e editar tarefas</li>
-                <li>Visualizadores podem apenas visualizar tarefas</li>
-                <li>Use avatares para facilitar a identificação</li>
-                <li>Evite excluir usuários associados a projetos ou tarefas</li>
-              </ul>
             </div>
           </div>
+
+          <div className="user-edit-form-actions">
+            <button onClick={handleUpdate} disabled={!editingUser.name.trim() || !editingUser.email.trim() || loading}>
+              Salvar Alterações
+            </button>
+            <button onClick={handleCancelEdit}>
+              Cancelar
+            </button>
+          </div>
         </div>
+      )}
+
+      {/* User list */}
+      <div className="user-list">
+        {loading ? (
+          <div className="loading">Carregando usuários...</div>
+        ) : users.length === 0 ? (
+          <div className="empty-state">
+            <p>Nenhum usuário cadastrado</p>
+            <p>Use o formulário acima para criar o primeiro usuário</p>
+          </div>
+        ) : (
+          users.map(user => {
+            const roleColor = getRoleColor(user.role);
+            const roleLabel = getRoleLabel(user.role);
+            const avatarUrl = getAvatarUrl(user.avatarUrl);
+            
+            return (
+              <div key={user.id} className="user-item">
+                <div className="user-info">
+                  <div className="user-avatar">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={user.name} className="avatar-image" />
+                    ) : (
+                      <div 
+                        className="avatar-placeholder"
+                        style={{ backgroundColor: roleColor }}
+                      >
+                        {getInitials(user.name)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="user-details">
+                    <div className="user-name">{user.name}</div>
+                    <div className="user-meta">
+                      <span className="user-meta-item">
+                        <span className="meta-label">Email:</span> {user.email}
+                      </span>
+                      {user.nickname && (
+                        <span className="user-meta-item">
+                          <span className="meta-label">Apelido:</span> {user.nickname}
+                        </span>
+                      )}
+                      <span className="user-meta-item">
+                        <span className="meta-label">Criado em:</span> {user.createdAt ? new Date(user.createdAt).toLocaleDateString('pt-BR') : 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="user-role">
+                    <div 
+                      className="role-badge"
+                      style={{ backgroundColor: roleColor }}
+                    >
+                      {roleLabel}
+                    </div>
+                  </div>
+                </div>
+                <div className="user-actions">
+                  <button onClick={() => handleEdit(user)}>
+                    Editar
+                  </button>
+                  <button onClick={() => handleDelete(user.id)}>
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Informações sobre usuários */}
+      <div className="user-info-section">
+        <h3>💡 Dicas sobre Usuários</h3>
+        <ul>
+          <li>Administradores têm acesso total ao sistema</li>
+          <li>Editores podem criar e editar tarefas</li>
+          <li>Visualizadores podem apenas visualizar tarefas</li>
+          <li>Use avatares para facilitar a identificação</li>
+          <li>Evite excluir usuários associados a projetos ou tarefas</li>
+          <li>Senhas devem ter pelo menos 6 caracteres</li>
+          <li>Apelidos são opcionais e podem ser gerados automaticamente</li>
+        </ul>
       </div>
     </div>
   );

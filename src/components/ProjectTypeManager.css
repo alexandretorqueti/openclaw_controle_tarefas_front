@@ -1,0 +1,671 @@
+/* ProjectTypeManager.css - Tema Escuro */
+
+/* Container principal */
+.project-type-manager {
+  padding: 24px;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* Cabeçalho */
+.project-type-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.project-type-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Mensagem de erro */
+.error-message {
+  padding: 12px 16px;
+  background-color: var(--danger-color);
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Formulário de criação */
+.project-type-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+/* Formulário de edição */
+.project-type-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.project-type-edit-form-header {
+  margin-bottom: 8px;
+}
+
+.project-type-edit-form-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.project-type-edit-form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.project-type-edit-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Grupos de formulário */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group textarea {
+  padding: 10px 12px;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px var(--accent-color-20);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+/* Tipos comuns */
+.common-types {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.common-types-label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.common-type-button {
+  padding: 4px 12px;
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.common-type-button:hover {
+  background-color: var(--bg-card);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+/* Paleta de cores */
+.color-palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.color-option {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.color-option.selected {
+  border-color: white;
+  box-shadow: 0 0 0 2px var(--accent-color), 0 4px 8px rgba(0, 0, 0, 0.3);
+  transform: scale(1.1);
+}
+
+/* Dica do campo */
+.field-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+
+/* Botões */
+button {
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+button:hover:not(:disabled) {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.project-type-edit-form-actions button:last-child {
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.project-type-edit-form-actions button:last-child:hover:not(:disabled) {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+/* Lista de tipos de projeto */
+.project-type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.project-type-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  transition: all 0.2s;
+}
+
+.project-type-item:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Informações do tipo de projeto */
+.project-type-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
+}
+
+.project-type-color {
+  flex-shrink: 0;
+}
+
+.color-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.project-type-details {
+  flex: 1;
+}
+
+.project-type-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.project-type-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.project-type-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.meta-label {
+  font-weight: 600;
+  color: var(--text-tertiary);
+}
+
+.project-type-preview {
+  margin-bottom: 8px;
+}
+
+.preview-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  margin-bottom: 2px;
+}
+
+.preview-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  max-height: 40px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-boxOrient: vertical;
+}
+
+/* Ações */
+.project-type-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.project-type-actions button {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.project-type-actions button:first-child {
+  background-color: var(--bg-input);
+  color: var(--accent-color);
+  border: 1px solid var(--border-color);
+}
+
+.project-type-actions button:first-child:hover {
+  background-color: var(--accent-color-10);
+  border-color: var(--accent-color);
+}
+
+.project-type-actions button:last-child {
+  background-color: var(--bg-input);
+  color: var(--danger-color);
+  border: 1px solid var(--border-color);
+}
+
+.project-type-actions button:last-child:hover {
+  background-color: var(--danger-color-10);
+  border-color: var(--danger-color);
+}
+
+/* Estados */
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+.empty-state {
+  padding: 40px;
+  text-align: center;
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  border: 2px dashed var(--border-color);
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.empty-state p:first-child {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.empty-state p:last-child {
+  font-size: 14px;
+}
+
+/* Seção de informações */
+.project-type-info-section {
+  padding: 20px;
+  background-color: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.project-type-info-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-type-info-section ul {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.project-type-info-section li {
+  margin-bottom: 6px;
+}
+
+.project-type-info-section li:last-child {
+  margin-bottom: 0;
+}
+
+.project-type-info-section strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .project-type-manager {
+    padding: 16px;
+  }
+  
+  .project-type-header h1 {
+    font-size: 24px;
+  }
+  
+  .project-type-form,
+  .project-type-edit-form {
+    padding: 16px;
+  }
+  
+  .project-type-edit-form-fields {
+    flex-direction: column;
+  }
+  
+  .project-type-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .project-type-info {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .project-type-color {
+    align-self: flex-start;
+  }
+  
+  .project-type-actions {
+    width: 100%;
+  }
+  
+  .project-type-actions button {
+    flex: 1;
+  }
+  
+  .common-types {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .color-palette {
+    justify-content: center;
+  }
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.project-type-item {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Scrollbar personalizada */
+.project-type-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.project-type-list::-webkit-scrollbar-track {
+  background: var(--bg-input);
+  border-radius: 4px;
+}
+
+.project-type-list::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.project-type-list::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Estilos para textareas com código/monospace */
+.form-group textarea[placeholder*="1."] {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Destaque para campos obrigatórios */
+.form-group label::after {
+  content: ' *';
+  color: var(--danger-color);
+  font-weight: bold;
+}
+
+.form-group label:not([for*="*"])::after {
+  content: '';
+}
+
+/* Estilos para preview de texto */
+.preview-text {
+  background-color: var(--bg-input);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-color);
+}
+
+/* Estilos para círculo de cor com texto */
+.color-circle {
+  position: relative;
+  overflow: hidden;
+}
+
+.color-circle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 50%;
+}
+
+.color-circle span {
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+/* Efeito de gradiente para itens da lista */
+.project-type-item:hover .color-circle {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Estilos para formulário de edição */
+.project-type-edit-form-fields textarea {
+  min-height: 100px;
+}
+
+/* Estilos para botões de ação */
+.project-type-actions button {
+  min-width: 80px;
+  justify-content: center;
+}
+
+/* Estilos para mensagens de sucesso/erro */
+.success-message {
+  padding: 12px 16px;
+  background-color: var(--success-color);
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  animation: slideIn 0.3s ease;
+}
+
+/* Estilos para tooltips */
+.color-option {
+  position: relative;
+}
+
+.color-option:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  margin-bottom: 8px;
+}
+
+/* Estilos para formulário responsivo */
+@media (max-width: 480px) {
+  .project-type-form,
+  .project-type-edit-form {
+    padding: 12px;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  button {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .project-type-name {
+    font-size: 16px;
+  }
+  
+  .project-type-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

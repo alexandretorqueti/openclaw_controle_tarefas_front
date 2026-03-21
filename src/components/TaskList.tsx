@@ -5,7 +5,7 @@ import { Task, User, Status, Priority, Project, Agent } from '../types';
 import TaskCard from './TaskCard';
 import Card from './shared/Card';
 import Button from './shared/Button';
-import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle , FaArrowUp} from 'react-icons/fa';
+import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle, FaArrowUp } from 'react-icons/fa';
 import { safeParseDate } from '../utils/dateUtils';
 
 interface TaskListProps {
@@ -31,26 +31,92 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({
-  tasks, 
-  users, 
-  statuses, 
-  priorities, 
-  projects,
+  tasks: propTasks = [], 
+  users: propUsers = [], 
+  statuses: propStatuses = [], 
+  priorities: propPriorities = [], 
+  projects: propProjects = [],
   agents = [] as Agent[],
-  selectedProject,
+  selectedProject = null,
   selectedParentTask = null,
   parentHierarchy = [],
-  onTaskSelect,
-  onViewSubtasks,
-  onBackToProjects,
-  onBackToParent,
-  onCreateTask,
-  onUpdateTask,
-  onDeleteTask,
-  onToggleCompletion,
+  onTaskSelect = () => {},
+  onViewSubtasks = () => {},
+  onBackToProjects = () => {},
+  onBackToParent = () => {},
+  onCreateTask = async () => ({ id: '', title: '', description: '', projectId: '', statusId: '', priorityId: '', assignedToId: '', deadline: '', createdAt: '', updatedAt: '', isCompleted: false }),
+  onUpdateTask = async () => ({ id: '', title: '', description: '', projectId: '', statusId: '', priorityId: '', assignedToId: '', deadline: '', createdAt: '', updatedAt: '', isCompleted: false }),
+  onDeleteTask = async () => {},
+  onToggleCompletion = async () => {},
   showCompleted: propShowCompleted = false,
-  onToggleShowCompleted
+  onToggleShowCompleted = () => {}
 }) => {
+  // Estados para dados quando não são fornecidos via props
+  const [tasks, setTasks] = useState<Task[]>(propTasks);
+  const [users, setUsers] = useState<User[]>(propUsers);
+  const [statuses, setStatuses] = useState<Status[]>(propStatuses);
+  const [priorities, setPriorities] = useState<Priority[]>(propPriorities);
+  const [projects, setProjects] = useState<Project[]>(propProjects);
+  const [isLoading, setIsLoading] = useState(false);
+  const [dataError, setDataError] = useState<string | null>(null);
+
+  // Buscar dados se não forem fornecidos via props
+  useEffect(() => {
+    const fetchData = async () => {
+      // Se já temos dados via props, não precisamos buscar
+      if (propTasks.length > 0 && propUsers.length > 0 && propStatuses.length > 0 && 
+          propPriorities.length > 0 && propProjects.length > 0) {
+        return;
+      }
+      
+      setIsLoading(true);
+      setDataError(null);
+      
+      try {
+        console.log('📊 TaskList: Buscando dados da API...');
+        
+        // Buscar dados em paralelo
+        const [tasksRes, usersRes, statusesRes, prioritiesRes, projectsRes] = await Promise.allSettled([
+          propTasks.length === 0 ? api.getTasks() : Promise.resolve({ tasks: propTasks }),
+          propUsers.length === 0 ? api.getUsers() : Promise.resolve({ users: propUsers }),
+          propStatuses.length === 0 ? api.getStatuses() : Promise.resolve({ statuses: propStatuses }),
+          propPriorities.length === 0 ? api.getPriorities() : Promise.resolve({ priorities: propPriorities }),
+          propProjects.length === 0 ? api.getProjects() : Promise.resolve({ projects: propProjects })
+        ]);
+        
+        // Processar resultados
+        if (tasksRes.status === 'fulfilled' && tasksRes.value.tasks) {
+          setTasks(tasksRes.value.tasks);
+        }
+        
+        if (usersRes.status === 'fulfilled' && usersRes.value.users) {
+          setUsers(usersRes.value.users);
+        }
+        
+        if (statusesRes.status === 'fulfilled' && statusesRes.value.statuses) {
+          setStatuses(statusesRes.value.statuses);
+        }
+        
+        if (prioritiesRes.status === 'fulfilled' && prioritiesRes.value.priorities) {
+          setPriorities(prioritiesRes.value.priorities);
+        }
+        
+        if (projectsRes.status === 'fulfilled' && projectsRes.value.projects) {
+          setProjects(projectsRes.value.projects);
+        }
+        
+        console.log('📊 TaskList: Dados carregados com sucesso');
+        
+      } catch (error) {
+        console.error('📊 TaskList: Erro ao buscar dados:', error);
+        setDataError('Não foi possível carregar os dados. Tente novamente mais tarde.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, [propTasks, propUsers, propStatuses, propPriorities, propProjects]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
@@ -83,7 +149,7 @@ const TaskList: React.FC<TaskListProps> = ({
 
   // Inicializar terminais com conteúdo da primeira tarefa
   useEffect(() => {
-    if (tasks.length > 0) {
+    if (tasks?.length > 0) {
       const firstTask = tasks[0];
       if (firstTask.arquitetosTerminalContent) {
         setAnalistaTerminal(firstTask.arquitetosTerminalContent);
@@ -149,7 +215,7 @@ const TaskList: React.FC<TaskListProps> = ({
       try {
         const updatedTask = JSON.parse(event.data);
         // Atualizar terminais se a tarefa atualizada for a primeira da lista
-        if (tasks.length > 0 && updatedTask.id === tasks[0].id) {
+        if (tasks?.length > 0 && updatedTask.id === tasks[0]?.id) {
           if (updatedTask.arquitetosTerminalContent !== undefined) {
             setAnalistaTerminal(updatedTask.arquitetosTerminalContent || '');
           }
@@ -183,9 +249,9 @@ const TaskList: React.FC<TaskListProps> = ({
     title: '',
     description: '',
     projectId: selectedProject?.id || '',
-    statusId: statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '',
-    priorityId: priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '',
-    assignedToId: users.length > 0 ? users[0]?.id || '' : '',
+    statusId: statuses?.find(s => s.name === 'Pendente')?.id || statuses?.[0]?.id || '',
+    priorityId: priorities?.find(p => p.name === 'Média')?.id || priorities?.[1]?.id || '',
+    assignedToId: users?.length > 0 ? users[0]?.id || '' : '',
     deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
     agent: typeof window !== 'undefined' ? localStorage.getItem('lastUsedAgent') || '' : '',
     parentTaskId: selectedParentTask?.id || null
@@ -201,9 +267,9 @@ const TaskList: React.FC<TaskListProps> = ({
 
   // Update defaults when data loads
   React.useEffect(() => {
-    const defaultStatus = statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id;
-    const defaultPriority = priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id;
-    const defaultUser = users[0]?.id;
+    const defaultStatus = statuses?.find(s => s.name === 'Pendente')?.id || statuses?.[0]?.id || '';
+    const defaultPriority = priorities?.find(p => p.name === 'Média')?.id || priorities?.[1]?.id || '';
+    const defaultUser = users?.[0]?.id || '';
     
     setNewTaskData(prev => ({
       ...prev,
@@ -243,7 +309,7 @@ const TaskList: React.FC<TaskListProps> = ({
   }, [selectedProject]);
 
   const shouldFilterByCompletion = !onToggleShowCompleted;
-  const filteredTasks = tasks.filter(task => {
+  const filteredTasks = tasks?.filter(task => {
     const matchesSearch = (task.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (task.description || '').toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -252,17 +318,17 @@ const TaskList: React.FC<TaskListProps> = ({
     const matchesCompletion = shouldFilterByCompletion ? (showCompleted ? true : !task.isCompleted) : true;
 
     return matchesSearch && matchesStatus && matchesPriority && matchesCompletion;
-  });
+  }) || [];
 
-  const sortedTasks = [...filteredTasks].sort((a, b) => {
+  const sortedTasks = filteredTasks.sort((a, b) => {
     switch (sortBy) {
       case 'deadline':
         const dateA = a.deadline ? safeParseDate(a.deadline)?.getTime() : Infinity;
         const dateB = b.deadline ? safeParseDate(b.deadline)?.getTime() : Infinity;
         return (dateA || Infinity) - (dateB || Infinity);
       case 'priority':
-        const priorityA = priorities.find(p => p.id === a.priorityId)?.weight || 0;
-        const priorityB = priorities.find(p => p.id === b.priorityId)?.weight || 0;
+        const priorityA = priorities?.find(p => p.id === a.priorityId)?.weight || 0;
+        const priorityB = priorities?.find(p => p.id === b.priorityId)?.weight || 0;
         return priorityB - priorityA;
       case 'title':
         return a.title.localeCompare(b.title);
@@ -272,12 +338,12 @@ const TaskList: React.FC<TaskListProps> = ({
   });
 
   const getProjectName = (projectId: string) => {
-    const project = projects.find(p => p.id === projectId);
+    const project = projects?.find(p => p.id === projectId);
     return project ? project.name : 'Projeto não encontrado';
   };
 
   const getTaskCountByStatus = (statusId: string) => {
-    return tasks.filter(task => task.statusId === statusId).length;
+    return tasks?.filter(task => task.statusId === statusId).length || 0;
   };
 
   const handleCreateTask = async () => {
@@ -298,7 +364,7 @@ const TaskList: React.FC<TaskListProps> = ({
       const taskData = {
         ...newTaskData,
         // createdById will be set by the parent component (App.tsx)
-        position: tasks.length,
+        position: tasks?.length || 0,
         // Ensure agent is null if empty string
         agent: newTaskData.agent || null
       };
@@ -313,9 +379,9 @@ const TaskList: React.FC<TaskListProps> = ({
       }
       
       // Reset form with current values (not empty strings)
-      const defaultStatus = statuses.find(s => s.name === 'Pendente')?.id || statuses[0]?.id || '';
-      const defaultPriority = priorities.find(p => p.name === 'Média')?.id || priorities[1]?.id || '';
-      const defaultUser = users[0]?.id || '';
+      const defaultStatus = statuses?.find(s => s.name === 'Pendente')?.id || statuses?.[0]?.id || '';
+      const defaultPriority = priorities?.find(p => p.name === 'Média')?.id || priorities?.[1]?.id || '';
+      const defaultUser = users?.[0]?.id || '';
       
       setNewTaskData({
         title: '',
@@ -353,6 +419,81 @@ const TaskList: React.FC<TaskListProps> = ({
       setError(errorMessage);
     }
   };
+
+  // Mostrar loading enquanto busca dados
+  if (isLoading) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '50vh',
+        backgroundColor: 'var(--bg-primary)',
+        color: 'var(--text-primary)'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid var(--border-color)',
+            borderTopColor: 'var(--accent-color)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }} />
+          <p style={{ fontSize: '16px', fontWeight: 500 }}>
+            Carregando tarefas...
+          </p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+  
+  // Mostrar erro se houver
+  if (dataError) {
+    return (
+      <div style={{ 
+        padding: '40px', 
+        textAlign: 'center',
+        backgroundColor: 'var(--bg-primary)',
+        color: 'var(--text-primary)'
+      }}>
+        <div style={{
+          width: '60px',
+          height: '60px',
+          backgroundColor: 'var(--danger-color)',
+          borderRadius: '50%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 20px'
+        }}>
+          <FaExclamationTriangle size={24} color="white" />
+        </div>
+        <h2 style={{ marginBottom: '16px' }}>Erro ao carregar dados</h2>
+        <p style={{ marginBottom: '24px', color: 'var(--text-secondary)' }}>{dataError}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: 'var(--accent-color)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer'
+          }}
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -962,23 +1103,23 @@ const TaskList: React.FC<TaskListProps> = ({
             <div style={{ display: 'flex', gap: '24px' }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)' }}>
-                  {tasks.length}
+                  {tasks?.length || 0}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Total de Tarefas</div>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--success-color)' }}>
-                  {tasks.filter(t => t.isCompleted).length}
+                  {tasks?.filter(t => t.isCompleted).length || 0}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Concluídas</div>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--danger-color)' }}>
-                  {tasks.filter(t => {
+                  {tasks?.filter(t => {
                     if (t.isCompleted) return false;
                     const deadlineDate = safeParseDate(t.deadline || '');
                     return deadlineDate && deadlineDate < new Date();
-                  }).length}
+                  }).length || 0}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Atrasadas</div>
               </div>

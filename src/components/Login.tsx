@@ -77,6 +77,9 @@ const Login: React.FC = () => {
 
     try {
       const backendUrl = getBackendUrl();
+      console.log('🔐 Login - Backend URL:', backendUrl);
+      console.log('🔐 Login - Nickname:', loginNickname.trim());
+      
       const response = await fetch(`${backendUrl}/api/auth/login`, {
         method: 'POST',
         headers: {
@@ -86,7 +89,10 @@ const Login: React.FC = () => {
         credentials: 'include'
       });
 
+      console.log('🔐 Login - Resposta HTTP:', response.status, response.statusText);
+      
       const data = await response.json();
+      console.log('🔐 Login - Dados da resposta:', data);
 
       if (response.ok) {
         // Save or clear login preference
@@ -97,14 +103,20 @@ const Login: React.FC = () => {
         }
 
         // Persist user in localStorage
+        console.log('🔐 Login - Salvando usuário no localStorage:', data.user);
         localStorage.setItem('tarefas_user', JSON.stringify(data.user));
-        window.location.reload();
+        
+        // Forçar um pequeno delay para garantir que o localStorage foi salvo
+        setTimeout(() => {
+          console.log('🔐 Login - Recarregando página...');
+          window.location.reload();
+        }, 100);
       } else {
         setError(data.message || 'Erro ao fazer login');
       }
     } catch (err) {
       setError('Erro de conexão com o servidor');
-      console.error('Erro no login:', err);
+      console.error('🔐 Erro no login:', err);
     } finally {
       setIsLoadingAction(false);
     }

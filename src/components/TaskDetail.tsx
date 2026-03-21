@@ -70,11 +70,11 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
 
-  const getAssignedUser = () => users.find(user => user.id === task.assignedToId);
-  const getStatus = () => statuses.find(status => status.id === task.statusId);
-  const getPriority = () => priorities.find(priority => priority.id === task.priorityId);
-  const getCreator = () => users.find(user => user.id === task.createdById);
-  const getProject = () => projects.find(project => project.id === task.projectId);
+  const getAssignedUser = () => users?.find(user => user.id === task.assignedToId);
+  const getStatus = () => statuses?.find(status => status.id === task.statusId);
+  const getPriority = () => priorities?.find(priority => priority.id === task.priorityId);
+  const getCreator = () => users?.find(user => user.id === task.createdById);
+  const getProject = () => projects?.find(project => project.id === task.projectId);
 
   const assignedUser = getAssignedUser();
   const status = getStatus();
@@ -143,7 +143,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 return dep.dependentTask;
               }
               // Fallback: buscar no array local de tasks
-              const foundTask = tasks.find(t => t.id === dep.dependentTaskId);
+              const foundTask = tasks?.find(t => t.id === dep.dependentTaskId);
               console.log('🔍 [TaskDetail] Fallback - Buscando no array tasks:', foundTask ? 'Encontrado' : 'Não encontrado');
               return foundTask;
             })
@@ -170,7 +170,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 return dep.task;
               }
               // Fallback: buscar no array local de tasks
-              const foundTask = tasks.find(t => t.id === dep.task?.id);
+              const foundTask = tasks?.find(t => t.id === dep.task?.id);
               console.log('🔍 [TaskDetail] Fallback - Buscando no array tasks:', foundTask ? 'Encontrado' : 'Não encontrado');
               return foundTask;
             })
@@ -211,7 +211,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
       await api.createDependency(dependencyData);
       
       // Find the added task
-      const addedTask = tasks.find(t => t.id === selectedDependencyId);
+      const addedTask = tasks?.find(t => t.id === selectedDependencyId);
       if (addedTask) {
         setDependencies(prev => [...prev, addedTask]);
         setSelectedDependencyId('');
@@ -228,7 +228,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     
     try {
       // Find the dependency to remove
-      const dependencyToRemove = dependencies.find(d => d.id === dependencyId);
+      const dependencyToRemove = dependencies?.find(d => d.id === dependencyId);
       if (!dependencyToRemove) return;
       
       // Call API to remove dependency
@@ -1017,7 +1017,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
               <div>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#333' }}>
                   {(() => {
-                    const agentObj = agents.find(a => a.id === task.agent);
+                    const agentObj = agents?.find(a => a.id === task.agent);
                     return agentObj 
                       ? `${agentObj.identity?.name || agentObj.id}${agentObj.identity?.model ? ` (${agentObj.identity.model})` : ''}`
                       : task.agent || 'Não definido';

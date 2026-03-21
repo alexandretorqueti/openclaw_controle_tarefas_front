@@ -1,18 +1,14 @@
 // @ts-nocheck
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaEnvelope, FaImage, FaUserTag, FaSave, FaTimes, FaKey } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaImage, FaUserTag, FaSave, FaTimes, FaKey, FaHome, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import AvatarUpload from './shared/AvatarUpload';
 import { getAvatarUrl } from '../utils/avatarUrl';
 
-interface UserProfileEditProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onProfileUpdate?: () => void;
-}
-
-const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onProfileUpdate }) => {
+const UserProfileEdit: React.FC = () => {
+  const navigate = useNavigate();
   const { user, updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,21 +24,21 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
-  // Carregar dados do usuário quando o modal abrir
+  // Carregar dados do usuário quando o componente montar
   useEffect(() => {
-    if (isOpen && user) {
+    if (user) {
       setFormData({
         name: user.name || '',
         email: user.email || '',
         nickname: user.nickname || '',
         avatarUrl: user.avatarUrl || ''
       });
-      setAvatarFile(null); // Reset avatar file when opening
+      setAvatarFile(null);
       setError(null);
       setSuccess(null);
       setIsUploadingAvatar(false);
     }
-  }, [isOpen, user]);
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -52,21 +48,43 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
     }));
   };
 
-  const handleAvatarChange = (file: File | null, previewUrl: string) => {
+  const handleAvatarChange = (file: File | null) => {
     setAvatarFile(file);
-    // If we have a previewUrl from a file, don't update formData.avatarUrl yet
-    // We'll update it after successful upload
-    if (!file && previewUrl === '') {
-      // User removed avatar
-      setFormData(prev => ({ ...prev, avatarUrl: '' }));
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({
+          ...prev,
+          avatarUrl: reader.result as string
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadAvatar = async (): Promise<string | null> => {
+    if (!avatarFile || !user) return null;
+
+    try {
+      setIsUploadingAvatar(true);
+      const formData = new FormData();
+      formData.append('avatar', avatarFile);
+      
+      const response = await apiService.uploadAvatar(formData);
+      return response.avatarUrl || null;
+    } catch (err) {
+      console.error('Erro ao fazer upload do avatar:', err);
+      return null;
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user?.id) {
-      setError('Usuário não identificado');
+    if (!user) {
+      setError('Usuário não autenticado');
       return;
     }
 
@@ -75,459 +93,460 @@ const UserProfileEdit: React.FC<UserProfileEditProps> = ({ isOpen, onClose, onPr
       setError(null);
       setSuccess(null);
 
-      // Validar campos obrigatórios
-      if (!formData.name.trim()) {
-        throw new Error('Nome é obrigatório');
-      }
-
-      if (!formData.email.trim()) {
-        throw new Error('Email é obrigatório');
-      }
-
+      // Upload do avatar primeiro, se houver
       let finalAvatarUrl = formData.avatarUrl;
-
-      // Upload avatar file if selected
-      if (avatarFile && user) {
-        setIsUploadingAvatar(true);
-        try {
-          const uploadResponse = await apiService.uploadAvatar(user.id, avatarFile);
-          finalAvatarUrl = uploadResponse.avatarUrl;
-        } catch (uploadErr: any) {
-          console.error('Erro ao fazer upload do avatar:', uploadErr);
-          const uploadErrorMessage = uploadErr?.response?.data?.error || uploadErr?.message || 'Erro ao fazer upload do avatar.';
-          throw new Error(`Erro no upload do avatar: ${uploadErrorMessage}`);
-        } finally {
-          setIsUploadingAvatar(false);
+      if (avatarFile) {
+        const uploadedAvatarUrl = await uploadAvatar();
+        if (uploadedAvatarUrl) {
+          finalAvatarUrl = uploadedAvatarUrl;
         }
       }
 
-      // Prepare user data
-      const userData = {
-        ...formData,
-        avatarUrl: finalAvatarUrl || undefined
+      // Atualizar perfil do usuário
+      const updateData = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        nickname: formData.nickname.trim(),
+        avatarUrl: finalAvatarUrl
       };
 
-      // Atualizar usuário no backend
-      const response = await apiService.updateUser(user.id, userData);
+      const updatedUser = await apiService.updateUserProfile(user.id, updateData);
       
-      // Atualizar no contexto de autenticação
-      if (updateUser) {
-        updateUser(response.user);
-      }
-
+      // Atualizar contexto de autenticação
+      updateUser(updatedUser);
+      
       setSuccess('Perfil atualizado com sucesso!');
       
-      // Notificar componente pai se necessário
-      if (onProfileUpdate) {
-        onProfileUpdate();
-      }
-
-      // Fechar modal após 2 segundos
-      setTimeout(() => {
-        onClose();
-      }, 2000);
-
+      // Limpar estado do avatar após sucesso
+      setAvatarFile(null);
+      
     } catch (err: any) {
-      console.error('Failed to update profile:', err);
-      setError(err.message || 'Falha ao atualizar perfil. Tente novamente.');
+      console.error('Erro ao atualizar perfil:', err);
+      const errorMessage = err?.response?.data?.message || err?.message || 'Erro ao atualizar perfil.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
+  const handleBack = () => {
+    navigate('/');
+  };
+
+  if (!user) {
+    return (
+      <div style={{
+        maxWidth: '800px',
+        margin: '0 auto',
+        padding: '40px',
+        textAlign: 'center',
+        color: 'var(--text-primary)'
+      }}>
+        <h2>Usuário não autenticado</h2>
+        <p>Faça login para acessar esta página.</p>
+        <button
+          onClick={() => navigate('/login')}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: 'var(--accent-color)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            marginTop: '20px'
+          }}
+        >
+          Ir para Login
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 2000,
-      padding: '20px'
+      maxWidth: '800px',
+      margin: '0 auto',
+      padding: '24px',
+      backgroundColor: 'var(--bg-primary)',
+      color: 'var(--text-primary)',
+      minHeight: 'calc(100vh - 64px)'
     }}>
+      {/* Header */}
       <div style={{
-        backgroundColor: 'white',
-        borderRadius: '16px',
-        width: '100%',
-        maxWidth: '500px',
-        maxHeight: '90vh',
-        overflow: 'hidden',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
         display: 'flex',
-        flexDirection: 'column'
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '32px',
+        paddingBottom: '16px',
+        borderBottom: '1px solid var(--border-color)'
       }}>
-        {/* Cabeçalho */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            backgroundColor: 'var(--accent-color)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <FaUser size={24} color="white" />
+          </div>
+          <div>
+            <h1 style={{
+              fontSize: '28px',
+              fontWeight: 700,
+              margin: 0,
+              color: 'var(--text-primary)'
+            }}>
+              Meu Perfil
+            </h1>
+            <p style={{
+              fontSize: '14px',
+              color: 'var(--text-secondary)',
+              margin: '4px 0 0 0'
+            }}>
+              Atualize suas informações pessoais
+            </p>
+          </div>
+        </div>
+        
+        <button
+          onClick={handleBack}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: 'var(--bg-input)',
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            fontSize: '14px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            transition: 'all 0.2s'
+          }}
+        >
+          <FaArrowLeft size={14} />
+          Voltar
+        </button>
+      </div>
+
+      {/* Success/Error Messages */}
+      {success && (
         <div style={{
-          padding: '24px',
-          backgroundColor: 'var(--bg-input)',
-          borderBottom: '1px solid var(--border-color)',
+          padding: '16px',
+          backgroundColor: 'var(--success-color)',
+          color: 'white',
+          borderRadius: '8px',
+          marginBottom: '24px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between'
+          gap: '12px'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '50%',
-              backgroundColor: 'var(--accent-color)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <FaUser size={24} color="white" />
-            </div>
-            <div>
-              <h2 style={{
-                fontSize: '20px',
-                fontWeight: 700,
-                color: '#333',
-                margin: 0
-              }}>
-                Meu Perfil
-              </h2>
-              <p style={{
-                fontSize: '14px',
-                color: 'var(--text-secondary)',
-                margin: '4px 0 0 0'
-              }}>
-                Atualize suas informações pessoais
-              </p>
-            </div>
-          </div>
-          
-          <button
-            onClick={onClose}
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              backgroundColor: 'transparent',
-              border: '1px solid var(--border-color)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              transition: 'all 0.2s'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-              e.currentTarget.style.borderColor = 'var(--danger-color)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.borderColor = 'var(--border-color)';
-            }}
-          >
-            <FaTimes size={16} color="var(--text-secondary)" />
-          </button>
+          <FaSave size={16} />
+          <span>{success}</span>
         </div>
+      )}
 
-        {/* Conteúdo */}
-        <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
-          {error && (
-            <div style={{
-              padding: '12px 16px',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--danger-color)',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
-              <div style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--danger-color)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <FaTimes size={12} color="white" />
-              </div>
-              <span style={{ color: 'var(--danger-color)', fontSize: '14px' }}>{error}</span>
-            </div>
-          )}
+      {error && (
+        <div style={{
+          padding: '16px',
+          backgroundColor: 'var(--danger-color)',
+          color: 'white',
+          borderRadius: '8px',
+          marginBottom: '24px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <FaTimes size={16} />
+          <span>{error}</span>
+        </div>
+      )}
 
-          {success && (
-            <div style={{
-              padding: '12px 16px',
-              backgroundColor: 'var(--bg-card)',
-              border: '1px solid var(--accent-color)',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
-              <div style={{
-                width: '24px',
-                height: '24px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--accent-color)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0
-              }}>
-                <FaSave size={12} color="white" />
-              </div>
-              <span style={{ color: 'var(--accent-color)', fontSize: '14px' }}>{success}</span>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit}>
-            {/* Avatar */}
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#333',
-                marginBottom: '12px',
+      {/* Main Content */}
+      <div style={{
+        backgroundColor: 'var(--bg-secondary)',
+        borderRadius: '12px',
+        padding: '32px',
+        border: '1px solid var(--border-color)'
+      }}>
+        <form onSubmit={handleSubmit}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 2fr',
+            gap: '32px',
+            alignItems: 'start'
+          }}>
+            {/* Left Column - Avatar */}
+            <div>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                margin: '0 0 16px 0',
+                color: 'var(--text-primary)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <FaImage size={14} color="var(--accent-color)" />
-                Foto do Perfil
-              </label>
-              <AvatarUpload
-                currentAvatarUrl={formData.avatarUrl}
-                onAvatarChange={handleAvatarChange}
-                userId={user?.id}
-                disabled={isUploadingAvatar || loading}
-              />
-            </div>
-
-            {/* Nome */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{
-                
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#333',
-                marginBottom: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <FaUser size={14} color="var(--accent-color)" />
-                Nome Completo *
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="Seu nome completo"
-                required
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  color: '#333',
-                  backgroundColor: 'var(--bg-input)',
-                  transition: 'all 0.2s'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--accent-color)';
-                  e.target.style.backgroundColor = 'white';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border-color)';
-                  e.target.style.backgroundColor = 'var(--bg-card)';
-                }}
-              />
-            </div>
-
-            {/* Email */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{
-                
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#333',
-                marginBottom: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <FaEnvelope size={14} color="var(--accent-color)" />
-                Email *
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                placeholder="seu@email.com"
-                required
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  color: '#333',
-                  backgroundColor: 'var(--bg-input)',
-                  transition: 'all 0.2s'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--accent-color)';
-                  e.target.style.backgroundColor = 'white';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border-color)';
-                  e.target.style.backgroundColor = 'var(--bg-card)';
-                }}
-              />
-            </div>
-
-            {/* Apelido */}
-            <div style={{ marginBottom: '32px' }}>
-              <label style={{
-                
-                fontSize: '14px',
-                fontWeight: 500,
-                color: '#333',
-                marginBottom: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <FaUserTag size={14} color="var(--accent-color)" />
-                Apelido (Nickname)
-              </label>
-              <input
-                type="text"
-                name="nickname"
-                value={formData.nickname}
-                onChange={handleInputChange}
-                placeholder="Seu apelido no sistema"
-                style={{
-                  width: '100%',
-                  padding: '12px 16px',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  color: '#333',
-                  backgroundColor: 'var(--bg-input)',
-                  transition: 'all 0.2s'
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = 'var(--accent-color)';
-                  e.target.style.backgroundColor = 'white';
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = 'var(--border-color)';
-                  e.target.style.backgroundColor = 'var(--bg-card)';
-                }}
-              />
-              <p style={{
-                fontSize: '12px',
-                color: 'var(--text-secondary)',
-                marginTop: '8px'
-              }}>
-                Apelido usado para identificação no sistema (opcional)
-              </p>
-            </div>
-
-            {/* Botões */}
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              paddingTop: '20px',
-              borderTop: '1px solid var(--text-primary)'
-            }}>
-              <button
-                type="button"
-                onClick={onClose}
-                style={{
-                  flex: 1,
-                  padding: '14px 20px',
-                  backgroundColor: 'transparent',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--bg-card)';
-                  e.currentTarget.style.borderColor = 'var(--text-secondary)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.borderColor = 'var(--border-color)';
-                }}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
+                <FaImage size={16} />
+                Foto de Perfil
+              </h3>
               
-              <button
-                type="submit"
-                style={{
-                  flex: 1,
-                  padding: '14px 20px',
-                  backgroundColor: 'var(--accent-color)',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontWeight: 500,
-                  color: 'white',
-                  cursor: 'pointer',
+              <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '16px'
+              }}>
+                <div style={{
+                  width: '160px',
+                  height: '160px',
+                  borderRadius: '50%',
+                  backgroundColor: 'var(--bg-input)',
+                  backgroundImage: formData.avatarUrl ? `url(${getAvatarUrl(formData.avatarUrl)})` : 'none',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  border: '3px solid var(--border-color)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
-                  transition: 'all 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-color)'}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <div style={{
-                      width: '16px',
-                      height: '16px',
-                      border: '2px solid rgba(255,255,255,0.3)',
-                      borderTopColor: 'white',
-                      borderRadius: '50%',
-                      animation: 'spin 1s linear infinite'
-                    }} />
-                    Salvando...
-                  </>
-                ) : (
-                  <>
-                    <FaSave size={14} />
-                    Salvar Alterações
-                  </>
+                  overflow: 'hidden'
+                }}>
+                  {!formData.avatarUrl && (
+                    <FaUser size={64} color="var(--text-secondary)" />
+                  )}
+                </div>
+                
+                <AvatarUpload
+                  onAvatarChange={handleAvatarChange}
+                  currentAvatarUrl={formData.avatarUrl}
+                  isUploading={isUploadingAvatar}
+                />
+                
+                {avatarFile && (
+                  <div style={{
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)',
+                    textAlign: 'center'
+                  }}>
+                    Nova imagem selecionada: {avatarFile.name}
+                  </div>
                 )}
-              </button>
+              </div>
             </div>
-          </form>
-        </div>
+
+            {/* Right Column - Form Fields */}
+            <div>
+              <h3 style={{
+                fontSize: '18px',
+                fontWeight: 600,
+                margin: '0 0 24px 0',
+                color: 'var(--text-primary)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <FaUser size={16} />
+                Informações Pessoais
+              </h3>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Name Field */}
+                <div>
+                  <label style={{
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <FaUser size={12} />
+                    Nome Completo
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: 'var(--bg-input)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    placeholder="Digite seu nome completo"
+                    required
+                  />
+                </div>
+
+                {/* Email Field */}
+                <div>
+                  <label style={{
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <FaEnvelope size={12} />
+                    E-mail
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: 'var(--bg-input)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    placeholder="seu@email.com"
+                    required
+                  />
+                </div>
+
+                {/* Nickname Field */}
+                <div>
+                  <label style={{
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    color: 'var(--text-secondary)',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <FaUserTag size={12} />
+                    Apelido (Nickname)
+                  </label>
+                  <input
+                    type="text"
+                    name="nickname"
+                    value={formData.nickname}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '12px 16px',
+                      backgroundColor: 'var(--bg-input)',
+                      color: 'var(--text-primary)',
+                      border: '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      fontSize: '16px',
+                      outline: 'none',
+                      transition: 'border-color 0.2s'
+                    }}
+                    placeholder="Seu apelido no sistema"
+                  />
+                  <div style={{
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)',
+                    marginTop: '4px'
+                  }}>
+                    Usado para identificar suas tarefas e atividades
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '12px',
+                marginTop: '32px',
+                paddingTop: '24px',
+                borderTop: '1px solid var(--border-color)'
+              }}>
+                <button
+                  type="button"
+                  onClick={handleBack}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: 'var(--bg-input)',
+                    color: 'var(--text-primary)',
+                    border: '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  <FaTimes size={14} />
+                  Cancelar
+                </button>
+                
+                <button
+                  type="submit"
+                  disabled={loading || isUploadingAvatar}
+                  style={{
+                    padding: '12px 24px',
+                    backgroundColor: 'var(--accent-color)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    cursor: loading || isUploadingAvatar ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    transition: 'all 0.2s',
+                    opacity: loading || isUploadingAvatar ? 0.7 : 1
+                  }}
+                >
+                  {loading || isUploadingAvatar ? (
+                    <>
+                      <div style={{
+                        width: '14px',
+                        height: '14px',
+                        border: '2px solid white',
+                        borderTop: '2px solid transparent',
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite'
+                      }} />
+                      {isUploadingAvatar ? 'Enviando imagem...' : 'Salvando...'}
+                    </>
+                  ) : (
+                    <>
+                      <FaSave size={14} />
+                      Salvar Alterações
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
       </div>
 
+      {/* CSS Animations */}
       <style>{`
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        
+        input:focus {
+          border-color: var(--accent-color) !important;
         }
       `}</style>
     </div>

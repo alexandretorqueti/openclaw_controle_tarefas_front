@@ -53,10 +53,10 @@ interface ProjectType {
 
 // Componente Principal Simplificado
 interface ProjectsDashboardProps {
-  onProjectSelect: (project: Project) => void;
+  onProjectSelect?: (project: Project) => void;
 }
 
-const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }) => {
+const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect = () => {} }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -260,7 +260,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
         <h3>Erro ao carregar projetos</h3>
         <p>{error}</p>
         <button onClick={loadProjects} className="btn btn-primary">
-          <FaSync size={14} />
+          <FaSync size={14} style={{ display: 'block', color: 'currentColor' }} />
           Tentar novamente
         </button>
       </div>
@@ -321,7 +321,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
             onClick={loadProjects}
             disabled={loading}
           >
-            <FaSync size={14} className={loading ? 'loading-spinner' : ''} />
+            <FaSync size={14} className={loading ? 'loading-spinner' : ''} style={{ display: 'block', color: 'currentColor' }} />
             {loading ? 'Atualizando...' : 'Atualizar'}
           </button>
           <button
@@ -621,62 +621,63 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button 
                     style={{
-                      width: '32px',
-                      height: '32px',
+                      padding: '8px',
                       borderRadius: '6px',
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'transparent',
-                      color: 'var(--text-secondary)',
+                      color: 'var(--text-secondary, #b0b0b0)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      minWidth: '32px',
+                      minHeight: '32px'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                      e.currentTarget.style.color = 'var(--text-primary)';
+                      e.currentTarget.style.color = 'var(--text-primary, #ffffff)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.color = 'var(--text-secondary, #b0b0b0)';
                     }}
                     onClick={() => onProjectSelect(project)}
                     title="Visualizar"
                   >
-                    <FaEye size={14} />
+                    <FaEye size={14} style={{ display: 'block', color: 'currentColor' }} />
                   </button>
                   <button 
                     style={{
-                      width: '32px',
-                      height: '32px',
+                      padding: '8px',
                       borderRadius: '6px',
                       border: '1px solid var(--border-color)',
                       backgroundColor: 'transparent',
-                      color: 'var(--text-secondary)',
+                      color: 'var(--text-secondary, #b0b0b0)',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      minWidth: '32px',
+                      minHeight: '32px'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                      e.currentTarget.style.color = 'var(--text-primary)';
+                      e.currentTarget.style.color = 'var(--text-primary, #ffffff)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.color = 'var(--text-secondary, #b0b0b0)';
                     }}
                     onClick={() => handleEditProject(project)}
                     title="Editar"
                   >
-                    <FaEdit size={14} />
+                    <FaEdit size={14} style={{ display: 'block', color: 'currentColor' }} />
                   </button>
                   <button 
                     style={{
-                      width: '32px',
-                      height: '32px',
+                      padding: '8px',
                       borderRadius: '6px',
                       border: '1px solid rgba(239, 68, 68, 0.3)',
                       backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -685,7 +686,9 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      minWidth: '32px',
+                      minHeight: '32px'
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
@@ -702,7 +705,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect }
                     }}
                     title="Desativar Projeto"
                   >
-                    <FaTrash size={14} />
+                    <FaTrash size={14} style={{ display: 'block', color: 'currentColor' }} />
                   </button>
                 </div>
               </div>

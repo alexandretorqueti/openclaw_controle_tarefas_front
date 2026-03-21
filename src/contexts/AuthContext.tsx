@@ -74,14 +74,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const checkAuth = async () => {
     try {
       setIsLoading(true);
+      console.log('🔐 checkAuth iniciando...');
       
       // Check local storage for user
       const savedUser = localStorage.getItem('tarefas_user');
+      console.log('🔐 localStorage.getItem("tarefas_user"):', savedUser ? 'Found' : 'Not found');
+      
       if (savedUser) {
         const parsedUser = JSON.parse(savedUser);
+        console.log('🔐 Usuário parseado do localStorage:', parsedUser);
         
         // Verificar se o usuário ainda existe no banco de dados
         const backendUrl = getBackendUrl();
+        console.log('🔐 Backend URL para verificação:', backendUrl);
+        
         try {
           const response = await fetch(`${backendUrl}/api/auth/check`, {
             method: 'POST',
@@ -92,41 +98,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             credentials: 'include'
           });
           
+          console.log('🔐 Resposta do /api/auth/check:', response.status, response.statusText);
+          
           if (response.ok) {
             const data = await response.json();
+            console.log('🔐 Dados da resposta:', data);
+            
             if (data.isAuthenticated && data.user) {
               // Atualizar usuário com dados do banco
+              console.log('🔐 Usuário autenticado no banco:', data.user);
               setUser(data.user);
               setIsAuthenticated(true);
               // Atualizar localStorage
               localStorage.setItem('tarefas_user', JSON.stringify(data.user));
             } else {
               // Usuário não encontrado no banco, limpar localStorage
+              console.log('🔐 Usuário não encontrado no banco, limpando localStorage');
               localStorage.removeItem('tarefas_user');
               setUser(null);
               setIsAuthenticated(false);
             }
           } else {
             // Erro na verificação, manter usuário local
+            console.log('🔐 Erro na verificação, mantendo usuário local');
             setUser(parsedUser);
             setIsAuthenticated(true);
           }
         } catch (error) {
           // Erro de conexão, manter usuário local
-          console.error('Erro ao verificar autenticação:', error);
+          console.error('🔐 Erro ao verificar autenticação:', error);
           setUser(parsedUser);
           setIsAuthenticated(true);
         }
       } else {
         // Nenhum usuário no localStorage
+        console.log('🔐 Nenhum usuário no localStorage');
         setUser(null);
         setIsAuthenticated(false);
       }
     } catch (error) {
-      console.error('Error checking auth:', error);
+      console.error('🔐 Error checking auth:', error);
       setUser(null);
       setIsAuthenticated(false);
     } finally {
+      console.log('🔐 checkAuth finalizado, isLoading = false');
       setIsLoading(false);
     }
   };
@@ -171,7 +186,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    console.log('🔐 AuthContext useEffect executando checkAuth');
     checkAuth();
+    
+    // Adicionar listener para storage events (para sincronizar entre abas)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'tarefas_user') {
+        console.log('🔐 Storage event detectado para tarefas_user');
+        checkAuth();
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   // Check for OAuth callback
