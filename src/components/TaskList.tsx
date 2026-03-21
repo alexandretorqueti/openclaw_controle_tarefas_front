@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
 import TaskCard from './TaskCard';
@@ -8,6 +8,11 @@ import Card from './shared/Card';
 import Button from './shared/Button';
 import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle, FaArrowUp } from 'react-icons/fa';
 import { safeParseDate } from '../utils/dateUtils';
+
+// Funções vazias padrão para comparação
+const NOOP_FN = () => {};
+const NOOP_ASYNC_FN = async () => {};
+const NOOP_ASYNC_TASK_FN = async () => ({ id: '', title: '', description: '', projectId: '', statusId: '', priorityId: '', assignedToId: '', deadline: '', createdAt: '', updatedAt: '', isCompleted: false });
 
 interface TaskListProps {
   tasks: Task[];
@@ -41,19 +46,27 @@ const TaskList: React.FC<TaskListProps> = ({
   selectedProject: propSelectedProject = null,
   selectedParentTask = null,
   parentHierarchy = [],
-  onTaskSelect = () => {},
-  onViewSubtasks = () => {},
-  onBackToProjects = () => {},
-  onBackToParent = () => {},
-  onCreateTask = async () => ({ id: '', title: '', description: '', projectId: '', statusId: '', priorityId: '', assignedToId: '', deadline: '', createdAt: '', updatedAt: '', isCompleted: false }),
-  onUpdateTask = async () => ({ id: '', title: '', description: '', projectId: '', statusId: '', priorityId: '', assignedToId: '', deadline: '', createdAt: '', updatedAt: '', isCompleted: false }),
-  onDeleteTask = async () => {},
-  onToggleCompletion = async () => {},
+  onTaskSelect = NOOP_FN,
+  onViewSubtasks = NOOP_FN,
+  onBackToProjects = NOOP_FN,
+  onBackToParent = NOOP_FN,
+  onCreateTask = NOOP_ASYNC_TASK_FN,
+  onUpdateTask = NOOP_ASYNC_TASK_FN,
+  onDeleteTask = NOOP_ASYNC_FN,
+  onToggleCompletion = NOOP_ASYNC_FN,
   showCompleted: propShowCompleted = false,
   onToggleShowCompleted = () => {}
 }) => {
   const { projectId } = useParams<{ projectId?: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Extrair estado de navegação para hierarquia de tarefas
+  const navigationState = location.state as { selectedParentTask?: Task; parentHierarchy?: Task[] } || {};
+  
+  // Usar estado de navegação se disponível, caso contrário usar props
+  const finalSelectedParentTask = navigationState.selectedParentTask || selectedParentTask;
+  const finalParentHierarchy = navigationState.parentHierarchy || parentHierarchy;
   
   // Estados para dados quando não são fornecidos via props
   const [tasks, setTasks] = useState<Task[]>(propTasks);
@@ -78,22 +91,69 @@ const TaskList: React.FC<TaskListProps> = ({
     }
   };
 
+  // Função segura para stringify que evita erros de referência circular
+  const safeStringify = (obj: any): string => {
+    try {
+      return JSON.stringify(obj);
+    } catch (error) {
+      console.error('Erro ao serializar objeto:', error);
+      return '{}';
+    }
+  };
+  
   // Criar versões em string das props para comparação estável
-  const propTasksString = JSON.stringify(propTasks);
-  const propUsersString = JSON.stringify(propUsers);
-  const propStatusesString = JSON.stringify(propStatuses);
-  const propPrioritiesString = JSON.stringify(propPriorities);
-  const propProjectsString = JSON.stringify(propProjects);
-  const propSelectedProjectString = JSON.stringify(propSelectedProject);
+  const propTasksString = safeStringify(propTasks);
+  const propUsersString = safeStringify(propUsers);
+  const propStatusesString = safeStringify(propStatuses);
+  const propPrioritiesString = safeStringify(propPriorities);
+  const propProjectsString = safeStringify(propProjects);
+  const propSelectedProjectString = safeStringify(propSelectedProject);
+  
+  // Sincronizar estados locais com props quando elas mudarem
+  useEffect(() => {
+    if (propTasksString !== safeStringify(tasks)) {
+      setTasks(propTasks);
+    }
+  }, [propTasksString]);
+  
+  useEffect(() => {
+    if (propUsersString !== safeStringify(users)) {
+      setUsers(propUsers);
+    }
+  }, [propUsersString]);
+  
+  useEffect(() => {
+    if (propStatusesString !== safeStringify(statuses)) {
+      setStatuses(propStatuses);
+    }
+  }, [propStatusesString]);
+  
+  useEffect(() => {
+    if (propPrioritiesString !== safeStringify(priorities)) {
+      setPriorities(propPriorities);
+    }
+  }, [propPrioritiesString]);
+  
+  useEffect(() => {
+    if (propProjectsString !== safeStringify(projects)) {
+      setProjects(propProjects);
+    }
+  }, [propProjectsString]);
+  
+  useEffect(() => {
+    if (propSelectedProjectString !== safeStringify(selectedProject)) {
+      setSelectedProject(propSelectedProject);
+    }
+  }, [propSelectedProjectString]);
   
   // Criar versões em string dos estados locais para comparação estável
-  const tasksString = JSON.stringify(tasks);
-  const usersString = JSON.stringify(users);
-  const statusesString = JSON.stringify(statuses);
-  const prioritiesString = JSON.stringify(priorities);
-  const projectsString = JSON.stringify(projects);
-  const selectedProjectString = JSON.stringify(selectedProject);
-  const selectedParentTaskString = JSON.stringify(selectedParentTask);
+  const tasksString = safeStringify(tasks);
+  const usersString = safeStringify(users);
+  const statusesString = safeStringify(statuses);
+  const prioritiesString = safeStringify(priorities);
+  const projectsString = safeStringify(projects);
+  const selectedProjectString = safeStringify(selectedProject);
+  const selectedParentTaskString = safeStringify(finalSelectedParentTask);
   
   // Buscar dados se não forem fornecidos via props - EVITAR LOOPS
   useEffect(() => {
@@ -150,8 +210,22 @@ const TaskList: React.FC<TaskListProps> = ({
         
         if (shouldFetchBasicData) {
           // Buscar dados básicos em paralelo
+          // Construir filtros para tarefas
+          const filters: any = {};
+          if (projectId) {
+            filters.projectId = projectId;
+          }
+          if (finalSelectedParentTask?.id) {
+            filters.parentTaskId = finalSelectedParentTask.id;
+          }
+          console.log('🔍 Buscando tarefas com os filtros:', filters);
+          
+          const tasksPromise = propTasks.length === 0 
+            ? api.getTasks(filters)
+            : Promise.resolve({ tasks: propTasks });
+          
           const [tasksRes, usersRes, statusesRes, prioritiesRes, projectsRes] = await Promise.allSettled([
-            propTasks.length === 0 ? api.getTasks() : Promise.resolve({ tasks: propTasks }),
+            tasksPromise,
             propUsers.length === 0 ? api.getUsers() : Promise.resolve({ users: propUsers }),
             propStatuses.length === 0 ? api.getStatuses() : Promise.resolve({ statuses: propStatuses }),
             propPriorities.length === 0 ? api.getPriorities() : Promise.resolve({ priorities: propPriorities }),
@@ -206,7 +280,7 @@ const TaskList: React.FC<TaskListProps> = ({
     return () => {
       console.log('🔄 TaskList: useEffect cleanup');
     };
-  }, [propTasksString, propUsersString, propStatusesString, propPrioritiesString, propProjectsString, propSelectedProjectString, projectId]);
+  }, [propTasksString, propUsersString, propStatusesString, propPrioritiesString, propProjectsString, propSelectedProjectString, projectId, selectedParentTaskString]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
@@ -344,14 +418,14 @@ const TaskList: React.FC<TaskListProps> = ({
     assignedToId: users?.length > 0 ? users[0]?.id || '' : '',
     deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
     agent: typeof window !== 'undefined' ? localStorage.getItem('lastUsedAgent') || '' : '',
-    parentTaskId: selectedParentTask?.id || null
+    parentTaskId: finalSelectedParentTask?.id || null
   });
 
   // Update parentTaskId when selectedParentTask changes
   React.useEffect(() => {
     setNewTaskData(prev => ({
       ...prev,
-      parentTaskId: selectedParentTask?.id || null
+      parentTaskId: finalSelectedParentTask?.id || null
     }));
   }, [selectedParentTaskString]);
 
@@ -482,7 +556,7 @@ const TaskList: React.FC<TaskListProps> = ({
         assignedToId: defaultUser,
         deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
         agent: newTaskData.agent || '', // Keep the same model for next task
-        parentTaskId: selectedParentTask?.id || null
+        parentTaskId: finalSelectedParentTask?.id || null
       });
       setIsCreatingTask(false);
     } catch (error: any) {
@@ -509,6 +583,137 @@ const TaskList: React.FC<TaskListProps> = ({
       setError(errorMessage);
     }
   };
+
+  // Handlers para atualização de tarefas
+  const handleUpdateTask = async (id: string, taskData: Partial<Task>) => {
+    console.log('🔄 TaskList: handleUpdateTask chamado', { id, taskData });
+    try {
+      // Se a prop onUpdateTask foi fornecida e não é a função padrão, use-a
+      if (onUpdateTask && onUpdateTask !== NOOP_ASYNC_TASK_FN) {
+        return await onUpdateTask(id, taskData);
+      }
+      
+      // Caso contrário, chame a API diretamente
+      const updatedTask = await api.updateTask(id, taskData);
+      console.log('✅ Task atualizada via API:', updatedTask);
+      
+      // Atualizar estado local
+      setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
+      
+      return updatedTask;
+    } catch (error) {
+      console.error('❌ Erro ao atualizar tarefa:', error);
+      throw error;
+    }
+  };
+
+  const handleDeleteTask = async (id: string) => {
+    console.log('🗑️ TaskList: handleDeleteTask chamado', { id });
+    try {
+      // Se a prop onDeleteTask foi fornecida e não é a função padrão, use-a
+      if (onDeleteTask && onDeleteTask !== NOOP_ASYNC_FN) {
+        await onDeleteTask(id);
+        return;
+      }
+      
+      // Caso contrário, chame a API diretamente
+      await api.deleteTask(id);
+      console.log('✅ Task deletada via API');
+      
+      // Atualizar estado local
+      setTasks(prev => prev.filter(task => task.id !== id));
+    } catch (error) {
+      console.error('❌ Erro ao deletar tarefa:', error);
+      throw error;
+    }
+  };
+
+  const handleToggleCompletion = async (id: string) => {
+    console.log('✅ TaskList: handleToggleCompletion chamado', { id });
+    try {
+      // Se a prop onToggleCompletion foi fornecida e não é a função padrão, use-a
+      if (onToggleCompletion && onToggleCompletion !== NOOP_ASYNC_FN) {
+        await onToggleCompletion(id);
+        return;
+      }
+      
+      // Caso contrário, chame a API diretamente
+      const task = tasks.find(t => t.id === id);
+      if (!task) {
+        throw new Error('Tarefa não encontrada');
+      }
+      
+      const updatedTask = await api.updateTask(id, { isCompleted: !task.isCompleted });
+      console.log('✅ Status de conclusão alterado via API:', updatedTask);
+      
+      // Atualizar estado local
+      setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
+    } catch (error) {
+      console.error('❌ Erro ao alternar conclusão da tarefa:', error);
+      throw error;
+    }
+  };
+
+  const handleTaskSelect = (task: Task) => {
+    console.log('🔍 TaskList: handleTaskSelect (fallback) chamado', { task });
+    // Implementação básica: mostrar detalhes em um alerta
+    // Pode ser substituída por um modal ou navegação
+    alert(`Detalhes da tarefa:\n\nTítulo: ${task.title}\nDescrição: ${task.description || 'Sem descrição'}\nStatus: ${task.statusId}\nPrioridade: ${task.priorityId}\nPrazo: ${task.deadline || 'Sem prazo'}`);
+  };
+
+  const handleViewSubtasks = (task: Task) => {
+    console.log('📋 TaskList: Navegando para subtarefas de', task.title);
+    
+    // Construir nova hierarquia
+    const newHierarchy = [...finalParentHierarchy];
+    if (finalSelectedParentTask) {
+      // Se já estamos em um nível de subtarefa, adicionar o pai atual à hierarquia
+      newHierarchy.push(finalSelectedParentTask);
+    }
+    
+    // Navegar para a mesma rota com estado
+    navigate(`/projects/${projectId}/tasks`, {
+      state: {
+        selectedParentTask: task,
+        parentHierarchy: newHierarchy
+      }
+    });
+  };
+
+  const handleBackToParent = () => {
+    console.log('🔙 TaskList: Voltando para nível anterior');
+    
+    // Se a prop onBackToParent foi fornecida e não é a função padrão, use-a
+    if (onBackToParent && onBackToParent !== NOOP_FN) {
+      onBackToParent();
+      return;
+    }
+    
+    // Caso contrário, implementar navegação de volta
+    if (finalParentHierarchy.length > 0) {
+      // Há ancestrais: voltar para o último ancestral (pai direto)
+      const parentTask = finalParentHierarchy[finalParentHierarchy.length - 1];
+      const grandparentHierarchy = finalParentHierarchy.slice(0, -1);
+      
+      navigate(`/projects/${projectId}/tasks`, {
+        state: {
+          selectedParentTask: parentTask,
+          parentHierarchy: grandparentHierarchy
+        }
+      });
+    } else {
+      // Sem ancestrais: voltar para a raiz (sem pai)
+      navigate(`/projects/${projectId}/tasks`, {
+        state: {
+          selectedParentTask: null,
+          parentHierarchy: []
+        }
+      });
+    }
+  };
+  
+  // Decidir qual handler usar para voltar ao pai
+  const backToParentHandler = onBackToParent !== NOOP_FN ? onBackToParent : handleBackToParent;
 
   // Mostrar loading enquanto busca dados
   if (isLoading) {
@@ -606,7 +811,7 @@ const TaskList: React.FC<TaskListProps> = ({
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
         {/* Breadcrumb / Navigation */}
-        {(selectedProject || selectedParentTask) && (
+        {(selectedProject || finalSelectedParentTask) && (
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -629,11 +834,11 @@ const TaskList: React.FC<TaskListProps> = ({
               <>
                 <span style={{ color: 'var(--text-tertiary)' }}>›</span>
                 <span 
-                  onClick={onBackToParent && selectedParentTask ? onBackToParent : undefined}
+                  onClick={finalSelectedParentTask ? backToParentHandler : undefined}
                   style={{ 
-                    cursor: (onBackToParent && selectedParentTask) ? 'pointer' : 'default', 
-                    color: selectedParentTask ? 'var(--accent-color)' : 'var(--text-primary)',
-                    fontWeight: selectedParentTask ? 500 : 600
+                    cursor: finalSelectedParentTask ? 'pointer' : 'default', 
+                    color: finalSelectedParentTask ? 'var(--accent-color)' : 'var(--text-primary)',
+                    fontWeight: finalSelectedParentTask ? 500 : 600
                   }}
                 >
                   {selectedProject.name}
@@ -641,7 +846,7 @@ const TaskList: React.FC<TaskListProps> = ({
               </>
             )}
 
-            {parentHierarchy.map((task, index) => (
+            {finalParentHierarchy.map((task, index) => (
               <React.Fragment key={task.id}>
                 <span style={{ color: 'var(--text-tertiary)' }}>›</span>
                 <span 
@@ -663,15 +868,15 @@ const TaskList: React.FC<TaskListProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-              {selectedParentTask 
-                ? `Subtarefas de: ${selectedParentTask.title}`
+              {finalSelectedParentTask 
+                ? `Subtarefas de: ${finalSelectedParentTask.title}`
                 : selectedProject 
                   ? `Tarefas do Projeto: ${selectedProject.name}` 
                   : 'Todas as Tarefas'}
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '8px 0 0' }}>
-              {selectedParentTask
-                ? selectedParentTask.description
+              {finalSelectedParentTask
+                ? finalSelectedParentTask.description
                 : selectedProject 
                   ? selectedProject.description
                   : 'Gerencie todas as tarefas de todos os projetos em um único lugar'}
@@ -679,16 +884,16 @@ const TaskList: React.FC<TaskListProps> = ({
           </div>
           
           <div style={{ display: 'flex', gap: '12px' }}>
-            {selectedParentTask && onBackToParent && (
+            {finalSelectedParentTask && (
               <Button
                 variant="secondary"
                 icon={<FaArrowLeft size={14} />}
-                onClick={onBackToParent}
+                onClick={backToParentHandler}
               >
                 Voltar
               </Button>
             )}
-            {!selectedParentTask && selectedProject && onBackToProjects && (
+            {!finalSelectedParentTask && selectedProject && onBackToProjects && (
               <Button
                 variant="secondary"
                 icon={<FaArrowLeft size={14} />}
@@ -1655,11 +1860,11 @@ const TaskList: React.FC<TaskListProps> = ({
                 statuses={statuses}
                 priorities={priorities}
                 projects={projects}
-                onTaskClick={onTaskSelect}
-                onViewSubtasks={onViewSubtasks}
-                onUpdateTask={onUpdateTask}
-                onDeleteTask={onDeleteTask}
-                onToggleCompletion={onToggleCompletion}
+                onTaskClick={onTaskSelect !== NOOP_FN ? onTaskSelect : handleTaskSelect}
+                onViewSubtasks={onViewSubtasks !== NOOP_FN ? onViewSubtasks : handleViewSubtasks}
+                onUpdateTask={handleUpdateTask}
+                onDeleteTask={handleDeleteTask}
+                onToggleCompletion={handleToggleCompletion}
                 agents={agents}
               />
             ))}
