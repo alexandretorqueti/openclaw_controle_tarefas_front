@@ -179,6 +179,7 @@ const AppRoutes = () => {
         
         {/* Rotas de gerenciamento */}
         <Route path="projects" element={<ProjectsDashboard />} />
+        <Route path="projects/:projectId/tasks" element={<TaskList />} />
         <Route path="agents" element={<AgentManager />} />
         <Route path="stages" element={<StageManager />} />
         <Route path="status" element={<StatusManager />} />

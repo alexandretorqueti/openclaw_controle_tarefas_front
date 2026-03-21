@@ -107,10 +107,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             if (data.isAuthenticated && data.user) {
               // Atualizar usuário com dados do banco
               console.log('🔐 Usuário autenticado no banco:', data.user);
+              console.log('🔐 URL atual durante autenticação:', window.location.href);
+              console.log('🔐 Deveria redirecionar de /login?', window.location.pathname === '/login');
+              
               setUser(data.user);
               setIsAuthenticated(true);
               // Atualizar localStorage
               localStorage.setItem('tarefas_user', JSON.stringify(data.user));
+              
+              // Se estamos na página de login, o React Router deve redirecionar automaticamente
+              // devido ao ProtectedRoute nas rotas
             } else {
               // Usuário não encontrado no banco, limpar localStorage
               console.log('🔐 Usuário não encontrado no banco, limpando localStorage');
@@ -187,6 +193,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     console.log('🔐 AuthContext useEffect executando checkAuth');
+    console.log('🔐 URL atual:', window.location.href);
+    console.log('🔐 Pathname:', window.location.pathname);
     checkAuth();
     
     // Adicionar listener para storage events (para sincronizar entre abas)

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { Task, User, Status, Priority, Project, Agent } from '../types';
 import TaskCard from './TaskCard';
@@ -37,7 +38,7 @@ const TaskList: React.FC<TaskListProps> = ({
   priorities: propPriorities = [], 
   projects: propProjects = [],
   agents = [] as Agent[],
-  selectedProject = null,
+  selectedProject: propSelectedProject = null,
   selectedParentTask = null,
   parentHierarchy = [],
   onTaskSelect = () => {},
@@ -51,58 +52,123 @@ const TaskList: React.FC<TaskListProps> = ({
   showCompleted: propShowCompleted = false,
   onToggleShowCompleted = () => {}
 }) => {
+  const { projectId } = useParams<{ projectId?: string }>();
+  const navigate = useNavigate();
+  
   // Estados para dados quando não são fornecidos via props
   const [tasks, setTasks] = useState<Task[]>(propTasks);
   const [users, setUsers] = useState<User[]>(propUsers);
   const [statuses, setStatuses] = useState<Status[]>(propStatuses);
   const [priorities, setPriorities] = useState<Priority[]>(propPriorities);
   const [projects, setProjects] = useState<Project[]>(propProjects);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(propSelectedProject);
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
+  
+  // Refs para controlar loops
+  const isFetchingRef = useRef(false);
+  const hasFetchedRef = useRef(false);
+  
+  // Função para voltar aos projetos
+  const handleBackToProjects = () => {
+    if (onBackToProjects && typeof onBackToProjects === 'function') {
+      onBackToProjects();
+    } else {
+      navigate('/projects');
+    }
+  };
 
-  // Buscar dados se não forem fornecidos via props
+  // Buscar dados se não forem fornecidos via props - EVITAR LOOPS
   useEffect(() => {
+    console.log('🔄 TaskList: useEffect executando');
+    console.log('🔄 Dependências:', { 
+      propTasksLength: propTasks.length,
+      propUsersLength: propUsers.length, 
+      propStatusesLength: propStatuses.length,
+      propPrioritiesLength: propPriorities.length,
+      propProjectsLength: propProjects.length,
+      propSelectedProject: !!propSelectedProject,
+      projectId 
+    });
+    
+    // Evitar loops: não executar se já está buscando ou já buscou
+    if (isFetchingRef.current) {
+      console.log('🔄 TaskList: Já está buscando, ignorando...');
+      return;
+    }
+    
+    // Se já buscou os dados básicos e não temos projectId novo, não buscar novamente
+    if (hasFetchedRef.current && !projectId) {
+      console.log('🔄 TaskList: Já buscou dados básicos, ignorando...');
+      return;
+    }
+    
     const fetchData = async () => {
-      // Se já temos dados via props, não precisamos buscar
-      if (propTasks.length > 0 && propUsers.length > 0 && propStatuses.length > 0 && 
-          propPriorities.length > 0 && propProjects.length > 0) {
-        return;
-      }
-      
+      console.log('🔄 TaskList: fetchData iniciando');
+      isFetchingRef.current = true;
       setIsLoading(true);
       setDataError(null);
       
       try {
         console.log('📊 TaskList: Buscando dados da API...');
+        console.log('📊 TaskList: projectId da URL:', projectId);
         
-        // Buscar dados em paralelo
-        const [tasksRes, usersRes, statusesRes, prioritiesRes, projectsRes] = await Promise.allSettled([
-          propTasks.length === 0 ? api.getTasks() : Promise.resolve({ tasks: propTasks }),
-          propUsers.length === 0 ? api.getUsers() : Promise.resolve({ users: propUsers }),
-          propStatuses.length === 0 ? api.getStatuses() : Promise.resolve({ statuses: propStatuses }),
-          propPriorities.length === 0 ? api.getPriorities() : Promise.resolve({ priorities: propPriorities }),
-          propProjects.length === 0 ? api.getProjects() : Promise.resolve({ projects: propProjects })
-        ]);
-        
-        // Processar resultados
-        if (tasksRes.status === 'fulfilled' && tasksRes.value.tasks) {
-          setTasks(tasksRes.value.tasks);
+        // Buscar projeto específico se tivermos projectId na URL
+        if (projectId && !propSelectedProject) {
+          try {
+            console.log('📊 TaskList: Buscando projeto específico:', projectId);
+            const projectData = await api.getProject(projectId);
+            console.log('📊 TaskList: Projeto carregado:', projectData.project?.name);
+            setSelectedProject(projectData.project || projectData);
+          } catch (projectError) {
+            console.error('📊 TaskList: Erro ao buscar projeto:', projectError);
+          }
         }
         
-        if (usersRes.status === 'fulfilled' && usersRes.value.users) {
-          setUsers(usersRes.value.users);
-        }
+        // Se já temos dados via props, não precisamos buscar os básicos
+        const shouldFetchBasicData = !(propTasks.length > 0 && propUsers.length > 0 && propStatuses.length > 0 && 
+          propPriorities.length > 0 && propProjects.length > 0);
         
-        if (statusesRes.status === 'fulfilled' && statusesRes.value.statuses) {
-          setStatuses(statusesRes.value.statuses);
-        }
+        console.log('📊 TaskList: shouldFetchBasicData:', shouldFetchBasicData);
         
-        if (prioritiesRes.status === 'fulfilled' && prioritiesRes.value.priorities) {
-          setPriorities(prioritiesRes.value.priorities);
-        }
-        
-        if (projectsRes.status === 'fulfilled' && projectsRes.value.projects) {
-          setProjects(projectsRes.value.projects);
+        if (shouldFetchBasicData) {
+          // Buscar dados básicos em paralelo
+          const [tasksRes, usersRes, statusesRes, prioritiesRes, projectsRes] = await Promise.allSettled([
+            propTasks.length === 0 ? api.getTasks() : Promise.resolve({ tasks: propTasks }),
+            propUsers.length === 0 ? api.getUsers() : Promise.resolve({ users: propUsers }),
+            propStatuses.length === 0 ? api.getStatuses() : Promise.resolve({ statuses: propStatuses }),
+            propPriorities.length === 0 ? api.getPriorities() : Promise.resolve({ priorities: propPriorities }),
+            propProjects.length === 0 ? api.getProjects() : Promise.resolve({ projects: propProjects })
+          ]);
+          
+          // Processar resultados
+          if (tasksRes.status === 'fulfilled' && tasksRes.value.tasks) {
+            console.log('📊 TaskList: Tasks carregadas:', tasksRes.value.tasks.length);
+            setTasks(tasksRes.value.tasks);
+          }
+          
+          if (usersRes.status === 'fulfilled' && usersRes.value.users) {
+            console.log('📊 TaskList: Users carregados:', usersRes.value.users.length);
+            setUsers(usersRes.value.users);
+          }
+          
+          if (statusesRes.status === 'fulfilled' && statusesRes.value.statuses) {
+            console.log('📊 TaskList: Statuses carregados:', statusesRes.value.statuses.length);
+            setStatuses(statusesRes.value.statuses);
+          }
+          
+          if (prioritiesRes.status === 'fulfilled' && prioritiesRes.value.priorities) {
+            console.log('📊 TaskList: Priorities carregados:', prioritiesRes.value.priorities.length);
+            setPriorities(prioritiesRes.value.priorities);
+          }
+          
+          if (projectsRes.status === 'fulfilled' && projectsRes.value.projects) {
+            console.log('📊 TaskList: Projects carregados:', projectsRes.value.projects.length);
+            setProjects(projectsRes.value.projects);
+          }
+          
+          // Marcar que já buscou dados básicos
+          hasFetchedRef.current = true;
         }
         
         console.log('📊 TaskList: Dados carregados com sucesso');
@@ -111,12 +177,19 @@ const TaskList: React.FC<TaskListProps> = ({
         console.error('📊 TaskList: Erro ao buscar dados:', error);
         setDataError('Não foi possível carregar os dados. Tente novamente mais tarde.');
       } finally {
+        console.log('🔄 TaskList: fetchData finalizado, isLoading = false');
         setIsLoading(false);
+        isFetchingRef.current = false;
       }
     };
     
     fetchData();
-  }, [propTasks, propUsers, propStatuses, propPriorities, propProjects]);
+    
+    // Cleanup function
+    return () => {
+      console.log('🔄 TaskList: useEffect cleanup');
+    };
+  }, [propTasks, propUsers, propStatuses, propPriorities, propProjects, propSelectedProject, projectId]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');

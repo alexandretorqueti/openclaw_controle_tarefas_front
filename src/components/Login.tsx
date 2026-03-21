@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { FaGoogle, FaTasks, FaSpinner, FaUser, FaUserPlus, FaSignInAlt, FaEnvelope, FaIdCard } from 'react-icons/fa';
 
@@ -43,6 +44,7 @@ const getBackendUrl = (): string => {
 };
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
   const { login, isLoading } = useAuth();
   const [loginNickname, setLoginNickname] = useState('');
   const [registerData, setRegisterData] = useState({
@@ -106,11 +108,9 @@ const Login: React.FC = () => {
         console.log('🔐 Login - Salvando usuário no localStorage:', data.user);
         localStorage.setItem('tarefas_user', JSON.stringify(data.user));
         
-        // Forçar um pequeno delay para garantir que o localStorage foi salvo
-        setTimeout(() => {
-          console.log('🔐 Login - Recarregando página...');
-          window.location.reload();
-        }, 100);
+        // Navegar para a página inicial (que redireciona para /projects)
+        console.log('🔐 Login - Navegando para /...');
+        navigate('/', { replace: true });
       } else {
         setError(data.message || 'Erro ao fazer login');
       }

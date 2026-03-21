@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   FaFolder, FaPlus, FaEdit, FaTrash, FaEye, FaSync, FaTimes, 
   FaCheck, FaExclamationTriangle, FaSpinner, FaSearch, 
@@ -53,15 +54,24 @@ interface ProjectType {
 
 // Componente Principal Simplificado
 interface ProjectsDashboardProps {
-  onProjectSelect?: (project: Project) => void;
+  // Prop removida - não usamos mais
 }
 
-const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect = () => {} }) => {
+const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [projectTypes, setProjectTypes] = useState<ProjectType[]>([]);
   const [loadingProjectTypes, setLoadingProjectTypes] = useState(true);
+  
+  // Função para visualizar tarefas de um projeto
+  const handleViewProjectTasks = (project: Project) => {
+    // SEMPRE navegar para a página de tarefas do projeto
+    // Ignorar onProjectSelect mesmo se for fornecido
+    console.log('🔍 Navegando para:', `/projects/${project.id}/tasks`);
+    navigate(`/projects/${project.id}/tasks`);
+  };
   
   // Filtros
   const [search, setSearch] = useState('');
@@ -620,6 +630,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect =
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button 
+                    type="button"
                     style={{
                       padding: '8px',
                       borderRadius: '6px',
@@ -642,7 +653,11 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = ({ onProjectSelect =
                       e.currentTarget.style.backgroundColor = 'transparent';
                       e.currentTarget.style.color = 'var(--text-secondary, #b0b0b0)';
                     }}
-                    onClick={() => onProjectSelect(project)}
+                    onClick={(e) => {
+                      console.log('🔍 Botão Visualizar clicado! Evento:', e.type);
+                      console.log('🔍 Projeto alvo:', project.name);
+                      handleViewProjectTasks(project);
+                    }}
                     title="Visualizar"
                   >
                     <FaEye size={14} style={{ display: 'block', color: 'currentColor' }} />
