@@ -179,7 +179,22 @@ const AppRoutes = () => {
         
         {/* Rotas de gerenciamento */}
         <Route path="projects" element={<ProjectsDashboard />} />
-        <Route path="projects/:projectId/tasks" element={<TaskList />} />
+        <Route path="projects/:projectId/tasks" element={
+          <TaskList 
+            onBackToProjects={() => {
+              console.log('\n🔙 [ROUTES] onBackToProjects chamada');
+              // Navega para a página de projetos
+              const navigate = typeof window !== 'undefined' ? window.location.pathname.startsWith('/login') ? null : (window['navigate'] as any);
+              if (navigate && typeof navigate === 'function') {
+                navigate('/projects');
+                console.log('\n🔙 [ROUTES] Navegando para /projects via useNavigate');
+              } else {
+                window.location.href = '/projects';
+                console.log('\n🔙 [ROUTES] Usando window.location.href para /projects');
+              }
+            }}
+          />
+        } />
         <Route path="agents" element={<AgentManager />} />
         <Route path="stages" element={<StageManager />} />
         <Route path="status" element={<StatusManager />} />
