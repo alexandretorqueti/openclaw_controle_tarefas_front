@@ -9,6 +9,7 @@ import api from '../services/api';
 import { getBackendBaseUrl } from '../config/api';
 import './ProjectsDashboard.css';
 import EditProjectModal from './EditProjectModal';
+import { set } from 'date-fns';
 
 // Interfaces
 interface Project {
@@ -113,6 +114,8 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
     loadProjectTypes();
   }, []);
 
+  
+
   const loadProjects = async () => {
     console.log('=== INÍCIO loadProjects ===');
     setLoading(true);
@@ -193,11 +196,34 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
     setDeleteConfirmOpen(true);
   };
 
+  const handleInativeProject = async (projectId: string, projectData: any) => {
+    try {
+      await api.updateProject(projectId, projectData);
+      handleUpdateProject(projectId, projectData);
+    }
+    catch (err: any) {
+      console.error(`Erro ao inativar projeto: ${err.message}`);
+      throw err;
+    }
+  }
+
   // Funções de API para Modais
   const handleUpdateProject = async (projectId: string, projectData: any) => {
     try {
-      await api.updateProject(projectId, projectData);
-      await loadProjects();
+      if (!projectData.ativo) {
+        setProjects(
+          prev => prev.filter(project => project.id !== projectId)
+        )
+      } else {
+        setProjects(
+          prev => prev.map(
+            (project) => 
+            {
+              return project.id === projectId ? { ...project, ...projectData } : project
+            }
+          )
+        );
+      }
     } catch (err: any) {
       console.error(`Erro ao atualizar projeto: ${err.message}`);
       throw err;
@@ -206,9 +232,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
 
   const handleCreateProjectSubmit = async (projectData: any) => {
     try {
-      const response = await api.createProject(projectData);
-      await loadProjects();
-      return response.data;
+      setProjects(prev => [...prev, projectData]);
     } catch (err: any) {
       console.error(`Erro ao criar projeto: ${err.message}`);
       throw err;
@@ -220,8 +244,8 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
 
     try {
       await api.deleteProject(selectedProject.id);
-      await loadProjects();
       setDeleteConfirmOpen(false);
+      setProjects(prev => prev.filter(project => project.id !== selectedProject.id));
     } catch (err: any) {
       console.error(`Erro ao excluir projeto: ${err.message}`);
     }
@@ -718,7 +742,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
                     }}
                     onClick={() => {
                       if (window.confirm(`Tem certeza que deseja desativar o projeto "${project.name}"? Ele não aparecerá mais no dashboard.`)) {
-                        handleUpdateProject(project.id, { ativo: false });
+                        handleInativeProject(project.id, { ativo: false });
                       }
                     }}
                     title="Desativar Projeto"

@@ -1,0 +1,27 @@
+/* Estilos para UI condicional de tarefas em execução */
+.task-execution-container {
+  background-color: #fff9c4;
+  border: 1px solid #f57c00;
+  border-radius: 4px;
+  padding: 8px;
+  margin: 8px 0;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.task-execution-title {
+  font-size: 10px;
+  color: #e65100;
+  margin-right: 8px;
+  margin-bottom: 4px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

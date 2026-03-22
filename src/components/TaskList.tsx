@@ -36,6 +36,7 @@ interface TaskListProps {
   onToggleCompletion?: (id: string) => Promise<void>;
   showCompleted?: boolean;
   onToggleShowCompleted?: (show: boolean) => void;
+  executeurFn?: (taskData: any) => void; // Nova prop para receber dados do backend
 }
 
 const TaskList: React.FC<TaskListProps> = ({
@@ -56,7 +57,8 @@ const TaskList: React.FC<TaskListProps> = ({
   onDeleteTask = NOOP_ASYNC_FN,
   onToggleCompletion = NOOP_ASYNC_FN,
   showCompleted: propShowCompleted = false,
-  onToggleShowCompleted = () => {}
+  onToggleShowCompleted = () => {},
+  executeurFn = NOOP_FN
 }) => {
   const { projectId } = useParams<{ projectId?: string }>();
   const navigate = useNavigate();
@@ -100,10 +102,19 @@ const TaskList: React.FC<TaskListProps> = ({
   // Estado para controle do modal de detalhes da tarefa
   const [selectedTaskDetail, setSelectedTaskDetail] = useState<Task | null>(null);
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
+  
+  // Estado para forçar re-render quando taskInExecução mudar
+  const [forceRender, setForceRender] = useState(false);
+  
+  // Estado para controlar animação de saída
+  const [isExiting, setIsExiting] = useState(false);
 
   // Refs para controlar loops
   const isFetchingRef = useRef(false);
   const hasFetchedRef = useRef(false);
+  
+  // Ref para armazenar tarefa em execução
+  const taskInExecução = useRef<Task | null>(null);
 
   // Função para voltar aos projetos
   const handleBackToProjects = () => {
@@ -168,6 +179,55 @@ const TaskList: React.FC<TaskListProps> = ({
       setSelectedProject(propSelectedProject);
     }
   }, [propSelectedProjectString]);
+
+  // Monitorar prop executeurFn para detectar quando tarefa começa/termina
+  useEffect(() => {
+    console.log('🎯 TaskList: Monitorando executeurFn');
+    
+    // Se executeurFn for uma função válida, configurar listener
+    if (executeurFn && typeof executeurFn === 'function' && executeurFn !== NOOP_FN) {
+      console.log('🎯 executeurFn disponível, configurando listener');
+      
+      // Função para processar dados do backend
+      const processExecuteurData = (data: any) => {
+        console.log('🎯 Dados recebidos do backend:', data);
+        
+        if (data && data.task) {
+          // Tarefa começou execução - resetar estado de saída
+          setIsExiting(false);
+          taskInExecução.current = data.task;
+          console.log('🎯 Tarefa em execução:', taskInExecução.current?.title);
+        } else if (data === null || data === undefined) {
+          // Tarefa terminou execução - iniciar animação de saída
+          if (taskInExecução.current) {
+            console.log('🎯 Iniciando animação de saída para tarefa:', taskInExecução.current.title);
+            setIsExiting(true);
+            
+            // Aguardar animação de saída terminar antes de limpar
+            setTimeout(() => {
+              taskInExecução.current = null;
+              setIsExiting(false);
+              console.log('🎯 Tarefa finalizada, limpando estado');
+              setForceRender(prev => !prev);
+            }, 300); // Tempo da animação fadeOut
+          }
+        }
+        
+        // Forçar re-render para atualizar UI
+        // Como estamos usando useRef, precisamos de um estado para forçar re-render
+        setForceRender(prev => !prev);
+      };
+      
+      // Chamar executeurFn com nossa função de callback
+      executeurFn(processExecuteurData);
+      
+      return () => {
+        console.log('🎯 Cleanup executeurFn listener');
+      };
+    } else {
+      console.log('🎯 executeurFn não disponível ou é NOOP_FN');
+    }
+  }, [executeurFn]);
 
   // Criar versões em string dos estados locais para comparação estável
   const tasksString = safeStringify(tasks);
@@ -632,8 +692,8 @@ const TaskList: React.FC<TaskListProps> = ({
       } else {
         // Caso contrário, chame a API diretamente
         console.log('🔧 TaskList: Chamando API diretamente (fallback)');
-        const request = await api.createTask(taskData) as { task: Task };
-        createdTask = request.task;
+        const response = await api.createTask(taskData) as { task: Task };
+        createdTask = response.task;
         console.log('✅ TaskList: Tarefa criada via API:', createdTask);
 
         // Atualizar lista local de tarefas
@@ -975,6 +1035,214 @@ const TaskList: React.FC<TaskListProps> = ({
                 </span>
               </React.Fragment>
             ))}
+          </div>
+        )}
+
+        {/* Container condicional para tarefa em execução */}
+        {(taskInExecução.current || isExiting) && (
+          <div
+            style={{
+              border: '2px solid var(--accent-color)',
+              backgroundColor: 'rgba(var(--accent-rgb), 0.05)',
+              borderRadius: '12px',
+              padding: '20px',
+              marginBottom: '24px',
+              transition: 'all 0.3s ease',
+              opacity: isExiting ? 0 : 1,
+              transform: isExiting ? 'translateY(-10px)' : 'translateY(0)',
+              animation: isExiting ? 'fadeOut 0.3s ease' : 'fadeIn 0.5s ease'
+            }}
+          >
+            <style>
+              {`
+                @keyframes fadeIn {
+                  from { opacity: 0; transform: translateY(-10px); }
+                  to { opacity: 1; transform: translateY(0); }
+                }
+                @keyframes fadeOut {
+                  from { opacity: 1; transform: translateY(0); }
+                  to { opacity: 0; transform: translateY(-10px); }
+                }
+                @keyframes pulse {
+                  0% { opacity: 1; }
+                  50% { opacity: 0.5; }
+                  100% { opacity: 1; }
+                }
+              `}
+            </style>
+            
+            {/* Título da tarefa em execução */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              marginBottom: '16px',
+              paddingBottom: '12px',
+              borderBottom: '1px solid var(--border-color)'
+            }}>
+              <div style={{
+                width: '12px',
+                height: '12px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--accent-color)',
+                marginRight: '12px',
+                animation: 'pulse 1.5s infinite'
+              }} />
+              <h3 style={{
+                fontSize: '16px',
+                fontWeight: 600,
+                color: 'var(--text-primary)',
+                margin: 0
+              }}>
+                {isExiting ? 'Finalizando tarefa: ' : 'Tarefa em execução: '}
+                <span style={{ color: 'var(--accent-color)' }}>
+                  {taskInExecução.current?.title || 'Tarefa finalizada'}
+                </span>
+              </h3>
+            </div>
+
+            {/* Quadros analista e programador - Responsivo */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+              gap: '20px',
+              marginTop: '16px'
+            }}>
+              {/* Quadro do Analista */}
+              <div style={{
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                padding: '16px',
+                backgroundColor: 'var(--bg-card)'
+              }}>
+                <h4 style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  margin: '0 0 12px 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#4CAF50'
+                  }} />
+                  Analista
+                </h4>
+                <div style={{
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5
+                }}>
+                  Analisando requisitos e criando especificações para a tarefa...
+                </div>
+                <div style={{
+                  marginTop: '12px',
+                  fontSize: '12px',
+                  color: 'var(--text-tertiary)',
+                  fontStyle: 'italic'
+                }}>
+                  Status: Em análise
+                </div>
+              </div>
+
+              {/* Quadro do Programador */}
+              <div style={{
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                padding: '16px',
+                backgroundColor: 'var(--bg-card)'
+              }}>
+                <h4 style={{
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  margin: '0 0 12px 0',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    backgroundColor: '#2196F3'
+                  }} />
+                  Programador
+                </h4>
+                <div style={{
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.5
+                }}>
+                  Aguardando especificações do analista para iniciar implementação...
+                </div>
+                <div style={{
+                  marginTop: '12px',
+                  fontSize: '12px',
+                  color: 'var(--text-tertiary)',
+                  fontStyle: 'italic'
+                }}>
+                  Status: Aguardando
+                </div>
+              </div>
+            </div>
+
+            {/* Progresso da execução */}
+            <div style={{
+              marginTop: '20px',
+              paddingTop: '16px',
+              borderTop: '1px solid var(--border-color)'
+            }}>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '8px'
+              }}>
+                <span style={{
+                  fontSize: '13px',
+                  color: 'var(--text-secondary)'
+                }}>
+                  Progresso da execução
+                </span>
+                <span style={{
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  color: 'var(--accent-color)'
+                }}>
+                  25%
+                </span>
+              </div>
+              <div style={{
+                height: '6px',
+                backgroundColor: 'var(--border-color)',
+                borderRadius: '3px',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '25%',
+                  height: '100%',
+                  backgroundColor: 'var(--accent-color)',
+                  borderRadius: '3px',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                marginTop: '8px',
+                fontSize: '11px',
+                color: 'var(--text-tertiary)'
+              }}>
+                <span>Análise</span>
+                <span>Implementação</span>
+                <span>Testes</span>
+                <span>Finalização</span>
+              </div>
+            </div>
           </div>
         )}
 

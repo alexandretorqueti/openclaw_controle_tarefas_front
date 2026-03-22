@@ -228,20 +228,31 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         backendBuildCmd: backendBuildCmd.trim() || null
       };
       
+
       if (isNew) {
         // Modo criação - chamar API diretamente
-        await api.createProject(projectData);
+        let createdProject: unknown;
+        const response = await api.createProject(projectData);
+        createdProject = response.project;
+        if (createdProject) {
+          onCreate(createdProject);
+        }
         setSuccess('Projeto criado com sucesso!');
       } else if (project) {
         // Modo edição - chamar API diretamente
-        await api.updateProject(project.id, projectData);
+        let updatedProject: unknown;
+        const response = await api.updateProject(project.id, projectData);
+        updatedProject = response;
+        if (updatedProject) {
+          onUpdate(updatedProject.id, updatedProject);
+        }
         setSuccess('Projeto atualizado com sucesso!');
       }
       
       // Fechar modal após 2 segundos
       setTimeout(() => {
         onClose();
-      }, 2000);
+      }, 50);
     } catch (err: any) {
       setError(err.message || 'Erro ao salvar projeto');
     } finally {

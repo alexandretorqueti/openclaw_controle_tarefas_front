@@ -1,70 +1,226 @@
 import React from 'react';
-// Adicione o useNavigate na importação
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 
-// ... (seus imports de componentes continuam os mesmos) ...
+// Importar componentes de layout
+import MainLayout from './components/layout/MainLayout';
+import Login from './components/Login';
 
+// Importar componentes de página
+import ProjectsDashboard from './components/ProjectsDashboard';
+import AgentManager from './components/AgentManager';
+import StageManager from './components/StageManager';
+import StatusManager from './components/StatusManager';
+import PriorityManager from './components/PriorityManager';
+import UserManager from './components/UserManager';
+import ProjectTypeManager from './components/ProjectTypeManager';
+import TaskList from './components/TaskList';
+import LogErros from './components/LogErros';
+import LogJarbas from './components/LogJarbas';
+import RecurrenceManager from './components/RecurrenceManager';
+import NextTaskManager from './components/NextTaskManager';
+import UserProfileEdit from './components/UserProfileEdit';
+import { Task } from './types';
+
+// Componente de rota protegida
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isLoading, isAuthenticated } = useAuth();
   
+  // Mostrar loading enquanto verifica autenticação
   if (isLoading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-        {/* ... seu layout de loading ... */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: 'var(--bg-primary)',
+        color: 'var(--text-primary)'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          padding: '40px',
+          borderRadius: '12px',
+          backgroundColor: 'var(--bg-card)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid var(--border-color)',
+            borderTopColor: 'var(--accent-color)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }} />
+          <p style={{ margin: 0, fontSize: '16px', fontWeight: 500 }}>
+            Verificando autenticação...
+          </p>
+        </div>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
       </div>
     );
   }
   
+  console.log('🔐 ProtectedRoute - user:', user ? 'Authenticated' : 'Not authenticated');
+  console.log('🔐 ProtectedRoute - isAuthenticated:', isAuthenticated);
+  console.log('🔐 ProtectedRoute - isLoading:', isLoading);
+  
+  // Verificar se há usuário no localStorage como fallback
   const localStorageUser = localStorage.getItem('tarefas_user');
+  console.log('🔐 ProtectedRoute - localStorage user:', localStorageUser ? 'Found' : 'Not found');
   
   if (!user && !isAuthenticated && !localStorageUser) {
+    console.log('🔐 Redirecting to /login - nenhuma autenticação encontrada');
     return <Navigate to="/login" replace />;
   }
   
-  // AVISO: O ideal é que o AuthContext faça a restauração do usuário baseado no localStorage.
-  // Se você mantiver o window.location.reload() aqui, certifique-se de que o localStorage
-  // seja limpo caso a tentativa de restaurar o usuário falhe, senão gerará um loop infinito.
+  // Se não há user no estado mas há no localStorage, tentar recarregar
   if (!user && localStorageUser) {
-    setTimeout(() => window.location.reload(), 100);
-    return <div>Sincronizando autenticação...</div>;
+    console.log('🔐 User no localStorage mas não no estado - recarregando...');
+    setTimeout(() => {
+      window.location.reload();
+    }, 100);
+    
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        backgroundColor: 'var(--bg-primary)',
+        color: 'var(--text-primary)'
+      }}>
+        <div style={{
+          textAlign: 'center',
+          padding: '40px',
+          borderRadius: '12px',
+          backgroundColor: 'var(--bg-card)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+        }}>
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '4px solid var(--border-color)',
+            borderTopColor: 'var(--accent-color)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }} />
+          <p style={{ margin: 0, fontSize: '16px', fontWeight: 500 }}>
+            Sincronizando autenticação...
+          </p>
+        </div>
+      </div>
+    );
   }
   
   return <>{children}</>;
 };
 
+// Componente de rotas principais
 const AppRoutes = () => {
-  // 1. Instancie o hook de navegação aqui
-  const navigate = useNavigate();
-
   return (
     <Routes>
+      {/* Rota pública de login */}
       <Route path="/login" element={<Login />} />
-      <Route path="/auth/callback" element={<div>Processando...</div>} />
       
+      {/* Rota de callback para OAuth */}
+      <Route path="/auth/callback" element={
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+          backgroundColor: 'var(--bg-primary)',
+          color: 'var(--text-primary)'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            padding: '40px',
+            borderRadius: '12px',
+            backgroundColor: 'var(--bg-card)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{
+              width: '50px',
+              height: '50px',
+              border: '4px solid var(--border-color)',
+              borderTopColor: 'var(--accent-color)',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 20px'
+            }} />
+            <p style={{ margin: 0, fontSize: '16px', fontWeight: 500 }}>
+              Processando autenticação...
+            </p>
+          </div>
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      } />
+      
+      {/* Rotas protegidas com MainLayout como wrapper */}
       <Route path="/" element={
         <ProtectedRoute>
           <MainLayout />
         </ProtectedRoute>
       }>
+        {/* Rota padrão (dashboard) - Redireciona para Projetos */}
         <Route index element={<Navigate to="/projects" replace />} />
         
+        {/* Rotas de gerenciamento */}
         <Route path="projects" element={<ProjectsDashboard />} />
-        
-        {/* 2. Use a função navigate que veio do hook */}
         <Route path="projects/:projectId/tasks" element={
+
           <TaskList 
             onBackToProjects={() => {
-              console.log('\n🔙 [ROUTES] Navegando para /projects via useNavigate');
-              navigate('/projects');
+              console.log('\n🔙 [ROUTES] onBackToProjects chamada');
+              // Navega para a página de projetos
+              const navigate = typeof window !== 'undefined' ? (window['navigate'] as any) : null;
+              if (navigate && typeof navigate === 'function') {
+                navigate('/projects');
+                console.log('\n🔙 [ROUTES] Navegando para /projects via useNavigate');
+              } else {
+                window.location.href = '/projects';
+                console.log('\n🔙 [ROUTES] Usando window.location.href para /projects');
+              }
+            }}
+            tasks={[]}
+            users={[]}
+            statuses={[]}
+            priorities={[]}
+            projects={[]}
+            selectedProject={null}
+            onTaskSelect={function (task: Task): void {
+              throw new Error('Function not implemented.');
             }}
           />
-        } />
-        
+
+
+        } /> 
         <Route path="agents" element={<AgentManager />} />
         <Route path="stages" element={<StageManager />} />
-        {/* ... outras rotas ... */}
+        <Route path="status" element={<StatusManager />} />
+        <Route path="priorities" element={<PriorityManager />} />
+        <Route path="users" element={<UserManager />} />
+        <Route path="project-types" element={<ProjectTypeManager />} />
+        <Route path="logs" element={<LogJarbas />} />
+        <Route path="error-logs" element={<LogErros />} />
+        <Route path="recurrence" element={<RecurrenceManager />} />
+        <Route path="next-task" element={<NextTaskManager />} />
+        <Route path="profile" element={<UserProfileEdit />} />
         
+        {/* Rota de fallback para página não encontrada */}
         <Route path="*" element={<div>Página não encontrada</div>} />
       </Route>
     </Routes>
