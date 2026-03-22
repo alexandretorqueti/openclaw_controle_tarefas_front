@@ -26,7 +26,7 @@ interface TaskListProps {
   selectedProject: Project | null;
   selectedParentTask?: Task | null;
   parentHierarchy?: Task[];
-  onTaskSelect: (task: Task) => void;
+  onTaskSelect: (task: Task, setSelectedTaskDetail: React.Dispatch<React.SetStateAction<Task | null>>, setShowTaskDetailModal: React.Dispatch<React.SetStateAction<boolean>>) => void;
   onViewSubtasks?: (task: Task) => void;
   onBackToProjects?: () => void;
   onBackToParent?: () => void;
@@ -2242,7 +2242,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 statuses={statuses}
                 priorities={priorities}
                 projects={projects}
-                onTaskClick={onTaskSelect !== NOOP_FN ? onTaskSelect : handleTaskSelect}
+                onTaskClick={(t) => onTaskSelect(t, setSelectedTaskDetail, setShowTaskDetailModal)}
                 onViewSubtasks={onViewSubtasks !== NOOP_FN ? onViewSubtasks : handleViewSubtasks}
                 onUpdateTask={handleUpdateTask}
                 onDeleteTask={handleDeleteTask}

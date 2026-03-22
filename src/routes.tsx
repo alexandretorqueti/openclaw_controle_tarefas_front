@@ -21,6 +21,7 @@ import RecurrenceManager from './components/RecurrenceManager';
 import NextTaskManager from './components/NextTaskManager';
 import UserProfileEdit from './components/UserProfileEdit';
 import { Task } from './types';
+import { set } from 'date-fns';
 
 // Componente de rota protegida
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -201,9 +202,16 @@ const AppRoutes = () => {
             priorities={[]}
             projects={[]}
             selectedProject={null}
-            onTaskSelect={function (task: Task): void {
-              throw new Error('Function not implemented.');
-            }}
+            onTaskSelect={
+              function (
+                task: Task, 
+                setSelectedTaskDetail: React.Dispatch<React.SetStateAction<Task | null>>,
+                setShowTaskDetailModal: React.Dispatch<React.SetStateAction<boolean>>
+              ): void {
+                setSelectedTaskDetail(task);
+                setShowTaskDetailModal(true);
+              }
+            }
           />
 
 
