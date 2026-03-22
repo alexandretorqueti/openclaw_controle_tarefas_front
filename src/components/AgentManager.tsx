@@ -752,14 +752,26 @@ const AgentManager: React.FC = () => {
 
   const handleUpdateAgent = async (agentId: string, identity: AgentIdentity) => {
     try {
+      console.log('🔧 AgentManager: Atualizando agente:', agentId, identity);
       const response = await apiService.updateAgentIdentity(agentId, identity);
+      console.log('🔧 AgentManager: Resposta da API:', response);
+      
       if (response.success) {
         addToast('success', 'Sucesso', 'Agente atualizado com sucesso!');
+        
+        // Aguardar um momento para garantir que o backend processou e cache foi atualizado
+        console.log('🔧 AgentManager: Aguardando 200ms antes de recarregar agentes...');
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Recarregar agentes
+        console.log('🔧 AgentManager: Recarregando agentes...');
         await loadAgents();
+        console.log('✅ AgentManager: Agentes recarregados após atualização');
       } else {
         throw new Error(response.error || 'Erro ao atualizar agente');
       }
     } catch (err: any) {
+      console.error('❌ AgentManager: Erro ao atualizar agente:', err);
       addToast('error', 'Erro', err.message || 'Falha ao atualizar agente');
       throw err;
     }

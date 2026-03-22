@@ -310,7 +310,16 @@ const TaskList: React.FC<TaskListProps> = ({
     return () => {
       console.log('🔄 TaskList: useEffect cleanup');
     };
-  }, [propTasksString, propUsersString, propStatusesString, propPrioritiesString, propProjectsString, propSelectedProjectString, projectId, selectedParentTaskString]);
+  }, [
+    propTasksString,
+    propUsersString, 
+    propStatusesString, 
+    propPrioritiesString, 
+    propProjectsString, 
+    propSelectedProjectString, 
+    projectId, 
+    selectedParentTaskString
+  ]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
@@ -415,6 +424,8 @@ const TaskList: React.FC<TaskListProps> = ({
     eventSource.addEventListener('task_updated', (event) => {
       try {
         const updatedTask = JSON.parse(event.data);
+        console.log('📡 SSE: task_updated recebido:', updatedTask.id, updatedTask.title);
+        
         // Atualizar terminais se a tarefa atualizada for a primeira da lista
         if (tasks?.length > 0 && updatedTask.id === tasks[0]?.id) {
           if (updatedTask.arquitetosTerminalContent !== undefined) {
@@ -424,8 +435,57 @@ const TaskList: React.FC<TaskListProps> = ({
             setProgramadorTerminal(updatedTask.programadorTerminalContent || '');
           }
         }
+        
+        // ATUALIZAR LISTA DE TAREFAS
+        // Verificar se a tarefa atualizada pertence ao projeto atual
+        const shouldUpdateTask = 
+          (!projectId || updatedTask.projectId === projectId) &&
+          (!finalSelectedParentTask || updatedTask.parentTaskId === finalSelectedParentTask.id);
+        
+        if (shouldUpdateTask) {
+          console.log('🔄 SSE: Atualizando tarefa na lista:', updatedTask.id);
+          setTasks(prev => prev.map(task => 
+            task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+          ));
+        } else {
+          console.log('ℹ️ SSE: Tarefa atualizada não pertence ao contexto atual, ignorando:', updatedTask.id);
+        }
       } catch (error) {
-        console.error('❌ Erro ao processar task_updated para terminal:', error);
+        console.error('❌ Erro ao processar task_updated:', error);
+      }
+    });
+
+    eventSource.addEventListener('task_created', (event) => {
+      try {
+        const newTask = JSON.parse(event.data);
+        console.log('📡 SSE: task_created recebido:', newTask.id, newTask.title);
+        
+        // Verificar se a nova tarefa pertence ao projeto atual
+        const shouldAddTask = 
+          (!projectId || newTask.projectId === projectId) &&
+          (!finalSelectedParentTask || newTask.parentTaskId === finalSelectedParentTask.id);
+        
+        if (shouldAddTask) {
+          console.log('🆕 SSE: Adicionando nova tarefa à lista:', newTask.id);
+          setTasks(prev => [...prev, newTask]);
+        } else {
+          console.log('ℹ️ SSE: Nova tarefa não pertence ao contexto atual, ignorando:', newTask.id);
+        }
+      } catch (error) {
+        console.error('❌ Erro ao processar task_created:', error);
+      }
+    });
+
+    eventSource.addEventListener('task_deleted', (event) => {
+      try {
+        const deletedTask = JSON.parse(event.data);
+        console.log('📡 SSE: task_deleted recebido:', deletedTask.id);
+        
+        // Remover tarefa da lista
+        console.log('🗑️ SSE: Removendo tarefa da lista:', deletedTask.id);
+        setTasks(prev => prev.filter(task => task.id !== deletedTask.id));
+      } catch (error) {
+        console.error('❌ Erro ao processar task_deleted:', error);
       }
     });
 
@@ -650,12 +710,19 @@ const TaskList: React.FC<TaskListProps> = ({
       }
 
       // Caso contrário, chame a API diretamente
-      const updatedTask = await api.updateTask(id, taskData);
+      const request = await api.updateTask(id, taskData);
+      const updatedTask = request.task;
       console.log('✅ Task atualizada via API:', updatedTask);
 
       // Atualizar estado local
       setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
-
+      // 2. ATUALIZAÇÃO NECESSÁRIA: Atualiza o detalhe que está aberto no modal
+      setSelectedTaskDetail(prev => {
+      if (prev && prev.id === id) {
+        return { ...prev, ...updatedTask };
+      }
+      return prev;
+    });
       return updatedTask;
     } catch (error) {
       console.error('❌ Erro ao atualizar tarefa:', error);
