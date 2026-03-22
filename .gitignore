@@ -22,7 +22,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Local env files
-.env
 .env.production
 
 # Editor directories and files
