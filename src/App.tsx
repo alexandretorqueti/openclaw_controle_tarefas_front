@@ -1,7 +1,7 @@
-// @ts-nocheck
 import React, { Component, ErrorInfo } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import { SSEProvider } from './contexts/SSEContext';
 import AppRoutes from './routes';
 
 // Error Boundary
@@ -77,7 +77,9 @@ const App: React.FC = () => {
         }}
       >
         <AuthProvider>
-          <AppRoutes />
+          <SSEProvider>
+            <AppRoutes />
+          </SSEProvider>
         </AuthProvider>
       </BrowserRouter>
     </ErrorBoundary>

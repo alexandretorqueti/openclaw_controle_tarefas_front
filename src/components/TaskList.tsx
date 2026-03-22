@@ -10,6 +10,7 @@ import Card from './shared/Card';
 import Button from './shared/Button';
 import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle, FaArrowUp } from 'react-icons/fa';
 import { safeParseDate } from '../utils/dateUtils';
+import { useSSE } from '../contexts/SSEContext';
 
 // Funções vazias padrão para comparação
 const NOOP_FN = () => {};
@@ -81,6 +82,9 @@ const TaskList: React.FC<TaskListProps> = ({
   // Usar estado de navegação se disponível, caso contrário usar props
   const finalSelectedParentTask = navigationState.selectedParentTask || selectedParentTask;
   const finalParentHierarchy = navigationState.parentHierarchy || parentHierarchy;
+
+  // Obter o contexto SSE para atualização em tempo real
+  const { addEventListener, removeEventListener } = useSSE();
 
   // Estados para dados quando não são fornecidos via props
   const [tasks, setTasks] = useState<Task[]>(propTasks);
@@ -368,131 +372,7 @@ const TaskList: React.FC<TaskListProps> = ({
     }
   }, [tasksString]);
 
-  // SSE para atualização em tempo real dos terminais
-  useEffect(() => {
-    // Get backend URL from centralized configuration
-    const backendUrl = getBackendBaseUrl();
-    const eventSource = new EventSource(`${backendUrl}/api/sse/events`);
 
-    eventSource.addEventListener('terminal_update', (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('📡 Terminal update received:', data);
-
-        if (data.type === 'analista' && data.content) {
-          setIsTypingAnalista(true);
-          setAnalistaTerminal(prev => prev + data.content);
-
-          // Efeito de digitação
-          setTimeout(() => {
-            setIsTypingAnalista(false);
-            // Scroll automático para o final
-            if (analistaRef.current) {
-              analistaRef.current.scrollTop = analistaRef.current.scrollHeight;
-            }
-          }, data.content.length * 30); // 30ms por caractere
-        }
-
-        if (data.type === 'programador' && data.content) {
-          setIsTypingProgramador(true);
-          setProgramadorTerminal(prev => prev + data.content);
-
-          // Efeito de digitação
-          setTimeout(() => {
-            setIsTypingProgramador(false);
-            // Scroll automático para o final
-            if (programadorRef.current) {
-              programadorRef.current.scrollTop = programadorRef.current.scrollHeight;
-            }
-          }, data.content.length * 30); // 30ms por caractere
-        }
-
-        if (data.type === 'terminal_clear') {
-          if (data.target === 'analista' || data.target === 'both') {
-            setAnalistaTerminal('');
-          }
-          if (data.target === 'programador' || data.target === 'both') {
-            setProgramadorTerminal('');
-          }
-        }
-
-      } catch (error) {
-        console.error('❌ Erro ao processar evento terminal_update:', error);
-      }
-    });
-
-    eventSource.addEventListener('task_updated', (event) => {
-      try {
-        const updatedTask = JSON.parse(event.data);
-        console.log('📡 SSE: task_updated recebido:', updatedTask.id, updatedTask.title);
-        
-        // Atualizar terminais se a tarefa atualizada for a primeira da lista
-        if (tasks?.length > 0 && updatedTask.id === tasks[0]?.id) {
-          if (updatedTask.arquitetosTerminalContent !== undefined) {
-            setAnalistaTerminal(updatedTask.arquitetosTerminalContent || '');
-          }
-          if (updatedTask.programadorTerminalContent !== undefined) {
-            setProgramadorTerminal(updatedTask.programadorTerminalContent || '');
-          }
-        }
-        
-        // ATUALIZAR LISTA DE TAREFAS
-        // Verificar se a tarefa atualizada pertence ao projeto atual
-        const shouldUpdateTask = 
-          (!projectId || updatedTask.projectId === projectId) &&
-          (!finalSelectedParentTask || updatedTask.parentTaskId === finalSelectedParentTask.id);
-        
-        if (shouldUpdateTask) {
-          console.log('🔄 SSE: Atualizando tarefa na lista:', updatedTask.id);
-          setTasks(prev => prev.map(task => 
-            task.id === updatedTask.id ? { ...task, ...updatedTask } : task
-          ));
-        } else {
-          console.log('ℹ️ SSE: Tarefa atualizada não pertence ao contexto atual, ignorando:', updatedTask.id);
-        }
-      } catch (error) {
-        console.error('❌ Erro ao processar task_updated:', error);
-      }
-    });
-
-    eventSource.addEventListener('task_created', (event) => {
-      try {
-        const newTask = JSON.parse(event.data);
-        console.log('📡 SSE: task_created recebido:', newTask.id, newTask.title);
-        
-        // Verificar se a nova tarefa pertence ao projeto atual
-        const shouldAddTask = 
-          (!projectId || newTask.projectId === projectId) &&
-          (!finalSelectedParentTask || newTask.parentTaskId === finalSelectedParentTask.id);
-        
-        if (shouldAddTask) {
-          console.log('🆕 SSE: Adicionando nova tarefa à lista:', newTask.id);
-          setTasks(prev => [...prev, newTask]);
-        } else {
-          console.log('ℹ️ SSE: Nova tarefa não pertence ao contexto atual, ignorando:', newTask.id);
-        }
-      } catch (error) {
-        console.error('❌ Erro ao processar task_created:', error);
-      }
-    });
-
-    eventSource.addEventListener('task_deleted', (event) => {
-      try {
-        const deletedTask = JSON.parse(event.data);
-        console.log('📡 SSE: task_deleted recebido:', deletedTask.id);
-        
-        // Remover tarefa da lista
-        console.log('🗑️ SSE: Removendo tarefa da lista:', deletedTask.id);
-        setTasks(prev => prev.filter(task => task.id !== deletedTask.id));
-      } catch (error) {
-        console.error('❌ Erro ao processar task_deleted:', error);
-      }
-    });
-
-    return () => {
-      eventSource.close();
-    };
-  }, [tasksString]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -559,6 +439,117 @@ const TaskList: React.FC<TaskListProps> = ({
   }, [selectedProjectString]);
 
   // Load last used agent from localStorage (fallback if no programadorContratado)
+  // SSE para atualização em tempo real das tarefas
+  React.useEffect(() => {
+    console.log('🔌 TaskList: Configurando listeners SSE para atualização em tempo real');
+
+    const handleTaskUpdated = (updatedTask: Task) => {
+      console.log('📡 TaskList: Evento task_updated recebido via SSE:', updatedTask.id, updatedTask.title);
+      
+      // Atualizar terminais se a tarefa atualizada for a primeira da lista
+      if (tasks?.length > 0 && updatedTask.id === tasks[0]?.id) {
+        if (updatedTask.arquitetosTerminalContent !== undefined) {
+          setAnalistaTerminal(updatedTask.arquitetosTerminalContent || '');
+        }
+        if (updatedTask.programadorTerminalContent !== undefined) {
+          setProgramadorTerminal(updatedTask.programadorTerminalContent || '');
+        }
+      }
+      
+      // ATUALIZAR LISTA DE TAREFAS
+      // Verificar se a tarefa atualizada pertence ao projeto atual
+      const shouldUpdateTask = 
+        (!projectId || updatedTask.projectId === projectId) &&
+        (!finalSelectedParentTask || updatedTask.parentTaskId === finalSelectedParentTask?.id);
+      
+      if (shouldUpdateTask) {
+        console.log('🔄 TaskList: Atualizando tarefa na lista via SSE:', updatedTask.id);
+        setTasks(prev => prev.map(task => 
+          task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+        ));
+      } else {
+        console.log('ℹ️ TaskList: Tarefa atualizada não pertence ao contexto atual, ignorando:', updatedTask.id);
+      }
+    };
+
+    const handleTaskCreated = (newTask: Task) => {
+      console.log('📡 TaskList: Evento task_created recebido via SSE:', newTask.id, newTask.title);
+      
+      // Verificar se a nova tarefa pertence ao projeto atual
+      const shouldAddTask = 
+        (!projectId || newTask.projectId === projectId) &&
+        (!finalSelectedParentTask || newTask.parentTaskId === finalSelectedParentTask?.id);
+      
+      if (shouldAddTask) {
+        console.log('🆕 TaskList: Adicionando nova tarefa à lista via SSE:', newTask.id);
+        setTasks(prev => [...prev, newTask]);
+      } else {
+        console.log('ℹ️ TaskList: Nova tarefa não pertence ao contexto atual, ignorando:', newTask.id);
+      }
+    };
+
+    const handleTaskDeleted = (deletedTask: { id: string }) => {
+      console.log('📡 TaskList: Evento task_deleted recebido via SSE:', deletedTask.id);
+      
+      // Remover tarefa da lista
+      console.log('🗑️ TaskList: Removendo tarefa da lista via SSE:', deletedTask.id);
+      setTasks(prev => prev.filter(task => task.id !== deletedTask.id));
+    };
+
+    const handleTerminalUpdate = (data: any) => {
+      console.log('📡 TaskList: Evento terminal_update recebido via SSE:', data);
+
+      if (data.type === 'analista' && data.content) {
+        setIsTypingAnalista(true);
+        setAnalistaTerminal(prev => prev + data.content);
+
+        setTimeout(() => {
+          setIsTypingAnalista(false);
+          if (analistaRef.current) {
+            analistaRef.current.scrollTop = analistaRef.current.scrollHeight;
+          }
+        }, data.content.length * 30);
+      }
+
+      if (data.type === 'programador' && data.content) {
+        setIsTypingProgramador(true);
+        setProgramadorTerminal(prev => prev + data.content);
+
+        setTimeout(() => {
+          setIsTypingProgramador(false);
+          if (programadorRef.current) {
+            programadorRef.current.scrollTop = programadorRef.current.scrollHeight;
+          }
+        }, data.content.length * 30);
+      }
+
+      if (data.type === 'terminal_clear') {
+        if (data.target === 'analista' || data.target === 'both') {
+          setAnalistaTerminal('');
+        }
+        if (data.target === 'programador' || data.target === 'both') {
+          setProgramadorTerminal('');
+        }
+      }
+    };
+
+    // Registrar listeners
+    addEventListener('task_updated', handleTaskUpdated);
+    addEventListener('task_created', handleTaskCreated);
+    addEventListener('task_deleted', handleTaskDeleted);
+    addEventListener('terminal_update', handleTerminalUpdate);
+
+    console.log('✅ TaskList: Listeners SSE configurados com sucesso');
+
+    return () => {
+      console.log('🔌 TaskList: Removendo listeners SSE');
+      removeEventListener('task_updated', handleTaskUpdated);
+      removeEventListener('task_created', handleTaskCreated);
+      removeEventListener('task_deleted', handleTaskDeleted);
+      removeEventListener('terminal_update', handleTerminalUpdate);
+    };
+  }, [projectId, finalSelectedParentTask, addEventListener, removeEventListener]); // REMOVI 'tasks' daqui!
+
   React.useEffect(() => {
     const lastModel = localStorage.getItem('lastUsedAgent');
     if (lastModel && (!selectedProject || !selectedProject.programadorContratado)) {
