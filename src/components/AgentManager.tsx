@@ -7,6 +7,7 @@ import {
 import './AgentManager.css';
 import apiService from '../services/api';
 import { Agent, AgentIdentity } from '../types/agent';
+import AgentFileManager from './AgentFileManager';
 
 // Componentes auxiliares
 interface LoadingSpinnerProps {
@@ -284,6 +285,7 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
   const [bindingError, setBindingError] = useState('');
   const [models, setModels] = useState<string[]>([]);
   const [loadingModels, setLoadingModels] = useState(false);
+  const [showFileManager, setShowFileManager] = useState(false);
 
   useEffect(() => {
     if (agent) {
@@ -398,6 +400,26 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
     }
   };
 
+  const handleOpenFileManager = () => {
+    setShowFileManager(true);
+    setActiveTab('files');
+  };
+
+  const handleCloseFileManager = () => {
+    setShowFileManager(false);
+  };
+
+  if (showFileManager && agent) {
+    return (
+      <div className="modal-overlay" style={{ zIndex: 1100 }}>
+        <AgentFileManager 
+          agentId={agent.id}
+          onClose={handleCloseFileManager}
+        />
+      </div>
+    );
+  }
+
   if (!isOpen || !agent) return null;
 
   return (
@@ -425,7 +447,7 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
           </button>
           <button
             className={`tab ${activeTab === 'files' ? 'active' : ''}`}
-            onClick={() => setActiveTab('files')}
+            onClick={handleOpenFileManager}
           >
             <FaCode size={14} /> Arquivos
           </button>
@@ -596,24 +618,26 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
             ) : (
               <div className="tab-content active">
                 <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '20px' }}>
-                  Os arquivos do agente (SOUL.md, USER.md, MEMORY.md) podem ser editados diretamente
-                  no workspace do agente em: <code>{agent.workspace || 'Workspace não configurado'}</code>
+                  Os arquivos do agente (SOUL.md, IDENTITY.md) podem ser editados diretamente pelo sistema.
+                  Clique abaixo para abrir o gerenciador de arquivos:
                 </p>
                 
-                <div className="form-group">
-                  <label className="form-label">
-                    Avatar URL
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={identity.avatar}
-                    onChange={(e) => setIdentity({...identity, avatar: e.target.value})}
-                    placeholder="URL da imagem do avatar"
-                    disabled={loading}
-                  />
-                  <div className="form-help">
-                    URL completa para a imagem do avatar (opcional)
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  alignItems: 'center', 
+                  height: '200px',
+                  border: '2px dashed var(--border-color)',
+                  borderRadius: '8px',
+                  background: 'var(--accent-subtle)',
+                  cursor: 'pointer',
+                }}
+                onClick={handleOpenFileManager}
+                >
+                  <div style={{ textAlign: 'center' }}>
+                    <FaCode size={48} style={{ color: 'var(--primary-color)', marginBottom: '12px' }} />
+                    <h4 style={{ margin: '0 0 8px 0' }}>Abrir Gerenciador de Arquivos</h4>
+                    <p style={{ margin: 0, color: 'var(--text-secondary)' }}>Click para editar SOUL.md e IDENTITY.md</p>
                   </div>
                 </div>
               </div>

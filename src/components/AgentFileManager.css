@@ -1,0 +1,231 @@
+.agent-file-manager {
+  background: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.agent-file-manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-color);
+  gap: 16px;
+}
+
+.file-header-info h3 {
+  margin: 0 0 4px 0;
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: var(--font-bold);
+}
+
+.file-header-info p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.file-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.agent-file-list {
+  padding: 16px;
+}
+
+.agent-file-description {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.agent-file-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 8px;
+  background: var(--surface-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.agent-file-item:hover {
+  border-color: var(--primary-color);
+  background: var(--accent-subtle);
+  transform: translateX(4px);
+}
+
+.agent-file-item:last-child {
+  margin-bottom: 0;
+}
+
+.agent-file-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--primary-color);
+  border-radius: 8px;
+  margin-right: 12px;
+}
+
+.agent-file-icon svg {
+  color: white;
+  font-size: 18px;
+}
+
+.agent-file-info {
+  flex: 1;
+}
+
+.agent-file-info h4 {
+  margin: 0 0 4px 0;
+  color: var(--text-primary);
+  font-size: 16px;
+  font-weight: var(--font-semibold);
+}
+
+.agent-file-info p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.agent-file-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--accent-subtle);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.agent-file-item:hover .agent-file-action {
+  background: var(--primary-color);
+  color: white;
+}
+
+.file-editor-container {
+  padding: 0;
+}
+
+.file-textarea {
+  width: 100%;
+  min-height: 400px;
+  padding: 16px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  border: none;
+  border-radius: 0 0 8px 8px;
+  background: var(--surface-bg);
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.file-textarea:focus {
+  background: var(--background);
+}
+
+.file-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.file-editor-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: var(--accent-subtle);
+  border-top: 1px solid var(--border-color);
+  border-radius: 0 0 8px 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.file-info {
+  display: flex;
+  gap: 16px;
+}
+
+.char-count,
+.line-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.file-error {
+  padding: 12px 16px;
+  margin: 16px;
+  background: #ffebeb;
+  border-left: 4px solid var(--danger-color);
+  border-radius: 4px;
+  color: var(--danger-color);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-success {
+  padding: 12px 16px;
+  margin: 16px;
+  background: #e6ffed;
+  border-left: 4px solid var(--success-color);
+  border-radius: 4px;
+  color: var(--success-color);
+  font-size: 14px;
+}
+
+.loading-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .agent-file-manager {
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .agent-file-manager-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .file-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .file-editor-container {
+    border-radius: 0 0 8px 8px;
+  }
+
+  .file-textarea {
+    min-height: 300px;
+    font-size: 13px;
+  }
+}

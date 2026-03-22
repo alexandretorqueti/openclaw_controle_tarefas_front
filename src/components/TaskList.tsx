@@ -38,10 +38,10 @@ interface TaskListProps {
 }
 
 const TaskList: React.FC<TaskListProps> = ({
-  tasks: propTasks = [], 
-  users: propUsers = [], 
-  statuses: propStatuses = [], 
-  priorities: propPriorities = [], 
+  tasks: propTasks = [],
+  users: propUsers = [],
+  statuses: propStatuses = [],
+  priorities: propPriorities = [],
   projects: propProjects = [],
   selectedProject: propSelectedProject = null,
   selectedParentTask = null,
@@ -61,13 +61,27 @@ const TaskList: React.FC<TaskListProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   
+  console.log('🚀 TaskList: Componente montado');
+  console.log('🚀 Props recebidas:', {
+    propTasksLength: propTasks.length,
+    propUsersLength: propUsers.length,
+    propStatusesLength: propStatuses.length,
+    propPrioritiesLength: propPriorities.length,
+    propProjectsLength: propProjects.length,
+    propSelectedProject: !!propSelectedProject,
+    propSelectedParentTask: !!selectedParentTask,
+    parentHierarchyLength: parentHierarchy.length
+  });
+  console.log('🚀 Parâmetros da URL:', { projectId });
+  console.log('🚀 Estado de navegação:', location.state);
+
   // Extrair estado de navegação para hierarquia de tarefas
   const navigationState = location.state as { selectedParentTask?: Task; parentHierarchy?: Task[] } || {};
-  
+
   // Usar estado de navegação se disponível, caso contrário usar props
   const finalSelectedParentTask = navigationState.selectedParentTask || selectedParentTask;
   const finalParentHierarchy = navigationState.parentHierarchy || parentHierarchy;
-  
+
   // Estados para dados quando não são fornecidos via props
   const [tasks, setTasks] = useState<Task[]>(propTasks);
   const [users, setUsers] = useState<User[]>(propUsers);
@@ -82,11 +96,11 @@ const TaskList: React.FC<TaskListProps> = ({
   // Estado para controle do modal de detalhes da tarefa
   const [selectedTaskDetail, setSelectedTaskDetail] = useState<Task | null>(null);
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
-  
+
   // Refs para controlar loops
   const isFetchingRef = useRef(false);
   const hasFetchedRef = useRef(false);
-  
+
   // Função para voltar aos projetos
   const handleBackToProjects = () => {
     if (onBackToProjects && typeof onBackToProjects === 'function') {
@@ -105,7 +119,7 @@ const TaskList: React.FC<TaskListProps> = ({
       return '{}';
     }
   };
-  
+
   // Criar versões em string das props para comparação estável
   const propTasksString = safeStringify(propTasks);
   const propUsersString = safeStringify(propUsers);
@@ -113,44 +127,44 @@ const TaskList: React.FC<TaskListProps> = ({
   const propPrioritiesString = safeStringify(propPriorities);
   const propProjectsString = safeStringify(propProjects);
   const propSelectedProjectString = safeStringify(propSelectedProject);
-  
+
   // Sincronizar estados locais com props quando elas mudarem
   useEffect(() => {
     if (propTasksString !== safeStringify(tasks)) {
       setTasks(propTasks);
     }
   }, [propTasksString]);
-  
+
   useEffect(() => {
     if (propUsersString !== safeStringify(users)) {
       setUsers(propUsers);
     }
   }, [propUsersString]);
-  
+
   useEffect(() => {
     if (propStatusesString !== safeStringify(statuses)) {
       setStatuses(propStatuses);
     }
   }, [propStatusesString]);
-  
+
   useEffect(() => {
     if (propPrioritiesString !== safeStringify(priorities)) {
       setPriorities(propPriorities);
     }
   }, [propPrioritiesString]);
-  
+
   useEffect(() => {
     if (propProjectsString !== safeStringify(projects)) {
       setProjects(propProjects);
     }
   }, [propProjectsString]);
-  
+
   useEffect(() => {
     if (propSelectedProjectString !== safeStringify(selectedProject)) {
       setSelectedProject(propSelectedProject);
     }
   }, [propSelectedProjectString]);
-  
+
   // Criar versões em string dos estados locais para comparação estável
   const tasksString = safeStringify(tasks);
   const usersString = safeStringify(users);
@@ -159,7 +173,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const projectsString = safeStringify(projects);
   const selectedProjectString = safeStringify(selectedProject);
   const selectedParentTaskString = safeStringify(finalSelectedParentTask);
-  
+
   // Buscar dados se não forem fornecidos via props - EVITAR LOOPS
   useEffect(() => {
     console.log('🔄 TaskList: useEffect executando');
@@ -170,31 +184,35 @@ const TaskList: React.FC<TaskListProps> = ({
       propPrioritiesStringLength: propPrioritiesString.length,
       propProjectsStringLength: propProjectsString.length,
       propSelectedProjectStringLength: propSelectedProjectString.length,
-      projectId 
+      projectId
     });
-    
+    console.log('🔄 propStatuses vazio?', propStatuses.length === 0);
+    console.log('🔄 propPriorities vazio?', propPriorities.length === 0);
+    console.log('🔄 propUsers vazio?', propUsers.length === 0);
+    console.log('🔄 propProjects vazio?', propProjects.length === 0);
+
     // Evitar loops: não executar se já está buscando ou já buscou
     if (isFetchingRef.current) {
       console.log('🔄 TaskList: Já está buscando, ignorando...');
       return;
     }
-    
+
     // Se já buscou os dados básicos e não temos projectId novo, não buscar novamente
     if (hasFetchedRef.current && !projectId) {
       console.log('🔄 TaskList: Já buscou dados básicos, ignorando...');
       return;
     }
-    
+
     const fetchData = async () => {
       console.log('🔄 TaskList: fetchData iniciando');
       isFetchingRef.current = true;
       setIsLoading(true);
       setDataError(null);
-      
+
       try {
         console.log('📊 TaskList: Buscando dados da API...');
         console.log('📊 TaskList: projectId da URL:', projectId);
-        
+
         // Buscar projeto específico se tivermos projectId na URL
         if (projectId && !propSelectedProject) {
           try {
@@ -206,13 +224,20 @@ const TaskList: React.FC<TaskListProps> = ({
             console.error('📊 TaskList: Erro ao buscar projeto:', projectError);
           }
         }
-        
+
         // Se já temos dados via props, não precisamos buscar os básicos
-        const shouldFetchBasicData = !(propTasks.length > 0 && propUsers.length > 0 && propStatuses.length > 0 && 
+        const shouldFetchBasicData = !(propTasks.length > 0 && propUsers.length > 0 && propStatuses.length > 0 &&
           propPriorities.length > 0 && propProjects.length > 0);
-        
+
         console.log('📊 TaskList: shouldFetchBasicData:', shouldFetchBasicData);
-        
+        console.log('📊 TaskList: Condição para não buscar:', {
+          propTasks: propTasks.length > 0,
+          propUsers: propUsers.length > 0,
+          propStatuses: propStatuses.length > 0,
+          propPriorities: propPriorities.length > 0,
+          propProjects: propProjects.length > 0
+        });
+
         if (shouldFetchBasicData) {
           // Buscar dados básicos em paralelo
           // Construir filtros para tarefas
@@ -224,11 +249,11 @@ const TaskList: React.FC<TaskListProps> = ({
             filters.parentTaskId = finalSelectedParentTask.id;
           }
           console.log('🔍 Buscando tarefas com os filtros:', filters);
-          
-          const tasksPromise = propTasks.length === 0 
+
+          const tasksPromise = propTasks.length === 0
             ? api.getTasks(filters)
             : Promise.resolve({ tasks: propTasks });
-          
+
           const [tasksRes, usersRes, statusesRes, prioritiesRes, projectsRes] = await Promise.allSettled([
             tasksPromise,
             propUsers.length === 0 ? api.getUsers() : Promise.resolve({ users: propUsers }),
@@ -236,39 +261,39 @@ const TaskList: React.FC<TaskListProps> = ({
             propPriorities.length === 0 ? api.getPriorities() : Promise.resolve({ priorities: propPriorities }),
             propProjects.length === 0 ? api.getProjects() : Promise.resolve({ projects: propProjects })
           ]);
-          
+
           // Processar resultados
           if (tasksRes.status === 'fulfilled' && tasksRes.value.tasks) {
             console.log('📊 TaskList: Tasks carregadas:', tasksRes.value.tasks.length);
             setTasks(tasksRes.value.tasks);
           }
-          
+
           if (usersRes.status === 'fulfilled' && usersRes.value.users) {
             console.log('📊 TaskList: Users carregados:', usersRes.value.users.length);
             setUsers(usersRes.value.users);
           }
-          
+
           if (statusesRes.status === 'fulfilled' && statusesRes.value.statuses) {
             console.log('📊 TaskList: Statuses carregados:', statusesRes.value.statuses.length);
             setStatuses(statusesRes.value.statuses);
           }
-          
+
           if (prioritiesRes.status === 'fulfilled' && prioritiesRes.value.priorities) {
             console.log('📊 TaskList: Priorities carregados:', prioritiesRes.value.priorities.length);
             setPriorities(prioritiesRes.value.priorities);
           }
-          
+
           if (projectsRes.status === 'fulfilled' && projectsRes.value.projects) {
             console.log('📊 TaskList: Projects carregados:', projectsRes.value.projects.length);
             setProjects(projectsRes.value.projects);
           }
-          
+
           // Marcar que já buscou dados básicos
           hasFetchedRef.current = true;
         }
-        
+
         console.log('📊 TaskList: Dados carregados com sucesso');
-        
+
       } catch (error) {
         console.error('📊 TaskList: Erro ao buscar dados:', error);
         setDataError('Não foi possível carregar os dados. Tente novamente mais tarde.');
@@ -278,15 +303,15 @@ const TaskList: React.FC<TaskListProps> = ({
         isFetchingRef.current = false;
       }
     };
-    
+
     fetchData();
-    
+
     // Cleanup function
     return () => {
       console.log('🔄 TaskList: useEffect cleanup');
     };
   }, [propTasksString, propUsersString, propStatusesString, propPrioritiesString, propProjectsString, propSelectedProjectString, projectId, selectedParentTaskString]);
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
@@ -298,7 +323,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const showCompleted = onToggleShowCompleted ? propShowCompleted : localShowCompleted;
   // Back to top functionality
   const [showBackToTop, setShowBackToTop] = useState(false);
-  
+
   // Estados para terminais em tempo real
   const [analistaTerminal, setAnalistaTerminal] = useState<string>('');
   const [programadorTerminal, setProgramadorTerminal] = useState<string>('');
@@ -339,16 +364,16 @@ const TaskList: React.FC<TaskListProps> = ({
     // Get backend URL from centralized configuration
     const backendUrl = getBackendBaseUrl();
     const eventSource = new EventSource(`${backendUrl}/api/sse/events`);
-    
+
     eventSource.addEventListener('terminal_update', (event) => {
       try {
         const data = JSON.parse(event.data);
         console.log('📡 Terminal update received:', data);
-        
+
         if (data.type === 'analista' && data.content) {
           setIsTypingAnalista(true);
           setAnalistaTerminal(prev => prev + data.content);
-          
+
           // Efeito de digitação
           setTimeout(() => {
             setIsTypingAnalista(false);
@@ -358,11 +383,11 @@ const TaskList: React.FC<TaskListProps> = ({
             }
           }, data.content.length * 30); // 30ms por caractere
         }
-        
+
         if (data.type === 'programador' && data.content) {
           setIsTypingProgramador(true);
           setProgramadorTerminal(prev => prev + data.content);
-          
+
           // Efeito de digitação
           setTimeout(() => {
             setIsTypingProgramador(false);
@@ -372,7 +397,7 @@ const TaskList: React.FC<TaskListProps> = ({
             }
           }, data.content.length * 30); // 30ms por caractere
         }
-        
+
         if (data.type === 'terminal_clear') {
           if (data.target === 'analista' || data.target === 'both') {
             setAnalistaTerminal('');
@@ -381,7 +406,7 @@ const TaskList: React.FC<TaskListProps> = ({
             setProgramadorTerminal('');
           }
         }
-        
+
       } catch (error) {
         console.error('❌ Erro ao processar evento terminal_update:', error);
       }
@@ -412,7 +437,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
- 
+
   const handleToggleShowCompleted = (checked: boolean) => {
     if (onToggleShowCompleted) {
       onToggleShowCompleted(checked);
@@ -446,7 +471,7 @@ const TaskList: React.FC<TaskListProps> = ({
     const defaultStatus = statuses?.find(s => s.name === 'Pendente')?.id || statuses?.[0]?.id || '';
     const defaultPriority = priorities?.find(p => p.name === 'Média')?.id || priorities?.[1]?.id || '';
     const defaultUser = users?.[0]?.id || '';
-    
+
     setNewTaskData(prev => ({
       ...prev,
       statusId: defaultStatus || prev.statusId || '',
@@ -488,7 +513,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const filteredTasks = tasks?.filter(task => {
     const matchesSearch = (task.title || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (task.description || '').toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = !selectedStatus || task.statusId === selectedStatus;
     const matchesPriority = !selectedPriority || task.priorityId === selectedPriority;
     const matchesCompletion = shouldFilterByCompletion ? (showCompleted ? true : !task.isCompleted) : true;
@@ -523,42 +548,59 @@ const TaskList: React.FC<TaskListProps> = ({
   };
 
   const handleCreateTask = async () => {
+    console.log('🆕 TaskList: handleCreateTask chamado', { newTaskData });
 
-    
-    if (!onCreateTask || !newTaskData.title || !newTaskData.projectId || !newTaskData.deadline) {
+    if (!newTaskData.title || !newTaskData.projectId || !newTaskData.deadline) {
       console.error('❌ Missing required data for task creation');
       setError('Preencha o título da tarefa e o prazo.');
       return;
     }
 
     setError(null); // Limpa erros anteriores
-    
+
     try {
       // Debug: log what we're sending
+      console.log('📤 TaskList: Enviando dados da tarefa:', newTaskData);
 
-      
-      const taskData = {
+      const taskData  = {
         ...newTaskData,
-        // createdById will be set by the parent component (App.tsx)
+        // createdById will be set by the parent component (App.tsx) or backend
         position: tasks?.length || 0,
         // Ensure agent is null if empty string
         agent: newTaskData.agent || null
       };
 
+      console.log('📤 TaskList: Dados finais para criação:', taskData);
 
-      
-      await onCreateTask(taskData);
-      
+      let createdTask: unknown;
+
+      // Se a prop onCreateTask foi fornecida e não é a função padrão, use-a
+      if (onCreateTask && onCreateTask !== NOOP_ASYNC_TASK_FN) {
+        console.log('🔧 TaskList: Usando onCreateTask prop');
+        createdTask = await onCreateTask(taskData);
+      } else {
+        // Caso contrário, chame a API diretamente
+        console.log('🔧 TaskList: Chamando API diretamente (fallback)');
+        const request = await api.createTask(taskData) as { task: Task };
+        createdTask = request.task;
+        console.log('✅ TaskList: Tarefa criada via API:', createdTask);
+
+        // Atualizar lista local de tarefas
+        if (createdTask) {
+          setTasks(prev => [...prev, createdTask]);
+        }
+      }
+
       // Save the selected agent to localStorage
       if (newTaskData.agent) {
         localStorage.setItem('lastUsedAgent', newTaskData.agent);
       }
-      
+
       // Reset form with current values (not empty strings)
       const defaultStatus = statuses?.find(s => s.name === 'Pendente')?.id || statuses?.[0]?.id || '';
       const defaultPriority = priorities?.find(p => p.name === 'Média')?.id || priorities?.[1]?.id || '';
       const defaultUser = users?.[0]?.id || '';
-      
+
       setNewTaskData({
         title: '',
         description: '',
@@ -571,27 +613,29 @@ const TaskList: React.FC<TaskListProps> = ({
         parentTaskId: finalSelectedParentTask?.id || null
       });
       setIsCreatingTask(false);
+
+      console.log('✅ TaskList: Tarefa criada com sucesso!');
     } catch (error: any) {
-      console.error('❌ Failed to create task:', error);
-      
+      console.error('❌ TaskList: Failed to create task:', error);
+
       // Extrai mensagem de erro amigável
       let errorMessage = 'Erro ao criar tarefa.';
-      
+
       if (error.message) {
         errorMessage = error.message;
       }
-      
+
       // Tenta extrair detalhes da resposta da API
       if (error.details && Array.isArray(error.details)) {
-        const validationErrors = error.details.map((detail: any) => 
+        const validationErrors = error.details.map((detail: any) =>
           detail.message || `${detail.path?.join('.')}: ${detail.code}`
         ).join(', ');
-        
+
         if (validationErrors) {
           errorMessage = `Erros de validação: ${validationErrors}`;
         }
       }
-      
+
       setError(errorMessage);
     }
   };
@@ -604,14 +648,14 @@ const TaskList: React.FC<TaskListProps> = ({
       if (onUpdateTask && onUpdateTask !== NOOP_ASYNC_TASK_FN) {
         return await onUpdateTask(id, taskData);
       }
-      
+
       // Caso contrário, chame a API diretamente
       const updatedTask = await api.updateTask(id, taskData);
       console.log('✅ Task atualizada via API:', updatedTask);
-      
+
       // Atualizar estado local
       setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
-      
+
       return updatedTask;
     } catch (error) {
       console.error('❌ Erro ao atualizar tarefa:', error);
@@ -627,11 +671,11 @@ const TaskList: React.FC<TaskListProps> = ({
         await onDeleteTask(id);
         return;
       }
-      
+
       // Caso contrário, chame a API diretamente
       await api.deleteTask(id);
       console.log('✅ Task deletada via API');
-      
+
       // Atualizar estado local
       setTasks(prev => prev.filter(task => task.id !== id));
     } catch (error) {
@@ -648,16 +692,16 @@ const TaskList: React.FC<TaskListProps> = ({
         await onToggleCompletion(id);
         return;
       }
-      
+
       // Caso contrário, chame a API diretamente
       const task = tasks.find(t => t.id === id);
       if (!task) {
         throw new Error('Tarefa não encontrada');
       }
-      
+
       const updatedTask = await api.updateTask(id, { isCompleted: !task.isCompleted });
       console.log('✅ Status de conclusão alterado via API:', updatedTask);
-      
+
       // Atualizar estado local
       setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
     } catch (error) {
@@ -675,14 +719,14 @@ const TaskList: React.FC<TaskListProps> = ({
 
   const handleViewSubtasks = (task: Task) => {
     console.log('📋 TaskList: Navegando para subtarefas de', task.title);
-    
+
     // Construir nova hierarquia
     const newHierarchy = [...finalParentHierarchy];
     if (finalSelectedParentTask) {
       // Se já estamos em um nível de subtarefa, adicionar o pai atual à hierarquia
       newHierarchy.push(finalSelectedParentTask);
     }
-    
+
     // Navegar para a mesma rota com estado
     navigate(`/projects/${projectId}/tasks`, {
       state: {
@@ -694,19 +738,19 @@ const TaskList: React.FC<TaskListProps> = ({
 
   const handleBackToParent = () => {
     console.log('🔙 TaskList: Voltando para nível anterior');
-    
+
     // Se a prop onBackToParent foi fornecida e não é a função padrão, use-a
     if (onBackToParent && onBackToParent !== NOOP_FN) {
       onBackToParent();
       return;
     }
-    
+
     // Caso contrário, implementar navegação de volta
     if (finalParentHierarchy.length > 0) {
       // Há ancestrais: voltar para o último ancestral (pai direto)
       const parentTask = finalParentHierarchy[finalParentHierarchy.length - 1];
       const grandparentHierarchy = finalParentHierarchy.slice(0, -1);
-      
+
       navigate(`/projects/${projectId}/tasks`, {
         state: {
           selectedParentTask: parentTask,
@@ -723,17 +767,17 @@ const TaskList: React.FC<TaskListProps> = ({
       });
     }
   };
-  
+
   // Decidir qual handler usar para voltar ao pai
   const backToParentHandler = onBackToParent !== NOOP_FN ? onBackToParent : handleBackToParent;
 
   // Mostrar loading enquanto busca dados
   if (isLoading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
         height: '50vh',
         backgroundColor: 'var(--bg-primary)',
         color: 'var(--text-primary)'
@@ -761,12 +805,12 @@ const TaskList: React.FC<TaskListProps> = ({
       </div>
     );
   }
-  
+
   // Mostrar erro se houver
   if (dataError) {
     return (
-      <div style={{ 
-        padding: '40px', 
+      <div style={{
+        padding: '40px',
         textAlign: 'center',
         backgroundColor: 'var(--bg-primary)',
         color: 'var(--text-primary)'
@@ -785,7 +829,7 @@ const TaskList: React.FC<TaskListProps> = ({
         </div>
         <h2 style={{ marginBottom: '16px' }}>Erro ao carregar dados</h2>
         <p style={{ marginBottom: '24px', color: 'var(--text-secondary)' }}>{dataError}</p>
-        <button 
+        <button
           onClick={() => window.location.reload()}
           style={{
             padding: '10px 20px',
@@ -821,7 +865,7 @@ const TaskList: React.FC<TaskListProps> = ({
         `}
       </style>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        
+
         {/* Breadcrumb / Navigation */}
         {(selectedProject || finalSelectedParentTask) && (
           <div style={{
@@ -835,20 +879,20 @@ const TaskList: React.FC<TaskListProps> = ({
             flexWrap: 'wrap',
             fontSize: '14px'
           }}>
-            <span 
+            <span
               onClick={onBackToProjects}
               style={{ cursor: 'pointer', color: 'var(--accent-color)', fontWeight: 500 }}
             >
               Projetos
             </span>
-            
+
             {selectedProject && (
               <>
                 <span style={{ color: 'var(--text-tertiary)' }}>›</span>
-                <span 
+                <span
                   onClick={finalSelectedParentTask ? backToParentHandler : undefined}
-                  style={{ 
-                    cursor: finalSelectedParentTask ? 'pointer' : 'default', 
+                  style={{
+                    cursor: finalSelectedParentTask ? 'pointer' : 'default',
                     color: finalSelectedParentTask ? 'var(--accent-color)' : 'var(--text-primary)',
                     fontWeight: finalSelectedParentTask ? 500 : 600
                   }}
@@ -861,9 +905,9 @@ const TaskList: React.FC<TaskListProps> = ({
             {finalParentHierarchy.map((task, index) => (
               <React.Fragment key={task.id}>
                 <span style={{ color: 'var(--text-tertiary)' }}>›</span>
-                <span 
+                <span
                   onClick={() => index < parentHierarchy.length - 1 && onTaskSelect(task)}
-                  style={{ 
+                  style={{
                     cursor: index < parentHierarchy.length - 1 ? 'pointer' : 'default',
                     color: index < parentHierarchy.length - 1 ? 'var(--accent-color)' : 'var(--text-primary)',
                     fontWeight: index < parentHierarchy.length - 1 ? 500 : 600
@@ -880,21 +924,21 @@ const TaskList: React.FC<TaskListProps> = ({
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h2 style={{ fontSize: '24px', fontWeight: 600, color: 'var(--text-primary)', margin: 0 }}>
-              {finalSelectedParentTask 
+              {finalSelectedParentTask
                 ? `Subtarefas de: ${finalSelectedParentTask.title}`
-                : selectedProject 
-                  ? `Tarefas do Projeto: ${selectedProject.name}` 
+                : selectedProject
+                  ? `Tarefas do Projeto: ${selectedProject.name}`
                   : 'Todas as Tarefas'}
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '8px 0 0' }}>
               {finalSelectedParentTask
                 ? finalSelectedParentTask.description
-                : selectedProject 
+                : selectedProject
                   ? selectedProject.description
                   : 'Gerencie todas as tarefas de todos os projetos em um único lugar'}
             </p>
           </div>
-          
+
           <div style={{ display: 'flex', gap: '12px' }}>
             {finalSelectedParentTask && (
               <Button
@@ -925,10 +969,10 @@ const TaskList: React.FC<TaskListProps> = ({
         </div>
 
         {/* Quadros de Terminal - Analista e Programador */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 1fr', 
-          gap: '20px', 
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '20px',
           marginBottom: '24px'
         }}>
           {/* Quadro do Analista */}
@@ -971,8 +1015,8 @@ const TaskList: React.FC<TaskListProps> = ({
                 Arquitetos AI
               </div>
             </div>
-            
-            <div 
+
+            <div
               ref={analistaRef}
               style={{
                 flex: 1,
@@ -991,7 +1035,7 @@ const TaskList: React.FC<TaskListProps> = ({
             >
               {analistaTerminal ? (
                 <>
-                  <div style={{ 
+                  <div style={{
                     position: 'absolute',
                     top: '16px',
                     right: '16px',
@@ -1038,7 +1082,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 </div>
               )}
             </div>
-            
+
             <div style={{
               fontSize: '11px',
               color: 'var(--text-tertiary)',
@@ -1117,8 +1161,8 @@ const TaskList: React.FC<TaskListProps> = ({
                 Programador AI
               </div>
             </div>
-            
-            <div 
+
+            <div
               ref={programadorRef}
               style={{
                 flex: 1,
@@ -1137,7 +1181,7 @@ const TaskList: React.FC<TaskListProps> = ({
             >
               {programadorTerminal ? (
                 <>
-                  <div style={{ 
+                  <div style={{
                     position: 'absolute',
                     top: '16px',
                     right: '16px',
@@ -1184,7 +1228,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 </div>
               )}
             </div>
-            
+
             <div style={{
               fontSize: '11px',
               color: 'var(--text-tertiary)',
@@ -1454,7 +1498,7 @@ const TaskList: React.FC<TaskListProps> = ({
               Preencha os campos abaixo para adicionar uma nova tarefa ao projeto
             </p>
           </div>
-            
+
             {/* Exibição de erro */}
             {error && (
               <div style={{
@@ -1475,7 +1519,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 </div>
               </div>
             )}
-            
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '16px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: '#333', marginBottom: '8px' }}>
@@ -1693,9 +1737,9 @@ const TaskList: React.FC<TaskListProps> = ({
                   value={newTaskData.parentTaskId || ''}
                   onChange={(e) => {
                     const value = e.target.value;
-                    setNewTaskData({ 
-                      ...newTaskData, 
-                      parentTaskId: value === '' ? null : value 
+                    setNewTaskData({
+                      ...newTaskData,
+                      parentTaskId: value === '' ? null : value
                     });
                   }}
                   style={{
@@ -1806,11 +1850,11 @@ const TaskList: React.FC<TaskListProps> = ({
 
       {/* Lista de Tarefas */}
       <div>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '16px' 
+          marginBottom: '16px'
         }}>
           <h2 style={{ fontSize: '20px', fontWeight: 600, color: '#333' }}>
             Tarefas ({filteredTasks.length})
