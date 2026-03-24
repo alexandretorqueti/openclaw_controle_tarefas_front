@@ -44,7 +44,7 @@ const TaskSummary: React.FC<TaskSummaryProps> = ({ task, onNavigateToSubtask, on
     if (task.isCompleted) return 'Concluída';
     if (task.hasChildExecuting) return 'Filhos em Execução';
     if (task.isExecuting) return 'Em Execução';
-    if (task.statusId === 'cancelled') return 'Cancelada';
+    
     return 'Pendente';
   };
 

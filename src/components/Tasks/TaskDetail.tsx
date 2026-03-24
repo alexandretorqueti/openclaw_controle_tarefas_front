@@ -2,11 +2,20 @@ import React from 'react';
 import './TaskDetail.css';
 
 // Definição das interfaces
+interface Status {
+  id: string;
+  name: string;
+  colorCode: string;
+  isFinalState: boolean;
+  visibleToAi: boolean;
+  order: number;
+}
+
 interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
+  status: Status;
 }
 
 interface Comment {
@@ -45,7 +54,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({ task, comments, logs, files }) 
       <div className="task-header">
         <h2 className="task-title">{task.title}</h2>
         <div className="task-meta">
-          <span className={`task-status ${task.status}`}>{task.status}</span>
+          <span className={`task-status ${task.status.name}`}>{task.status.name}</span>
         </div>
       </div>
 
