@@ -3,6 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { SSEProvider } from './contexts/SSEContext';
 import AppRoutes from './routes';
+import { reportErrorToBackend } from './utils/errorReporter'; // <-- 1. Importe aqui
+
 
 // Error Boundary
 class ErrorBoundary extends Component<
@@ -18,9 +20,16 @@ class ErrorBoundary extends Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log error to console or error reporting service
+componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Esse console.error já estava aí
     console.error('Error caught by ErrorBoundary:', error, errorInfo);
+
+    reportErrorToBackend({
+      type: 'React Component Error',
+      message: error.message,
+      stack: errorInfo.componentStack || error.stack
+    });
+    // ---------------------------
   }
 
   render() {

@@ -4,7 +4,7 @@ import api from '../services/api';
 import { Task, User, Status, Priority } from '../types';
 import { getBackendBaseUrl } from '../config/api';
 import TaskCard from './TaskCard';
-import TaskDetail from './TaskDetail'; // Adicionar import do TaskDetail
+import TaskDetail from './Tasks/TaskDetail'; // Adicionar import do TaskDetail
 import FormModal from './shared/FormModal'; // Adicionar import do FormModal
 import Card from './shared/Card';
 import Button from './shared/Button';
@@ -91,6 +91,8 @@ const TaskList: React.FC<TaskListProps> = ({
 
   // Estados para dados quando não são fornecidos via props
   const [tasks, setTasks] = useState<Task[]>(propTasks);
+  const [taskInclusionSemaphore, setTaskInclusionSemaphore] = useState(false);
+  const [taskInInclusion, setTaskInInclusion] = useState<Task>();
   const [users, setUsers] = useState<User[]>(propUsers);
   const [statuses, setStatuses] = useState<Status[]>(propStatuses);
   const [priorities, setPriorities] = useState<Priority[]>(propPriorities);
@@ -98,7 +100,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const [selectedProject, setSelectedProject] = useState<Project | null>(propSelectedProject);
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
-  const [agents, setAgents] = useState<Agent[]>([]);
+  const [agents, setAgents] = useState<any[]>([]);
 
   // Estado para controle do modal de detalhes da tarefa
   const [selectedTaskDetail, setSelectedTaskDetail] = useState<Task | null>(null);
@@ -544,7 +546,13 @@ const TaskList: React.FC<TaskListProps> = ({
       
       if (shouldAddTask) {
         console.log('🆕 TaskList: Adicionando nova tarefa à lista via SSE:', newTask.id);
-        setTasks(prev => [...prev, newTask]);
+        // Primeiro vamos verificar se a tarefa já não está na lista.
+        if (tasks.some(task => task.id === newTask.id)) {
+          console.log('ℹ️ TaskList: Nova tarefa ja estava na lista, ignorando:', newTask.id);
+          return;
+        }
+        // Se a tarefa ainda não estava na lista, adicione-a
+        setTaskInInclusion(newTask);
       } else {
         console.log('ℹ️ TaskList: Nova tarefa não pertence ao contexto atual, ignorando:', newTask.id);
       }
@@ -660,6 +668,24 @@ const TaskList: React.FC<TaskListProps> = ({
     return tasks?.filter(task => task.statusId === statusId).length || 0;
   };
 
+  useEffect(() => {
+    if (!taskInclusionSemaphore && taskInInclusion) {
+      setTaskInclusionSemaphore(true);
+      
+      setTimeout(() => {
+        if (taskInInclusion) {
+          const jaTemaTarefaNaLista : boolean = tasks?.some(task => task.id === taskInInclusion.id);
+          if (!jaTemaTarefaNaLista) {
+            setTasks(prev => [...prev, taskInInclusion]);  
+          }
+          setTaskInInclusion(null);
+        }
+        setTimeout(() => {
+          setTaskInclusionSemaphore(false);
+        }, 100);
+      }, 100);
+    }
+  }, [taskInclusionSemaphore, taskInInclusion]);
   const handleCreateTask = async () => {
     console.log('🆕 TaskList: handleCreateTask chamado', { newTaskData });
 
@@ -685,7 +711,7 @@ const TaskList: React.FC<TaskListProps> = ({
 
       console.log('📤 TaskList: Dados finais para criação:', taskData);
 
-      let createdTask: unknown;
+      let createdTask: Task | null = null;
 
       // Se a prop onCreateTask foi fornecida e não é a função padrão, use-a
       if (onCreateTask && onCreateTask !== NOOP_ASYNC_TASK_FN) {
@@ -700,7 +726,7 @@ const TaskList: React.FC<TaskListProps> = ({
 
         // Atualizar lista local de tarefas
         if (createdTask) {
-          setTasks(prev => [...prev, createdTask]);
+          setTaskInInclusion(createdTask);
         }
       }
 

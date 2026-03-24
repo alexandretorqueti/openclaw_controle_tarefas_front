@@ -1,565 +1,77 @@
-// @ts-nocheck
-import React, { useState, useEffect } from 'react';
-import { TaskComment, User } from '../types';
-import api from '../services/api';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { 
-  FaUser, 
-  FaComment, 
-  FaPaperPlane, 
-  FaEdit, 
-  FaTrash, 
-  FaReply,
-  FaTimes,
-  FaSave,
-  FaChevronDown,
-  FaChevronUp
-} from 'react-icons/fa';
+import React, { useState } from 'react';
+import './CommentsSection.css';
 
-// TESTE DE REGRAS E COMENTÁRIOS: Este componente recebe as regras do projeto e os comentários
-// para verificar se estão sendo enviados corretamente para a IA. Alteração realizada em 25/02/2026.
-
-interface CommentsSectionProps {
-  taskId: string;
-  currentUser: User | null;
+interface Comment {
+  id: string;
+  username: string;
+  content: string;
+  createdAt: Date;
 }
 
-const CommentsSection: React.FC<CommentsSectionProps> = ({ taskId, currentUser }) => {
-  const [comments, setComments] = useState<TaskComment[]>([]);
-  const [newComment, setNewComment] = useState('');
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingContent, setEditingContent] = useState('');
-  const [replyingToCommentId, setReplyingToCommentId] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
+interface CommentsSectionProps {
+  comments: Comment[];
+}
 
-  // Load comments
-  useEffect(() => {
-    loadComments();
-  }, [taskId]);
+const CommentsSection: React.FC<CommentsSectionProps> = ({ comments }) => {
+  const [expandedComments, setExpandedComments] = useState<Record<string, boolean>>({});
 
-  const loadComments = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await api.getCommentsByTask(taskId);
-      // @ts-ignore
-      setComments((response as any).comments || []);
-    } catch (error: any) {
-      console.error('Failed to load comments:', error);
-      setError('Erro ao carregar comentários. Tente novamente.');
-    } finally {
-      setLoading(false);
-    }
+  const toggleCommentExpansion = (id: string) => {
+    setExpandedComments(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
 
-  const handleSubmitComment = async (e: React.FormEvent) => {
-    console.log('[DEBUG CommentsSection] taskId:', taskId, 'newComment:', newComment);
-    e.preventDefault();
-    if (!newComment.trim() || !currentUser) return;
-
-    try {
-      setError(null);
-      const comment = await api.createComment({
-        content: newComment,
-        taskId,
-        userId: currentUser.id
-      });
-      
-      setComments(prev => [...prev, comment.comment]);
-      setNewComment('');
-    } catch (error: any) {
-      console.error('Failed to create comment:', error);
-      setError('Erro ao criar comentário. Tente novamente.');
-    }
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
-  const handleSubmitReply = async (parentCommentId: string) => {
-    if (!replyContent.trim() || !currentUser) return;
-
-    try {
-      setError(null);
-      const comment = await api.createComment({
-        content: replyContent,
-        taskId,
-        userId: currentUser.id,
-        parentCommentId
-      });
-      
-      // Update the parent comment with the new reply
-      setComments(prev => prev.map(comment => {
-        if (comment.id === parentCommentId) {
-          return {
-            ...comment,
-            replies: [...(comment.replies || []), comment.comment]
-          };
-        }
-        return comment;
-      }));
-      
-      setReplyContent('');
-      setReplyingToCommentId(null);
-    } catch (error: any) {
-      console.error('Failed to create reply:', error);
-      setError('Erro ao criar resposta. Tente novamente.');
-    }
-  };
-
-  const handleUpdateComment = async (commentId: string) => {
-    if (!editingContent.trim()) return;
-
-    try {
-      setError(null);
-      const response = await api.updateComment(commentId, {
-        content: editingContent
-      });
-      
-      setComments(prev => prev.map(comment => {
-        if (comment.id === commentId) {
-          return response.comment;
-        }
-        return comment;
-      }));
-      
-      setEditingCommentId(null);
-      setEditingContent('');
-    } catch (error: any) {
-      console.error('Failed to update comment:', error);
-      setError('Erro ao atualizar comentário. Tente novamente.');
-    }
-  };
-
-  const handleDeleteComment = async (commentId: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir este comentário?')) return;
-
-    try {
-      setError(null);
-      await api.deleteComment(commentId);
-      
-      // Remove comment from state
-      setComments(prev => prev.filter(comment => comment.id !== commentId));
-    } catch (error: any) {
-      console.error('Failed to delete comment:', error);
-      setError('Erro ao excluir comentário. Tente novamente.');
-    }
-  };
-
-  const toggleReplies = (commentId: string) => {
-    const newExpanded = new Set(expandedReplies);
-    if (newExpanded.has(commentId)) {
-      newExpanded.delete(commentId);
-    } else {
-      newExpanded.add(commentId);
-    }
-    setExpandedReplies(newExpanded);
-  };
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
-    } catch {
-      return dateString;
-    }
-  };
-
-  const renderComment = (comment: TaskComment, isReply = false) => {
-    const isOwner = currentUser && comment.user?.id === currentUser.id;
-    const hasReplies = comment.replies && comment.replies.length > 0;
-    const isExpanded = expandedReplies.has(comment.id);
-
+  if (!comments || comments.length === 0) {
     return (
-      <div key={comment.id} style={{
-        marginBottom: '16px',
-        marginLeft: isReply ? '32px' : '0',
-        padding: '16px',
-        backgroundColor: 'var(--bg-card)',
-        borderRadius: '8px',
-        border: '1px solid #e9ecef',
-        position: 'relative'
-      }}>
-        {/* Comment header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {comment.user?.avatarUrl ? (
-              <img 
-                src={comment.user.avatarUrl} 
-                alt={comment.user.name}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  objectFit: 'cover'
-                }}
-              />
-            ) : (
-              <div style={{
-                width: '32px',
-                height: '32px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--bg-card)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <FaUser size={16} color="var(--accent-color)" />
-              </div>
-            )}
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
-                {comment.user?.name || 'Usuário desconhecido'}
-              </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
-                {formatDate(comment.createdAt)}
-                {comment.createdAt !== comment.updatedAt && ' (editado)'}
-              </div>
-            </div>
-          </div>
-
-          {/* Comment actions */}
-          {!isReply && currentUser && (
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {isOwner && (
-                <button
-                  onClick={() => {
-                    setEditingCommentId(comment.id);
-                    setEditingContent(comment.content);
-                  }}
-                  style={{
-                    padding: '6px 10px',
-                    backgroundColor: 'var(--bg-input)',
-                    color: 'var(--text-primary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <FaEdit size={12} />
-                  Editar
-                </button>
-              )}
-              <button
-                onClick={() => handleDeleteComment(comment.id)}
-                style={{
-                  padding: '6px 10px',
-                  backgroundColor: 'rgba(231, 76, 60, 0.1)',
-                  color: 'var(--danger-color)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                <FaTrash size={12} />
-                Excluir
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Comment content */}
-        {editingCommentId === comment.id ? (
-          <div>
-            <textarea
-              value={editingContent}
-              onChange={(e) => setEditingContent(e.target.value)}
-              rows={3}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                fontSize: '14px',
-                resize: 'vertical',
-                marginBottom: '10px'
-              }}
-            />
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => handleUpdateComment(comment.id)}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: 'var(--success-color)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <FaSave size={14} />
-                Salvar
-              </button>
-              <button
-                onClick={() => {
-                  setEditingCommentId(null);
-                  setEditingContent('');
-                }}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <FaTimes size={14} />
-                Cancelar
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div style={{ 
-            fontSize: '14px', 
-            color: 'var(--text-primary)', 
-            lineHeight: 1.6,
-            marginBottom: '12px'
-          }}>
-            {comment.content}
-          </div>
-        )}
-
-        {/* Reply button */}
-        {!isReply && currentUser && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button
-              onClick={() => {
-                setReplyingToCommentId(comment.id);
-                setReplyContent('');
-              }}
-              style={{
-                padding: '6px 12px',
-                backgroundColor: 'var(--bg-input)',
-                color: 'var(--text-secondary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '4px',
-                fontSize: '12px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <FaReply size={12} />
-              Responder
-            </button>
-
-            {/* Show replies toggle */}
-            {hasReplies && (
-              <button
-                onClick={() => toggleReplies(comment.id)}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-secondary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '4px',
-                  fontSize: '12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                {isExpanded ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
-                {comment.replies?.length || 0} resposta{comment.replies?.length !== 1 ? 's' : ''}
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Reply form */}
-        {replyingToCommentId === comment.id && (
-          <div style={{ marginTop: '16px' }}>
-            <textarea
-              value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
-              placeholder="Digite sua resposta..."
-              rows={3}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                fontSize: '14px',
-                resize: 'vertical',
-                marginBottom: '10px'
-              }}
-            />
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button
-                onClick={() => handleSubmitReply(comment.id)}
-                disabled={!replyContent.trim()}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: replyContent.trim() ? 'var(--accent-color)' : 'var(--text-secondary)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  cursor: replyContent.trim() ? 'pointer' : 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <FaPaperPlane size={14} />
-                Enviar resposta
-              </button>
-              <button
-                onClick={() => {
-                  setReplyingToCommentId(null);
-                  setReplyContent('');
-                }}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <FaTimes size={14} />
-                Cancelar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Replies */}
-        {isExpanded && hasReplies && (
-          <div style={{ marginTop: '16px' }}>
-            {comment.replies?.map(reply => renderComment(reply, true))}
-          </div>
-        )}
-      </div>
-    );
-  };
-
-  if (loading) {
-    return (
-      <div style={{ padding: '40px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-        Carregando comentários...
+      <div className="comments-section">
+        <h3>Comentários</h3>
+        <p className="no-comments">Nenhum comentário ainda.</p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '24px' }}>
-      <h3 style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <FaComment size={18} />
-        Comentários ({comments.length})
-      </h3>
+    <div className="comments-section">
+      <h3>Comentários</h3>
+      <div className="comments-list">
+        {comments.map((comment) => {
+          const isExpanded = expandedComments[comment.id];
+          const truncatedContent = comment.content.length > 150 
+            ? comment.content.substring(0, 150) + '...' 
+            : comment.content;
 
-      {/* Error message */}
-      {error && (
-        <div style={{
-          backgroundColor: 'var(--bg-card)',
-          border: '1px solid var(--danger-color)',
-          color: 'var(--danger-color)',
-          padding: '16px',
-          borderRadius: '8px',
-          marginBottom: '20px'
-        }}>
-          {error}
-        </div>
-      )}
-
-      {/* New comment form */}
-      {currentUser ? (
-        <div style={{ marginBottom: '32px' }}>
-          <form onSubmit={handleSubmitComment}>
-            <textarea
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Adicione um comentário..."
-              rows={4}
-              style={{
-                width: '100%',
-                padding: '16px',
-                border: '1px solid var(--border-color)',
-                borderRadius: '8px',
-                fontSize: '14px',
-                resize: 'vertical',
-                marginBottom: '12px'
-              }}
-            />
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button
-                type="submit"
-                disabled={!newComment.trim()}
-                style={{
-                  padding: '12px 24px',
-                  backgroundColor: newComment.trim() ? 'var(--accent-color)' : 'var(--text-secondary)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  cursor: newComment.trim() ? 'pointer' : 'not-allowed',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <FaPaperPlane size={14} />
-                Enviar comentário
-              </button>
+          return (
+            <div key={comment.id} className="comment-item">
+              <div className="comment-header">
+                <span className="comment-username">{comment.username}</span>
+                <span className="comment-date">{formatDate(comment.createdAt)}</span>
+              </div>
+              <div className="comment-content">
+                {isExpanded ? comment.content : truncatedContent}
+              </div>
+              {comment.content.length > 150 && (
+                <button 
+                  className="read-more-btn"
+                  onClick={() => toggleCommentExpansion(comment.id)}
+                >
+                  {isExpanded ? 'Mostrar menos' : 'Ler mais...'}
+                </button>
+              )}
             </div>
-          </form>
-        </div>
-      ) : (
-        <div style={{
-          backgroundColor: 'var(--bg-input)',
-          padding: '20px',
-          borderRadius: '8px',
-          textAlign: 'center',
-          marginBottom: '24px',
-          color: 'var(--text-secondary)'
-        }}>
-          Faça login para adicionar comentários.
-        </div>
-      )}
-
-      {/* Comments list */}
-      {comments.length === 0 ? (
-        <div style={{
-          backgroundColor: 'var(--bg-input)',
-          padding: '40px',
-          borderRadius: '8px',
-          textAlign: 'center',
-          color: 'var(--text-secondary)'
-        }}>
-          <FaComment size={32} style={{ marginBottom: '12px', opacity: 0.5 }} />
-          <div style={{ fontSize: '16px', marginBottom: '8px' }}>Nenhum comentário ainda</div>
-          <div style={{ fontSize: '14px' }}>Seja o primeiro a comentar!</div>
-        </div>
-      ) : (
-        <div>
-          {comments.map(comment => renderComment(comment))}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 };

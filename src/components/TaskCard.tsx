@@ -151,7 +151,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (!onUpdateTask) return;
 
     setIsUpdating(true);
-    setError(null); // Limpa erros anterior
+    setError(null); // Limpa erros anteriores
 
     try {
       const newValue = e.target.value === '' ? null : e.target.value;

@@ -1,190 +1,124 @@
-// src/components/Tasks/TaskDetail.tsx
 import React from 'react';
 import './TaskDetail.css';
-import { Task, Comment, Log, File, TaskDetailProps } from '../../types/tasks';
-import { Agent } from '../../types/agent'; // Supondo que Agent type exista e seja necessário
 
-// Mock data for demonstration if actual data fetching is not yet implemented
-const mockTask: Task = {
-  id: 'task-123',
-  projectId: 'proj-abc',
-  parentTaskId: null,
-  title: 'Implementar TaskDetail Component',
-  description: 'Criar o componente TaskDetail em React com TypeScript, incluindo layout básico e estilização tema escuro.',
-  statusId: 'status-running',
-  priorityId: 'priority-high',
-  createdById: 'user-1',
-  assignedToId: 'user-1',
-  deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-  position: 1,
-  isCompleted: false,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  agent: 'Jarbas',
-  domain: 'Frontend',
-  isDecomposed: false,
-  isAtomic: true,
-  isExecuting: false,
-  // Recurrence fields not set for this task
-  isRecurring: false,
-  recurrenceType: null,
-  recurrenceTimes: null,
-  recurrenceDays: null,
-  lastExecutedAt: null,
-  nextExecutionAt: null,
-  // Default values for other fields
-  arquitetosPromptContent: null,
-  arquitetosAnalysisContent: null,
-  arquitetosTerminalContent: null,
-  programadorTerminalContent: null,
-  programadorReportContent: null,
-};
+// Definição das interfaces
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: 'pending' | 'in-progress' | 'completed' | 'cancelled';
+}
 
-const mockComments: Comment[] = [
-  {
-    id: 'comment-1',
-    author: 'Alexandre Torqueti',
-    authorAvatar: '/public/avatars/alexandre.png',
-    text: 'Excelente trabalho com o componente!',
-    createdAt: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(), // 1 hour ago
-  },
-  {
-    id: 'comment-2',
-    author: 'Igor',
-    authorAvatar: '/public/avatars/igor.png',
-    text: 'A interface está bem intuitiva. Ótima aplicação do tema escuro.',
-    createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(), // 30 minutes ago
-  },
-];
+interface Comment {
+  id: string;
+  text: string;
+  author: string;
+  timestamp: string;
+}
 
-const mockLogs: Log[] = [
-  {
-    id: 'log-1',
-    timestamp: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
-    level: 'INFO',
-    message: 'Componente TaskDetail renderizado com sucesso.'
-  },
-  {
-    id: 'log-2',
-    timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
-    level: 'DEBUG',
-    message: 'Verificando dados de comentários.'
-  }
-];
+interface Log {
+  id: string;
+  level: 'INFO' | 'DEBUG' | 'WARN' | 'ERROR';
+  message: string;
+  timestamp: string;
+}
 
-const mockFiles: File[] = [
-  {
-    id: 'file-1',
-    name: 'task_detail_spec.ts',
-    size: '2KB',
-    mimeType: 'text/plain'
-  },
-  {
-    id: 'file-2',
-    name: 'screenshot.png',
-    size: '150KB',
-    mimeType: 'image/png',
-    url: '/public/attachments/task-123/screenshot.png'
-  }
-];
+interface File {
+  id: string;
+  name: string;
+  url: string;
+  size: string;
+  type: string;
+}
 
-// Mock de um objeto Agent para o avatar, se necessário
-const mockAgent: Agent = {
-  id: 'agent-1',
-  identity: {
-    name: 'Jarbas',
-    avatar: '/public/avatars/jarbas.png',
-    model: 'deepseek-chat',
-  },
-  bindings: 0,
-  bindingsList: [],
-  workspace: '/home/alexandrebragatorqueti/agentes/jarbas'
-};
-
-// Props para o componente TaskDetail
-const taskDetailProps: TaskDetailProps = {
-  task: mockTask,
-  comments: mockComments,
-  logs: mockLogs,
-  files: mockFiles,
-};
+// Interface de props do componente
+interface TaskDetailProps {
+  task: Task;
+  comments: Comment[];
+  logs: Log[];
+  files: File[];
+}
 
 const TaskDetail: React.FC<TaskDetailProps> = ({ task, comments, logs, files }) => {
-  // Estado para controlar a visibilidade dos detalhes (opcional)
-  const [showDetails, setShowDetails] = React.useState(true);
-
-  // Handler para fechar o modal (se fosse um modal)
-  const handleClose = () => {
-    console.log('Closing Task Detail');
-  };
-
   return (
-    <div className="task-detail-container">
-      {/* Header da Tarefa */}
-      <div className="task-detail-header">
-        <div className="task-title">{task.title}</div>
+    <div className="task-detail">
+      <div className="task-header">
+        <h2 className="task-title">{task.title}</h2>
         <div className="task-meta">
-          <span className="task-id">ID: {task.id}</span>
-          <span className={`task-status ${task.statusId}`}>{task.statusId}</span> {/* Usando statusId diretamente para exemplo */}
+          <span className={`task-status ${task.status}`}>{task.status}</span>
         </div>
       </div>
 
-      {/* Corpo da Tarefa */}
-      <div className="task-detail-body">
-        <div className="task-description">
-          <h3>Descrição</h3>
-          <p>{task.description}</p>
-        </div>
+      <div className="task-description">
+        <h3>Descrição</h3>
+        <p>{task.description}</p>
+      </div>
 
-        {/* Comentários */}
-        <div className="comments-section">
-          <h3>Comentários (<span className="comment-count">{comments.length}</span>)</h3>
-          {comments.map((comment) => (
-            <div key={comment.id} className="comment-item">
-              <div className="comment-header">
-                <img src={comment.authorAvatar || '/public/avatars/default-avatar.png'} alt="Avatar" className="comment-avatar" /> {/* Avatar padrão */}
-                <span className="comment-author">{comment.author}</span>
-                <span className="comment-date">{new Date(comment.createdAt).toLocaleString()}</span> {/* Formatando data */}
+      {comments !== undefined && comments.length > 0 ? (
+        <div className="task-comments">
+          <h3>Comentários</h3>
+          <div className="comments-list">
+            {comments.map(comment => (
+              <div key={comment.id} className="comment-item">
+                <div className="comment-author">{comment.author}</div>
+                <div className="comment-text">{comment.text}</div>
+                <div className="comment-timestamp">{comment.timestamp}</div>
               </div>
-              <div className="comment-content">{comment.text}</div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      ) : (
+        <div className="task-comments empty">
+          <h3>Comentários</h3>
+          <p>Sem comentários</p>
+        </div>
+      )}
 
-        {/* Logs de Execução */}
-        <div className="logs-section">
-          <h3>Logs ({logs.length})</h3>
-          {logs.map((log) => (
-            <div key={log.id} className={`log-item log-${log.level.toLowerCase()}`}>
-              <span className="log-timestamp">{new Date(log.timestamp).toLocaleString()}</span>
-              <span className={`log-level log-${log.level.toLowerCase()}`}>{log.level}</span> {/* Usando level em minúsculo para classe CSS */}
-              <span className="log-message">{log.message}</span>
-            </div>
-          ))}
+      {logs !== undefined && logs.length > 0 ? (
+        <div className="task-logs">
+          <h3>Logs</h3>
+          <div className="logs-list">
+            {logs.map(log => (
+              <div key={log.id} className={`log-item log-${log.level.toLowerCase()}`}>
+                <span className="log-level">{log.level}</span>
+                <span className="log-message">{log.message}</span>
+                <span className="log-timestamp">{log.timestamp}</span>
+              </div>
+            ))}
+          </div>
         </div>
+      ) : (
+        <div className="task-logs empty">
+          <h3>Logs</h3>
+          <p>Sem logs registrados</p>
+        </div>
+      )}
 
-        {/* Arquivos Anexos */}
-        <div className="files-section">
-          <h3>Arquivos ({files.length})</h3>
-          {files.map((file) => (
-            <div key={file.id} className="file-item">
-              <span className="file-name">{file.name}</span>
-              <span className="file-size">{file.size}</span>
-              {file.url && (
-                <a href={file.url} download={file.name} className="download-btn">Download</a>
-              )}
-            </div>
-          ))}
+      {files !== undefined && files.length > 0 ? (
+        <div className="task-files">
+          <h3>Arquivos Anexos</h3>
+          <div className="files-list">
+            {files.map(file => (
+              <div key={file.id} className="file-item">
+                <a href={file.url} target="_blank" rel="noopener noreferrer" className="file-link">
+                  {file.name}
+                </a>
+                <span className="file-size">{file.size}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="task-files empty">
+          <h3>Arquivos Anexos</h3>
+          <p>Sem arquivos anexos</p>
+        </div>
+      )}
 
-      {/* Footer */}
-      <div className="task-detail-footer">
-        <div className="task-actions">
-          <button className="btn-edit">Editar</button>
-          <button className="btn-delete">Excluir</button>
-          <button className="btn-close" onClick={handleClose}>Fechar</button>
-        </div>
+      <div className="task-footer">
+        <button className="btn-edit">Editar</button>
+        <button className="btn-delete">Excluir</button>
+        <button className="btn-close">Fechar</button>
       </div>
     </div>
   );

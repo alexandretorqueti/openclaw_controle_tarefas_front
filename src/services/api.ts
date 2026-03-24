@@ -1,6 +1,7 @@
 import { convertToCamelCase, convertToSnakeCase } from '../types';
 import { getApiUrl } from '../config/api';
 import { Project } from '../types/project';
+import { reportErrorToBackend, flushPendingErrors } from '../utils/errorReporter';
 
 // Type definitions for API parameters
 interface ProjectData {
@@ -142,74 +143,82 @@ class ApiService {
 
   constructor() {
     this.baseUrl = getApiBaseUrl();
+    
+    // 2. Tenta limpar a gaveta de erros logo que o serviço de API é iniciado!
+    flushPendingErrors();
   }
 
   async request<T>(endpoint: string, options: any = {}, skipJsonProcessing: boolean = false) : Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
+    // ... (Mantenha a configuração de defaultOptions e config intactas) ...
     const defaultOptions: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include' as RequestCredentials, // Include cookies for session authentication
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include' as RequestCredentials,
     };
 
     const config = {
       ...defaultOptions,
       ...options,
-      headers: {
-        ...defaultOptions.headers,
-        ...options.headers,
-      },
+      headers: { ...defaultOptions.headers, ...options.headers },
     };
 
-    // For FormData, remove Content-Type header so browser can set it with boundary
     if (config.body instanceof FormData) {
       delete config.headers['Content-Type'];
     }
 
-    // Convert request body to snake_case if present and not FormData
     console.log('[DEBUG api.ts] Body antes snake_case:', config.body);
     if (config.body && typeof config.body === 'string' && !skipJsonProcessing) {
+      // ... (Mantenha a lógica de snake_case idêntica) ...
       try {
         const parsedBody = JSON.parse(config.body);
-        console.log('[DEBUG api.ts] parsedBody:', parsedBody);
-        
-        // Remove campos undefined para evitar problemas, mantendo booleanos (false)
         const cleanedBody = Object.fromEntries(
           Object.entries(parsedBody).filter(([_, value]) => value !== undefined)
         );
-        
         const snakeCaseBody = convertToSnakeCase(cleanedBody);
-        console.log('[DEBUG api.ts] Body depois snake_case:', JSON.stringify(snakeCaseBody));
         config.body = JSON.stringify(snakeCaseBody);
       } catch (error) {
-        // If body is not valid JSON, leave it as is
         console.warn('Failed to parse request body for snake_case conversion:', error);
       }
     }
 
+    // 3. A MÁGICA ACONTECE AQUI: Separamos o fetch em um try...catch próprio
+    let response: Response;
     try {
-      const response = await fetch(url, config);
-      
-      if (!response.ok) {
-        const error = await response.json().catch(() => ({
-          error: `HTTP error ${response.status}`,
-        }));
-        throw new Error(error.error || `HTTP error ${response.status}`);
-      }
-
-      const data = await response.json();
-      
-      // Convert response data to camelCase
-      return convertToCamelCase(data);
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw error;
+      response = await fetch(url, config);
+    } catch (networkError: any) {
+      // Se cair aqui, a requisição NUNCA chegou no backend (Offline, CORS, Backend caído)
+      // Portanto, o front-end assume a responsabilidade e gera a tarefa!
+      reportErrorToBackend({
+        type: 'Network Error',
+        message: `Falha de rede ao tentar acessar ${endpoint}: ${networkError.message}`,
+        stack: networkError.stack
+      });
+      console.error('API network request failed:', networkError);
+      throw networkError; // Continua quebrando para a tela mostrar o erro
     }
-  }
 
-  // Project endpoints
+    // Se a requisição chegou até aqui, a rede está funcionando!
+    // Aproveitamos a carona para esvaziar qualquer erro que estivesse preso na gaveta
+    if (response.ok) {
+      flushPendingErrors();
+    }
+
+    // 4. Tratamento de erros de API (onde o backend já sabe do erro)
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({
+        error: `HTTP error ${response.status}`,
+      }));
+      
+      // NÃO chamamos reportErrorToBackend aqui, pois o backend (ErrorMiddleware) 
+      // já capturou esse 400/500 e já criou a tarefa lá do lado dele!
+      throw new Error(errorData.error || `HTTP error ${response.status}`);
+    }
+
+    const data = await response.json();
+    return convertToCamelCase(data);
+  }  // Project endpoints
+  
   async getProjects() {
     return this.request('/projects');
   }
@@ -225,14 +234,20 @@ class ApiService {
     });
   }
 
-  async updateProject(id: string, data: UpdateProjectData) {
-    const response = await this.request(`/projects/${id}`, {
+  async updateProject(id: string, data: UpdateProjectData): Promise<Project> {
+    type UpdateResponse = Project | { message: string; project: Project; correlationId?: string };
+    
+    const response = await this.request<UpdateResponse>(`/projects/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
+
+    if ('project' in response && response.project) {
+      return response.project; // É o wrapper, retornamos apenas o projeto
+    }
     // A API retorna { message, project, correlationId }
     // Precisamos retornar apenas o projeto
-    return response.project || response;
+    return response as Project;
   }
 
   async deleteProject(id: string) {
