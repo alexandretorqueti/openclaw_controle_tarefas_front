@@ -276,3 +276,11 @@ export function convertToSnakeCase<T>(obj: any): T {
   
   return obj;
 }
+
+// Export task-related types for components
+export type TaskDetailProps = {
+  task: Task;
+  comments: Comment[];
+  logs: Log[];
+  files: File[];
+};

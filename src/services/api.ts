@@ -1,5 +1,6 @@
 import { convertToCamelCase, convertToSnakeCase } from '../types';
 import { getApiUrl } from '../config/api';
+import { Project } from '../types/project';
 
 // Type definitions for API parameters
 interface ProjectData {
@@ -143,7 +144,7 @@ class ApiService {
     this.baseUrl = getApiBaseUrl();
   }
 
-  async request(endpoint: string, options: any = {}, skipJsonProcessing: boolean = false) {
+  async request<T>(endpoint: string, options: any = {}, skipJsonProcessing: boolean = false) : Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
     const defaultOptions: RequestInit = {
@@ -213,8 +214,8 @@ class ApiService {
     return this.request('/projects');
   }
 
-  async getProject(id: string) {
-    return this.request(`/projects/${id}`);
+  async getProject(id: string) : Promise<{ project : Project }> {
+    return this.request<{ project : Project}>(`/projects/${id}`);
   }
 
   async createProject(data: ProjectData) {

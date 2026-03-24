@@ -187,7 +187,7 @@ const AppRoutes = () => {
             onBackToProjects={() => {
               console.log('\n🔙 [ROUTES] onBackToProjects chamada');
               // Navega para a página de projetos
-              const navigate = typeof window !== 'undefined' ? (window['navigate'] as any) : null;
+              const navigate = typeof window !== 'undefined' ? (window['navigate']) : null;
               if (navigate && typeof navigate === 'function') {
                 navigate('/projects');
                 console.log('\n🔙 [ROUTES] Navegando para /projects via useNavigate');

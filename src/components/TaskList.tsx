@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { Task, User, Status, Priority, Project, Agent } from '../types';
+import { Task, User, Status, Priority } from '../types';
 import { getBackendBaseUrl } from '../config/api';
 import TaskCard from './TaskCard';
 import TaskDetail from './TaskDetail'; // Adicionar import do TaskDetail
@@ -11,6 +11,7 @@ import Button from './shared/Button';
 import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle, FaArrowUp } from 'react-icons/fa';
 import { safeParseDate } from '../utils/dateUtils';
 import { useSSE } from '../contexts/SSEContext';
+import { Project } from '../types/project';
 
 // Funções vazias padrão para comparação
 const NOOP_FN = () => {};
@@ -281,9 +282,10 @@ const TaskList: React.FC<TaskListProps> = ({
         if (projectId && !propSelectedProject) {
           try {
             console.log('📊 TaskList: Buscando projeto específico:', projectId);
-            const projectData = await api.getProject(projectId);
-            console.log('📊 TaskList: Projeto carregado:', projectData.project?.name);
-            setSelectedProject(projectData.project || projectData);
+            // projectData é um array de projetos
+            const { project } : { project : Project } = await api.getProject(projectId);
+            console.log('📊 TaskList: Projeto carregado:', project?.name);
+            setSelectedProject(project);
           } catch (projectError) {
             console.error('📊 TaskList: Erro ao buscar projeto:', projectError);
           }
@@ -1024,7 +1026,7 @@ const TaskList: React.FC<TaskListProps> = ({
               <React.Fragment key={task.id}>
                 <span style={{ color: 'var(--text-tertiary)' }}>›</span>
                 <span
-                  onClick={() => index < parentHierarchy.length - 1 && onTaskSelect(task)}
+                  onClick={() => index < parentHierarchy.length - 1 && onTaskSelect(task, setSelectedTaskDetail, setShowTaskDetailModal)}
                   style={{
                     cursor: index < parentHierarchy.length - 1 ? 'pointer' : 'default',
                     color: index < parentHierarchy.length - 1 ? 'var(--accent-color)' : 'var(--text-primary)',

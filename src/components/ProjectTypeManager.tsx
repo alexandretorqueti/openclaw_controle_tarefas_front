@@ -17,6 +17,9 @@ const ProjectTypeManager: React.FC = () => {
     color: '#9D4EDD' // Cor padrão
   });
 
+  // Form visibility state
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
   // Paleta de cores
   const colorPalette = [
     '#9D4EDD', // Roxo
@@ -88,6 +91,9 @@ const ProjectTypeManager: React.FC = () => {
         baseRules: '',
         color: '#9D4EDD'
       });
+
+      // Close form
+      setShowCreateForm(false);
 
       // Reload project types
       loadProjectTypes();
@@ -187,6 +193,14 @@ const ProjectTypeManager: React.FC = () => {
     <div className="project-type-manager">
       <div className="project-type-header">
         <h1>Gerenciar Tipos de Projeto</h1>
+        {!showCreateForm && (
+          <button 
+            className="add-project-type-button"
+            onClick={() => setShowCreateForm(true)}
+          >
+            Incluir Tipo de Projeto
+          </button>
+        )}
       </div>
 
       {/* Error message */}
@@ -211,82 +225,92 @@ const ProjectTypeManager: React.FC = () => {
         </div>
       )}
 
-      {/* Create form */}
-      <div className="project-type-form">
-        <div className="form-group">
-          <label>Nome do Tipo *</label>
-          <input
-            type="text"
-            value={newProjectType.name}
-            onChange={(e) => handleNewProjectTypeChange('name', e.target.value)}
-            placeholder="Ex: DEV, MARKETING, VENDAS, DESIGN, IA"
-          />
-          <div className="common-types">
-            <span className="common-types-label">Tipos comuns:</span>
-            {commonTypes.map(type => (
-              <button
-                key={type.name}
-                type="button"
-                onClick={() => loadCommonType(type)}
-                className="common-type-button"
-              >
-                {type.name}
-              </button>
-            ))}
+      {/* Create form - visible only when showCreateForm is true */}
+      {showCreateForm && (
+        <div className="project-type-form">
+          <div className="form-group">
+            <label>Nome do Tipo *</label>
+            <input
+              type="text"
+              value={newProjectType.name}
+              onChange={(e) => handleNewProjectTypeChange('name', e.target.value)}
+              placeholder="Ex: DEV, MARKETING, VENDAS, DESIGN, IA"
+            />
+            <div className="common-types">
+              <span className="common-types-label">Tipos comuns:</span>
+              {commonTypes.map(type => (
+                <button
+                  key={type.name}
+                  type="button"
+                  onClick={() => loadCommonType(type)}
+                  className="common-type-button"
+                >
+                  {type.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Persona Prompt *</label>
+            <textarea
+              value={newProjectType.personaPrompt}
+              onChange={(e) => handleNewProjectTypeChange('personaPrompt', e.target.value)}
+              placeholder="Ex: Você é um Desenvolvedor Sênior especializado em..."
+              rows={4}
+            />
+            <div className="field-hint">
+              Este texto define "quem a IA é" ao executar tarefas deste tipo
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Regras Base</label>
+            <textarea
+              value={newProjectType.baseRules}
+              onChange={(e) => handleNewProjectTypeChange('baseRules', e.target.value)}
+              placeholder="Ex: 1. Sempre priorize código limpo...&#10;2. Use versionamento..."
+              rows={6}
+            />
+            <div className="field-hint">
+              Regras gerais que serão combinadas com regras específicas de cada projeto
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Cor (Visual)</label>
+            <div className="color-palette">
+              {colorPalette.map(color => (
+                <div
+                  key={color}
+                  className={`color-option ${newProjectType.color === color ? 'selected' : ''}`}
+                  style={{ backgroundColor: color }}
+                  onClick={() => handleColorSelect(color)}
+                  title={color}
+                />
+              ))}
+            </div>
+            <div className="field-hint">
+              Apenas para identificação visual na interface
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button 
+              onClick={handleCreate}
+              disabled={!newProjectType.name.trim() || !newProjectType.personaPrompt.trim() || loading}
+            >
+              Criar Tipo de Projeto
+            </button>
+            <button 
+              onClick={() => setShowCreateForm(false)}
+              className="cancel-button"
+            >
+              Cancelar
+            </button>
           </div>
         </div>
-
-        <div className="form-group">
-          <label>Persona Prompt *</label>
-          <textarea
-            value={newProjectType.personaPrompt}
-            onChange={(e) => handleNewProjectTypeChange('personaPrompt', e.target.value)}
-            placeholder="Ex: Você é um Desenvolvedor Sênior especializado em..."
-            rows={4}
-          />
-          <div className="field-hint">
-            Este texto define "quem a IA é" ao executar tarefas deste tipo
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>Regras Base</label>
-          <textarea
-            value={newProjectType.baseRules}
-            onChange={(e) => handleNewProjectTypeChange('baseRules', e.target.value)}
-            placeholder="Ex: 1. Sempre priorize código limpo...&#10;2. Use versionamento..."
-            rows={6}
-          />
-          <div className="field-hint">
-            Regras gerais que serão combinadas com regras específicas de cada projeto
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>Cor (Visual)</label>
-          <div className="color-palette">
-            {colorPalette.map(color => (
-              <div
-                key={color}
-                className={`color-option ${newProjectType.color === color ? 'selected' : ''}`}
-                style={{ backgroundColor: color }}
-                onClick={() => handleColorSelect(color)}
-                title={color}
-              />
-            ))}
-          </div>
-          <div className="field-hint">
-            Apenas para identificação visual na interface
-          </div>
-        </div>
-
-        <button 
-          onClick={handleCreate}
-          disabled={!newProjectType.name.trim() || !newProjectType.personaPrompt.trim() || loading}
-        >
-          Criar Tipo de Projeto
-        </button>
-      </div>
+      )}
 
       {/* Edit form */}
       {editingProjectType && (
@@ -345,7 +369,7 @@ const ProjectTypeManager: React.FC = () => {
         ) : projectTypes.length === 0 ? (
           <div className="empty-state">
             <p>Nenhum tipo de projeto cadastrado</p>
-            <p>Use o formulário acima para criar o primeiro tipo</p>
+            <p>Clique em "Incluir Tipo de Projeto" para criar o primeiro tipo</p>
           </div>
         ) : (
           projectTypes.map(projectType => {

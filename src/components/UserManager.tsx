@@ -26,6 +26,9 @@ const UserManager: React.FC = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
+  // Form visibility state
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
   // Role options
   const roleOptions = [
     { value: 'Admin', label: 'Administrador', description: 'Acesso total ao sistema', color: '#9D4EDD' },
@@ -114,6 +117,9 @@ const UserManager: React.FC = () => {
       });
       setAvatarFile(null);
       setAvatarPreview(null);
+
+      // Close form
+      setShowCreateForm(false);
 
       // Reload users
       loadUsers();
@@ -253,97 +259,129 @@ const UserManager: React.FC = () => {
         </div>
       )}
 
-      {/* Create form */}
-      <div className="user-form">
-        <div className="form-group">
-          <label>Nome Completo *</label>
-          <input
-            type="text"
-            value={newUser.name}
-            onChange={(e) => handleNewUserChange('name', e.target.value)}
-            placeholder="Ex: João da Silva"
-          />
+      {/* Botão para mostrar formulário de criação */}
+      {!showCreateForm && (
+        <div className="create-user-button-container">
+          <button 
+            onClick={() => setShowCreateForm(true)}
+            className="show-create-form-button"
+          >
+            Incluir Usuário
+          </button>
         </div>
+      )}
 
-        <div className="form-group">
-          <label>Email *</label>
-          <input
-            type="email"
-            value={newUser.email}
-            onChange={(e) => handleNewUserChange('email', e.target.value)}
-            placeholder="Ex: joao@empresa.com"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Apelido (Opcional)</label>
-          <input
-            type="text"
-            value={newUser.nickname}
-            onChange={(e) => handleNewUserChange('nickname', e.target.value)}
-            placeholder="Ex: joaosilva"
-          />
-          <div className="field-hint">
-            Deixe em branco para gerar automaticamente a partir do email
+      {/* Formulário de criação (visível apenas quando showCreateForm for true) */}
+      {showCreateForm && (
+        <div className="user-form">
+          <div className="user-form-header">
+            <h3>Novo Usuário</h3>
+            <button 
+              onClick={() => setShowCreateForm(false)}
+              className="cancel-create-button"
+            >
+              Cancelar
+            </button>
           </div>
-        </div>
-
-        <div className="form-group">
-          <label>Senha *</label>
-          <input
-            type="password"
-            value={newUser.password}
-            onChange={(e) => handleNewUserChange('password', e.target.value)}
-            placeholder="Mínimo 6 caracteres"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Confirmar Senha *</label>
-          <input
-            type="password"
-            value={newUser.confirmPassword}
-            onChange={(e) => handleNewUserChange('confirmPassword', e.target.value)}
-            placeholder="Digite a senha novamente"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Permissão de Acesso</label>
-          <div className="role-palette">
-            {roleOptions.map(option => (
-              <div
-                key={option.value}
-                className={`role-option ${newUser.role === option.value ? 'selected' : ''}`}
-                style={{ backgroundColor: option.color }}
-                onClick={() => handleRoleSelect(option.value)}
-                title={option.description}
-              >
-                <div className="role-option-label">{option.label}</div>
-                <div className="role-option-description">{option.description}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>Avatar (Opcional)</label>
-          <div className="avatar-upload-section">
-            <AvatarUpload
-              currentAvatarUrl={avatarPreview || ''}
-              onAvatarChange={handleAvatarFileSelect}
-              disabled={false}
+          
+          <div className="form-group">
+            <label>Nome Completo *</label>
+            <input
+              type="text"
+              value={newUser.name}
+              onChange={(e) => handleNewUserChange('name', e.target.value)}
+              placeholder="Ex: João da Silva"
             />
           </div>
-        </div>
 
-        <button 
-          onClick={handleCreate}
-          disabled={!newUser.name.trim() || !newUser.email.trim() || !newUser.password || loading}
-        >
-          Criar Usuário
-        </button>
-      </div>
+          <div className="form-group">
+            <label>Email *</label>
+            <input
+              type="email"
+              value={newUser.email}
+              onChange={(e) => handleNewUserChange('email', e.target.value)}
+              placeholder="Ex: joao@empresa.com"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Apelido (Opcional)</label>
+            <input
+              type="text"
+              value={newUser.nickname}
+              onChange={(e) => handleNewUserChange('nickname', e.target.value)}
+              placeholder="Ex: joaosilva"
+            />
+            <div className="field-hint">
+              Deixe em branco para gerar automaticamente a partir do email
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Senha *</label>
+            <input
+              type="password"
+              value={newUser.password}
+              onChange={(e) => handleNewUserChange('password', e.target.value)}
+              placeholder="Mínimo 6 caracteres"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Confirmar Senha *</label>
+            <input
+              type="password"
+              value={newUser.confirmPassword}
+              onChange={(e) => handleNewUserChange('confirmPassword', e.target.value)}
+              placeholder="Digite a senha novamente"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Permissão de Acesso</label>
+            <div className="role-palette">
+              {roleOptions.map(option => (
+                <div
+                  key={option.value}
+                  className={`role-option ${newUser.role === option.value ? 'selected' : ''}`}
+                  style={{ backgroundColor: option.color }}
+                  onClick={() => handleRoleSelect(option.value)}
+                  title={option.description}
+                >
+                  <div className="role-option-label">{option.label}</div>
+                  <div className="role-option-description">{option.description}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label>Avatar (Opcional)</label>
+            <div className="avatar-upload-section">
+              <AvatarUpload
+                currentAvatarUrl={avatarPreview || ''}
+                onAvatarChange={handleAvatarFileSelect}
+                disabled={false}
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button 
+              onClick={handleCreate}
+              disabled={!newUser.name.trim() || !newUser.email.trim() || !newUser.password || loading}
+            >
+              Criar Usuário
+            </button>
+            <button 
+              onClick={() => setShowCreateForm(false)}
+              className="cancel-button"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Edit form */}
       {editingUser && (
@@ -438,7 +476,7 @@ const UserManager: React.FC = () => {
         ) : users.length === 0 ? (
           <div className="empty-state">
             <p>Nenhum usuário cadastrado</p>
-            <p>Use o formulário acima para criar o primeiro usuário</p>
+            <p>Clique em "Incluir Usuário" para criar o primeiro usuário</p>
           </div>
         ) : (
           users.map(user => {

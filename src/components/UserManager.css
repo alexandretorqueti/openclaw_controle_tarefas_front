@@ -47,6 +47,31 @@
   }
 }
 
+/* Container do botão de criação */
+.create-user-button-container {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+/* Botão para mostrar formulário de criação */
+.show-create-form-button {
+  padding: 12px 24px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.show-create-form-button:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 /* Formulário de criação */
 .user-form {
   display: flex;
@@ -57,6 +82,63 @@
   background-color: var(--bg-card);
   border-radius: 8px;
   border: 1px solid var(--border-color);
+}
+
+/* Cabeçalho do formulário de criação */
+.user-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.user-form-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+/* Botão de cancelar no cabeçalho */
+.cancel-create-button {
+  padding: 8px 16px;
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-create-button:hover {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
+}
+
+/* Ações do formulário */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Botão de cancelar nas ações */
+.cancel-button {
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.cancel-button:hover {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
 }
 
 /* Formulário de edição */

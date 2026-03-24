@@ -57,6 +57,7 @@
   background-color: var(--bg-card);
   border-radius: 8px;
   border: 1px solid var(--border-color);
+  animation: slideIn 0.3s ease;
 }
 
 /* Formulário de edição */
@@ -668,4 +669,41 @@ button:active:not(:disabled) {
     flex-direction: column;
     gap: 4px;
   }
+}
+
+/* Botão no cabeçalho */
+.add-project-type-button {
+  padding: 10px 20px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-project-type-button:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+}
+
+/* Ações do formulário */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.cancel-button {
+  background-color: var(--bg-input) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+.cancel-button:hover {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--text-secondary) !important;
 }
