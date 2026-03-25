@@ -29,3 +29,13 @@ export interface Project {
   createdBy?: any;
   tasks?: Task[];
 }
+
+export interface ProjectType {
+  id: string;
+  name: string;
+  personaPrompt: string;
+  baseRules: string;
+  createdAt: string;
+  updatedAt: string;
+  projects?: Project[];
+}

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
-import { Task, User, Status, Priority } from '../types';
+import { Task, Status, Priority } from '../types/tasks';
+import { User } from '../types/user';
+import { Agent } from '../types/agent';
 import { getBackendBaseUrl } from '../config/api';
 import TaskCard from './TaskCard';
 import TaskDetail from './Tasks/TaskDetail'; // Adicionar import do TaskDetail
@@ -100,7 +102,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const [selectedProject, setSelectedProject] = useState<Project | null>(propSelectedProject);
   const [isLoading, setIsLoading] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
-  const [agents, setAgents] = useState<any[]>([]);
+  const [agents, setAgents] = useState<Agent[]>([]);
 
   // Estado para controle do modal de detalhes da tarefa
   const [selectedTaskDetail, setSelectedTaskDetail] = useState<Task | null>(null);
@@ -415,8 +417,20 @@ const TaskList: React.FC<TaskListProps> = ({
       setShowBackToTop(window.scrollY > 300);
     };
     const carregarAgentes = async () => {
-      const response = await api.getAgents();
-      setAgents(response.data || []);
+      try {
+        const response = await api.getAgents();
+        const agentsData: Agent[] = response.data || [];
+        
+        // Ordenar agentes pelo ID em ordem crescente
+        const sortedAgents = [...agentsData].sort((a, b) => {
+          return a.id.localeCompare(b.id);
+        });
+        
+        setAgents(sortedAgents);
+      } catch (error) {
+        console.error('Erro ao carregar agentes:', error);
+        setAgents([]);
+      }
     }
     carregarAgentes();
     window.addEventListener('scroll', handleScroll);
@@ -2035,8 +2049,9 @@ const TaskList: React.FC<TaskListProps> = ({
                     backgroundColor: 'white'
                   }}
                 >
+                  <option value="">Selecione um agente...</option>
                   {agents.length > 0 ? (
-                    agents.map((agent) => (
+                    agents.map((agent: Agent) => (
                       <option key={agent.id} value={agent.id}>
                         {agent.id} {agent.identity?.model ? `(${agent.identity.model})` : ''}
                       </option>
