@@ -5,6 +5,8 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { FaUser, FaCalendarAlt, FaFlag, FaListAlt, FaEdit, FaTrash, FaCheck, FaTimes, FaProjectDiagram, FaExclamationTriangle, FaTasks, FaAtom, FaSpinner, FaCircle } from 'react-icons/fa';
 import { safeParseDate, safeFormatDate } from '../utils/dateUtils';
+import CommentDTO from '../types/CommentDTO';
+import CommentsSection from '../components/CommentsSection';
 
 interface TaskCardProps {
   task: Task;
@@ -13,6 +15,7 @@ interface TaskCardProps {
   priorities: Priority[];
   agents?: Agent[];
   projects: Project[];
+  comments?: CommentDTO[]; // Novas prop de comentários
   onTaskClick: (task: Task) => void;
   onViewSubtasks?: (task: Task) => void;
   onUpdateTask?: (id: string, taskData: Partial<Task>) => Promise<Task>;
@@ -28,6 +31,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   priorities,
   agents = [] as Agent[],
   projects,
+  comments = [] as CommentDTO[],
   onTaskClick,
   onViewSubtasks,
   onUpdateTask,
@@ -649,6 +653,13 @@ if (compact) {
           {task.description || 'Esta tarefa não possui descrição.'}
         </p>
       </div>
+
+      {/* Comments Section */}
+      {onUpdateTask && (
+        <CommentsSection 
+          comments={comments} 
+        />
+      )}
 
       {/* Task metadata */}
       <div style={{

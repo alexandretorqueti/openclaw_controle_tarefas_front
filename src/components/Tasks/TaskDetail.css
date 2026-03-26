@@ -618,6 +618,137 @@
   white-space: pre-line;
 }
 
+.task-detail-comment-text strong {
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.task-detail-comment-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.task-detail-btn-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.task-detail-btn-small:hover {
+  background: #e0e0e0;
+}
+
+.task-detail-btn-small.task-detail-btn-secondary:hover {
+  background: #6c757d;
+}
+
+.task-detail-btn-small.task-detail-btn-danger:hover {
+  background: #e74c3c;
+}
+
+.task-detail-comment-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.task-detail-comment-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #0066ff;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 60px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.task-detail-comment-input:focus {
+  box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+}
+
+.task-detail-comment-actions-small {
+  display: flex;
+  gap: 8px;
+}
+
+.task-detail-comment-error {
+  color: #e74c3c;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.task-detail-comment-success {
+  color: #28a745;
+  font-size: 12px;
+  font-weight: 500;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.task-detail-comment-form {
+  margin-top: 24px;
+  padding: 20px;
+  background: #ffffff;
+  border: 2px solid #0066ff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
+}
+
+.task-detail-comment-form-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.task-detail-comment-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-detail-comment-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0066ff;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.task-detail-comment-user-name {
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 14px;
+}
+
+.task-detail-comment-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  gap: 16px;
+}
+
 /* ==================== HISTORY ==================== */
 
 .task-detail-history {

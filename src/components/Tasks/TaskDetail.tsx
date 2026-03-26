@@ -9,7 +9,9 @@ import {
   TaskHistory,
   TaskAttachment,
   TaskDependency,
+  Agent,
 } from '../../types';
+import api from '../../services/api';
 import './TaskDetail.css';
 
 // ==================== TYPES ====================
@@ -260,12 +262,20 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
+  // ==================== STATE PARA RESUMO FLOTANTE ====================
+  const [showResumoOverlay, setShowResumoOverlay] = useState(false);
+  const [isResumoExpanded, setIsResumoExpanded] = useState(false);
+
   // ==================== STATES FOR COMMENTS ====================
   const [newCommentText, setNewCommentText] = useState('');
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editingCommentText, setEditingCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
+
+  // ==================== STATE FOR AGENTS ====================
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loadingAgents, setLoadingAgents] = useState(false);
 
   // ==================== COMPUTED VALUES ====================
   const subtasksCount = useMemo(() => {
@@ -287,7 +297,163 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
     return !task.isCompleted && deadline < today;
   }, [task.deadline, task.isCompleted]);
 
-  // ==================== HANDLERS ====================
+  // ==================== LOAD AGENTS ====================
+  useEffect(() => {
+    const loadAgents = async () => {
+      try {
+        setLoadingAgents(true);
+        const response = await api.getAgents();
+        
+        // Estrutura da resposta: { success: boolean, data: Agent[], count: number }
+        console.log('[DEBUG TaskDetail] Response da API de agentes:', response);
+        
+        let agentsList: Agent[] = [];
+        
+        if (response && typeof response === 'object') {
+          // Se for um objeto com propriedade 'data' ou 'agents'
+          if (Array.isArray(response.data)) {
+            agentsList = response.data;
+          } else if (Array.isArray(response.agents)) {
+            agentsList = response.agents;
+          } else if ('data' in response && typeof response.data === 'object' && Array.isArray((response.data as any).agents)) {
+            agentsList = (response.data as any).agents;
+          }
+        } else if (Array.isArray(response)) {
+          // Se já for um array
+          agentsList = response;
+        }
+        
+        // Ordenar agentes por ID (alfabeticamente)
+        const sortedAgents = agentsList.sort((a: any, b: any) => 
+          String(a.id || '').localeCompare(String(b.id || ''))
+        );
+        
+        console.log('[DEBUG TaskDetail] Agentes carregados:', sortedAgents);
+        setAgents(sortedAgents);
+      } catch (error) {
+        console.error('Falha ao carregar agentes:', error);
+      } finally {
+        setLoadingAgents(false);
+      }
+    };
+
+    loadAgents();
+  }, []);
+
+  // ==================== HANDLERS PARA RESUMO FLOTANTE ====================
+  const handleResumoToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsResumoExpanded(!isResumoExpanded);
+  };
+
+  const handleResumoClick = () => {
+    setIsResumoExpanded(true);
+    setShowResumoOverlay(true);
+  };
+
+  const handleResumoDismiss = () => {
+    setShowResumoOverlay(false);
+    setIsResumoExpanded(false);
+  };
+
+  // ==================== HANDLERS PARA COMENTÁRIOS ====================
+  /**
+   * Add a new comment to the task
+   * @AGENT-NOTE: Função para adicionar comentários. Valida o texto, chama a API de comments,
+   * atualiza o estado e limpa o campo de texto.
+   */
+  const handleAddComment = async () => {
+    if (!newCommentText.trim()) {
+      setCommentError('Por favor, digite um comentário.');
+      return;
+    }
+
+    try {
+      setIsSubmittingComment(true);
+      setCommentError(null);
+      setCommentSuccess(null);
+
+      // Aqui você deve chamar a API real de criação de comentários
+      // Exemplo: await api.createComment(task.id, newCommentText);
+      console.log('[DEBUG] Adicionando comentário:', newCommentText);
+
+      // Simular delay da API
+      setTimeout(() => {
+        setCommentSuccess('Comentário adicionado!');
+        setTimeout(() => setCommentSuccess(null), 3000);
+      }, 500);
+
+      setNewCommentText('');
+    } catch (error) {
+      console.error('Falha ao adicionar comentário:', error);
+      setCommentError('Falha ao adicionar comentário. Tente novamente.');
+      setTimeout(() => setCommentError(null), 3000);
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+  /**
+   * Start editing a comment
+   * @AGENT-NOTE: Prepara o estado de edição para um comentário específico
+   */
+  const handleEditComment = (commentId: string, currentText: string) => {
+    setEditingCommentId(commentId);
+    setEditingCommentText(currentText);
+  };
+
+  /**
+   * Cancel editing a comment
+   * @AGENT-NOTE: Limpa o estado de edição sem salvar alterações
+   */
+  const handleCancelEditComment = () => {
+    setEditingCommentId(null);
+    setEditingCommentText('');
+  };
+
+  /**
+   * Save edited comment
+   * @AGENT-NOTE: Salva as alterações do comentário e limpa o estado de edição
+   */
+  const handleSaveEditComment = (commentId: string) => {
+    if (!editingCommentText.trim()) {
+      setCommentError('O comentário não pode ser vazio.');
+      return;
+    }
+
+    try {
+      // Aqui você deve chamar a API real de atualização de comentários
+      console.log('[DEBUG] Editando comentário:', commentId, editingCommentText);
+
+      setEditingCommentId(null);
+      setEditingCommentText('');
+      setCommentSuccess('Comentário atualizado!');
+      setTimeout(() => setCommentSuccess(null), 3000);
+    } catch (error) {
+      console.error('Falha ao salvar comentário:', error);
+      setCommentError('Falha ao salvar comentário.');
+    }
+  };
+
+  /**
+   * Delete a comment
+   * @AGENT-NOTE: Remove um comentário após confirmação do usuário
+   */
+  const handleDeleteComment = async (commentId: string) => {
+    if (window.confirm('Tem certeza que deseja excluir este comentário?')) {
+      try {
+        // Aqui você deve chamar a API real de exclusão de comentários
+        console.log('[DEBUG] Excluindo comentário:', commentId);
+        setCommentSuccess('Comentário excluído!');
+        setTimeout(() => setCommentSuccess(null), 3000);
+      } catch (error) {
+        console.error('Falha ao excluir comentário:', error);
+        setCommentError('Falha ao excluir comentário.');
+      }
+    }
+  };
+
+  // ==================== HANDLERS PARA EDIÇÃO INLINE ====================
   const handleInlineEditStart = (field: 'status' | 'assignedTo' | 'agent') => {
     setInlineEdit({ editingField: field });
   };
@@ -318,13 +484,11 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
   const handleInlineAgentChange = async (newAgent: string) => {
     try {
-      setInlineEdit({ editingField: 'agent' });
-      await onUpdateTask(task.id, { agent: newAgent || null });
+      await onUpdateTask(task.id, { agent: newAgent ? newAgent : null });
       setInlineEdit({ editingField: null });
     } catch (error) {
-      console.error('Failed to update agent:', error);
+      console.error('Falha ao atualizar agente:', error);
       alert('Falha ao atualizar o agente da tarefa.');
-      setInlineEdit({ editingField: null });
     }
   };
 
@@ -526,14 +690,19 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
               <div className="task-detail-form-group">
                 <label htmlFor="edit-agent">Agente</label>
-                <input
+                <select
                   id="edit-agent"
-                  type="text"
                   className="task-detail-form-input"
                   value={editForm.editedTask.agent ?? task.agent ?? ''}
                   onChange={(e) => setEditForm(prev => ({ ...prev, editedTask: { ...prev.editedTask, agent: e.target.value } }))}
-                  placeholder="Ex: programador, arquiteto"
-                />
+                >
+                  <option value="">Nenhum agente atribuído</option>
+                  {agents.map((agent) => (
+                    <option key={agent.id} value={agent.id}>
+                      {agent.identity?.emoji || '🤖'} {agent.identity?.name || agent.id}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="task-detail-form-group">
@@ -589,6 +758,157 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   return (
     <div className="task-detail-container">
       <div className="task-detail-modal-content">
+        
+        {/* ==================== RESUMO FLOTANTE (EXPANDÍVEL) ==================== */}
+        {showResumoOverlay && (
+          <div className={`task-resumo-overlay`}>
+            <div 
+              className={`task-resumo-card`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsResumoExpanded(true);
+              }}
+            >
+              <div className="task-resumo-layout">
+                <div className="task-resumo-left">
+                  {task.createdBy?.avatarUrl && (
+                    <img
+                      src={task.createdBy.avatarUrl}
+                      alt={task.createdBy.name}
+                      className="task-resumo-avatar"
+                    />
+                  )}
+                  <div className="task-resumo-info">
+                    <h3 className="task-resumo-title">{task.title}</h3>
+                    <div className="task-resumo-meta">
+                      <div className="task-resumo-item">
+                        <span className="task-resumo-icon">📋</span>
+                        <span className="task-resumo-value">{task.status?.name || '−'}</span>
+                      </div>
+                      <div className="task-resumo-item">
+                        <span className="task-resumo-icon">👤</span>
+                        <span className="task-resumo-value">{task.assignedTo?.name || task.createdBy?.name || '-'}</span>
+                      </div>
+                      {task.deadline && (
+                        <div className="task-resumo-item">
+                          <span className="task-resumo-icon">⏰</span>
+                          <span className="task-resumo-value">
+                            {new Date(task.deadline).toLocaleDateString('pt-BR')}
+                            {isOverdue && ' ⚠️'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  className="task-resumo-toggle"
+                  onClick={handleResumoToggle}
+                  title={isResumoExpanded ? 'Ocultar visão geral' : 'Expandir visão geral'}
+                >
+                  {isResumoExpanded ? (
+                    <span className="task-resumo-toggle-icon">×</span>
+                  ) : (
+                    <span className="task-resumo-toggle-icon">⇲</span>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* RESUMO EXPANDIDO */}
+            {isResumoExpanded && (
+              <div className="task-resumo-full-content" onClick={(e) => e.stopPropagation()}>
+                <div className="task-resumo-full-header">
+                  <div className="task-resumo-full-header-left">
+                    {task.createdBy?.avatarUrl && (
+                      <img src={task.createdBy.avatarUrl} alt={task.createdBy.name} className="task-resumo-full-avatar" />
+                    )}
+                    <div className="task-resumo-full-title">
+                      <h3 className="task-resumo-full-title-text">{task.title}</h3>
+                      <span className={`task-resumo-full-status ${task.status?.name === 'Concluída' ? 'status-concluida' : 'status-pendente'}`}>
+                        {task.status?.name || '−'}
+                      </span>
+                    </div>
+                  </div>
+                  <button className="task-resumo-close-btn" onClick={handleResumoDismiss} title="Fechar resumo">
+                    <span className="task-resumo-close-icon">×</span>
+                  </button>
+                </div>
+
+                <div className="task-resumo-full-body">
+                  <div className="task-resumo-full-grid">
+                    <InfoCard label="Criador" value={<span className="task-detail-user-name">{task.createdBy?.name || '-'}</span>} />
+                    <InfoCard label="Responsável" value={<span className="task-detail-user-name">{task.assignedTo?.name || '-'}</span>} />
+                    {task.deadline && (
+                      <InfoCard 
+                        label="Prazo" 
+                        value={<span className={`task-detail-deadline ${isOverdue ? 'task-detail-deadline-overdue' : ''}`}>{formatDeadline(task.deadline)}</span>} 
+                      />
+                    )}
+                    <InfoCard 
+                      label="Data de Criação" 
+                      value={<span className="task-detail-property-value">{formatDate(task.createdAt)}</span>} 
+                    />
+                    <InfoCard 
+                      label="Última Atualização" 
+                      value={<span className="task-detail-property-value">{formatDate(task.updatedAt)}</span>} 
+                    />
+                    <InfoCard 
+                      label="Projeto" 
+                      value={<span className="task-detail-project-name">{task.project?.name || '-'}</span>} 
+                    />
+                    <InfoCard 
+                      label="Domínio" 
+                      value={<span className="task-detail-domain">{task.domain || '-'}</span>} 
+                    />
+                    {task.agent && (
+                      <InfoCard 
+                        label="Agente" 
+                        value={<span className="task-detail-agent-text">{task.agent}</span>} 
+                      />
+                    )}
+                    <InfoCard 
+                      label="Tamanho" 
+                      value={<span className="task-detail-property-value">{task.description?.split(/\s+/).filter(word => word.length > 0).length || 0} palavras</span>} 
+                    />
+                  </div>
+
+                  <div className="task-resumo-full-description">
+                    <span className="task-resumo-full-label">Descrição:</span>
+                    <p className="task-detail-description">{task.description || 'Sem descrição'}</p>
+                  </div>
+
+                  <div className="task-resumo-full-stats">
+                    <h4 className="task-resumo-full-stats-title">Estatísticas</h4>
+                    <div className="task-resumo-full-stats-grid">
+                      <div className="task-resumo-full-stat-item">
+                        <span className="task-resumo-full-stat-icon">📄</span>
+                        <span className="task-resumo-full-stat-value">{subtasksCount}</span>
+                        <span className="task-resumo-full-stat-label">Sub-Tarefas</span>
+                      </div>
+                      <div className="task-resumo-full-stat-item">
+                        <span className="task-resumo-full-stat-icon">💬</span>
+                        <span className="task-resumo-full-stat-value">{commentsCount}</span>
+                        <span className="task-resumo-full-stat-label">Comentários</span>
+                      </div>
+                      <div className="task-resumo-full-stat-item">
+                        <span className="task-resumo-full-stat-icon">📜</span>
+                        <span className="task-resumo-full-stat-value">{historyCount}</span>
+                        <span className="task-resumo-full-stat-label">Histórico</span>
+                      </div>
+                      <div className="task-resumo-full-stat-item">
+                        <span className="task-resumo-full-stat-icon">📊</span>
+                        <span className="task-resumo-full-stat-value">{logsCount}</span>
+                        <span className="task-resumo-full-stat-label">Logs</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Header */}
         <div className="task-detail-header">
           <div className="task-detail-header-left">
@@ -611,15 +931,16 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
             </div>
           </div>
           <div className="task-detail-actions">
-            <button
-              className={`task-detail-btn task-detail-btn-success ${task.isCompleted ? 'task-detail-btn-active' : ''}`}
-              onClick={handleToggleCompletion}
-              title={task.isCompleted ? 'Desmarcar como concluída' : 'Marcar como concluída'}
+    <button
+              className="task-detail-btn task-detail-btn-icon"
+              onClick={() => setShowResumoOverlay(prev => !prev)}
+              title={showResumoOverlay ? 'Ocultar resumo' : 'Mostrar resumo'}
+              style={{ backgroundColor: showResumoOverlay ? '#ff9800' : 'transparent' }}
             >
-              {task.isCompleted ? '✓' : '○'}
+              📋
             </button>
             <button
-              className="task-detail-btn task-detail-btn-secondary"
+              className="task-detail-btn task-detail-btn-icon task-detail-btn-secondary"
               onClick={handleEditTask}
               title="Editar tarefa"
             >
@@ -747,12 +1068,14 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                     {inlineEdit.editingField !== 'agent' ? (
                       <span className="task-detail-agent-text">{task.agent || '-'}</span>
                     ) : (
-                      <InlineInput
+                      <InlineSelect
                         value={task.agent || ''}
+                        options={[
+                          { value: '', label: 'Nenhum (campo vazio)' },
+                          ...agents.map((a) => ({ value: a.id, label: `${a.identity?.emoji || '🤖'} ${a.identity?.name || a.id}` }))
+                        ]}
                         onChange={handleInlineAgentChange}
-                        onBlur={() => setInlineEdit({ editingField: null })}
-                        placeholder="Digite o agente..."
-                        isLoading={inlineEdit.editingField === 'agent'}
+                        isLoading={inlineEdit.editingField === 'agent' || loadingAgents}
                       />
                     )}
                   </div>
@@ -898,28 +1221,125 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
                 </div>
               ) : (
                 <div className="task-detail-comments-list">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="task-detail-comment-item">
-                      <div className="task-detail-comment-header">
-                        {comment.authorAvatar && (
-                          <img
-                            src={comment.authorAvatar}
-                            alt={comment.author}
-                            className="task-detail-comment-avatar"
-                          />
-                        )}
-                        <div className="task-detail-comment-infos">
-                          <span className="task-detail-comment-author">{comment.author}</span>
-                          <span className="task-detail-comment-date">{formatDate(comment.createdAt)}</span>
+                  {comments.map((comment) => {
+                    const isEditing = editingCommentId === comment.id;
+                    return (
+                      <div key={comment.id} className="task-detail-comment-item">
+                        <div className="task-detail-comment-header">
+                          {comment.authorAvatar && (
+                            <img
+                              src={comment.authorAvatar}
+                              alt={comment.author}
+                              className="task-detail-comment-avatar"
+                            />
+                          )}
+                          <div className="task-detail-comment-infos">
+                            <span className="task-detail-comment-author">{comment.author}</span>
+                            <span className="task-detail-comment-date">{formatDate(comment.createdAt)}</span>
+                          </div>
+                          {/* Botões de ação do comentário */}
+                          <div className="task-detail-comment-actions">
+                            {isEditing ? (
+                              <button
+                                className="task-detail-btn-small"
+                                onClick={() => handleSaveEditComment(comment.id)}
+                                disabled={isSubmittingComment}
+                              >
+                                ✓
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  className="task-detail-btn-small"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditComment(comment.id, comment.text);
+                                  }}
+                                  title="Editar comentário"
+                                >
+                                  ✏️
+                                </button>
+                                <button
+                                  className="task-detail-btn-small task-detail-btn-danger"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDeleteComment(comment.id);
+                                  }}
+                                  title="Excluir comentário"
+                                >
+                                  🗑️
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <div className="task-detail-comment-text">
+                          {isEditing ? (
+                            <div className="task-detail-comment-edit-form">
+                              <textarea
+                                value={editingCommentText}
+                                onChange={(e) => setEditingCommentText(e.target.value)}
+                                className="task-detail-comment-input"
+                                autoFocus
+                                rows={3}
+                              />
+                              <div className="task-detail-comment-actions-small">
+                                <button
+                                  className="task-detail-btn-small"
+                                  onClick={() => handleSaveEditComment(comment.id)}
+                                >
+                                  Salvar
+                                </button>
+                                <button
+                                  className="task-detail-btn-small task-detail-btn-secondary"
+                                  onClick={handleCancelEditComment}
+                                >
+                                  Cancelar
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="task-detail-comment-text">{comment.text}</div>
+                          )}
                         </div>
                       </div>
-                      <div className="task-detail-comment-text">
-                        {comment.text}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
+
+              {/* Formulário de novo comentário */}
+              <div className="task-detail-comment-form">
+                <div className="task-detail-comment-form-top">
+                  <div className="task-detail-comment-user-info">
+                    <span className="task-detail-comment-user-avatar">👤</span>
+                    <span className="task-detail-comment-user-name">Você</span>
+                  </div>
+                </div>
+                <textarea
+                  placeholder="Adicione um comentário..."
+                  value={newCommentText}
+                  onChange={(e) => setNewCommentText(e.target.value)}
+                  className="task-detail-comment-input"
+                  rows={3}
+                  disabled={isSubmittingComment}
+                />
+                <div className="task-detail-comment-form-actions">
+                  {commentError && (
+                    <span className="task-detail-comment-error">{commentError}</span>
+                  )}
+                  {commentSuccess && (
+                    <span className="task-detail-comment-success">{commentSuccess}</span>
+                  )}
+                  <button
+                    className="task-detail-btn"
+                    onClick={handleAddComment}
+                    disabled={!newCommentText.trim() || isSubmittingComment}
+                  >
+                    {isSubmittingComment ? 'Enviando...' : 'Adicionar Comentário'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

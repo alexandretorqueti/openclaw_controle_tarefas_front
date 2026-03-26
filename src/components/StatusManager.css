@@ -19,6 +19,27 @@
   margin: 0;
 }
 
+.btn-include-status {
+  background-color: var(--primary-color, #3B82F6);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s, transform 0.1s;
+}
+
+.btn-include-status:hover {
+  background-color: var(--primary-color-hover, #2563EB);
+  transform: translateY(-1px);
+}
+
+.btn-include-status:active {
+  transform: translateY(0);
+}
+
 .status-form {
   display: flex;
   gap: 12px;

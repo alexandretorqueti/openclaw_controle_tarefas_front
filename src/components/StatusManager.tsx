@@ -8,6 +8,7 @@ const StatusManager: React.FC = () => {
   const [editingStatus, setEditingStatus] = useState<Status | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   
   // Form state for new status
   const [newStatus, setNewStatus] = useState({
@@ -41,7 +42,11 @@ const StatusManager: React.FC = () => {
       setLoading(true);
       setError(null);
       const response = await api.getStatuses();
-      const data = (response as any).data || response;
+      // O backend retorna o wrapper: { count, statuses, correlationId }
+      // Precisamos acessar response.statuses após o camelCase conversion
+      console.log('[DEBUG StatusManager] Response completo:', JSON.stringify(response, null, 2));
+      console.log('[DEBUG StatusManager] response.statuses:', (response as any).statuses);
+      const data = (response as any).statuses || [];
       setStatuses(Array.isArray(data) ? data : []);
       
       // Set default order for new status
@@ -162,8 +167,29 @@ const StatusManager: React.FC = () => {
         </div>
       )}
 
-      {/* Create form */}
-      <div className="status-form">
+      {/* Button to show/hide create form */}
+      <button 
+        className="btn-include-status"
+        onClick={() => setShowCreateForm(!showCreateForm)}
+        style={{
+          backgroundColor: 'var(--primary-color, #3B82F6)',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          padding: '10px 20px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: '600',
+          marginBottom: '20px',
+          display: 'inline-block'
+        }}
+      >
+        {showCreateForm ? '❌ Ocultar Formulário' : '➕ Incluir Status'}
+      </button>
+
+      {/* Create form - conditional */}
+      {showCreateForm && (
+        <div className="status-form">
         <div className="form-group" style={{ flex: 2 }}>
           <label>Nome do Status *</label>
           <input
@@ -255,10 +281,20 @@ const StatusManager: React.FC = () => {
         <button 
           onClick={handleCreate}
           disabled={!newStatus.name.trim() || loading}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: 'var(--primary-color, #3B82F6)',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: '500'
+          }}
         >
-          Adicionar Status
+          {loading ? 'Salvando...' : 'Adicionar Status'}
         </button>
       </div>
+      )}
 
       {/* Edit form */}
       {editingStatus && (

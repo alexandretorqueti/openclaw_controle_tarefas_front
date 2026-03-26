@@ -49,20 +49,26 @@ export function convertToCamelCase<T>(obj: any): T {
     const newObj: any = {};
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-        const value = obj[key];
-        
-        // Special handling for JSON strings that should be arrays
-        if ((camelKey === 'recurrenceTimes' || camelKey === 'recurrenceDays') && 
-            typeof value === 'string' && value.trim().startsWith('[')) {
-          try {
-            newObj[camelKey] = JSON.parse(value);
-          } catch (error) {
-            console.warn(`Failed to parse ${camelKey} as JSON:`, value, error);
-            newObj[camelKey] = value;
-          }
+        // Preserve specific keys that should NOT be converted
+        // This includes "statuses" array wrapper from API responses
+        if (key === 'statuses' || key === 'status') {
+          newObj[key] = obj[key];
         } else {
-          newObj[camelKey] = convertToCamelCase(value);
+          const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+          const value = obj[key];
+          
+          // Special handling for JSON strings that should be arrays
+          if ((camelKey === 'recurrenceTimes' || camelKey === 'recurrenceDays') && 
+              typeof value === 'string' && value.trim().startsWith('[')) {
+            try {
+              newObj[camelKey] = JSON.parse(value);
+            } catch (error) {
+              console.warn(`Failed to parse ${camelKey} as JSON:`, value, error);
+              newObj[camelKey] = value;
+            }
+          } else {
+            newObj[camelKey] = convertToCamelCase(value);
+          }
         }
       }
     }
