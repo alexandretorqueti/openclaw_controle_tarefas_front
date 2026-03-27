@@ -261,7 +261,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
   };
 
-if (compact) {
+  if (compact) {
     return (
       <div
         className="task-card-compact"

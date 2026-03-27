@@ -15,6 +15,7 @@ import PriorityManager from './components/PriorityManager';
 import UserManager from './components/UserManager';
 import ProjectTypeManager from './components/ProjectTypeManager';
 import TaskList from './components/TaskList';
+import TaskDetailPage from './components/TaskDetail/TaskDetailPage';
 import LogErros from './components/LogErros';
 import LogJarbas from './components/LogJarbas';
 import RecurrenceManager from './components/RecurrenceManager';
@@ -227,6 +228,9 @@ const AppRoutes = () => {
         <Route path="recurrence" element={<RecurrenceManager />} />
         <Route path="next-task" element={<NextTaskManager />} />
         <Route path="profile" element={<UserProfileEdit />} />
+        
+        {/* Rota para detalhes da tarefa */}
+        <Route path="tasks/:id" element={<TaskDetailPage />} />
         
         {/* Rota de fallback para página não encontrada */}
         <Route path="*" element={<div>Página não encontrada</div>} />

@@ -9,6 +9,7 @@ import api from '../services/api';
 import { getBackendBaseUrl } from '../config/api';
 import './ProjectsDashboard.css';
 import EditProjectModal from './EditProjectModal';
+import ViewTasksButton from './ViewTasksButton';
 import { set } from 'date-fns';
 
 // Interfaces
@@ -656,39 +657,19 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button 
-                    type="button"
-                    style={{
-                      padding: '8px',
-                      borderRadius: '6px',
-                      border: '1px solid var(--border-color)',
-                      backgroundColor: 'transparent',
-                      color: 'var(--text-secondary, #b0b0b0)',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'all 0.2s',
-                      minWidth: '32px',
-                      minHeight: '32px'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                      e.currentTarget.style.color = 'var(--text-primary, #ffffff)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = 'var(--text-secondary, #b0b0b0)';
-                    }}
-                    onClick={(e) => {
-                      console.log('🔍 Botão Visualizar clicado! Evento:', e.type);
+                  <ViewTasksButton 
+                    onClick={() => {
+                      console.log('🔍 Botão Visualizar clicado!');
                       console.log('🔍 Projeto alvo:', project.name);
                       handleViewProjectTasks(project);
                     }}
-                    title="Visualizar"
-                  >
-                    <FaEye size={14} style={{ display: 'block', color: 'currentColor' }} />
-                  </button>
+                    label="📋 Visualizar Tarefas"
+                    showCount={true}
+                    tasksCount={project.tasks?.filter(t => !t.isCompleted).length || 0}
+                    loading={false}
+                    className="view-tasks-button--card"
+                    variant="primary"
+                  />
                   <button 
                     style={{
                       padding: '8px',

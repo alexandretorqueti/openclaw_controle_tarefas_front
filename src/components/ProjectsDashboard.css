@@ -746,3 +746,27 @@
     opacity: 1;
   }
 }
+
+/* Estilos específicos para ViewTasksButton dentro do card de projeto */
+.view-tasks-button--card {
+  flex: 1;
+  justify-content: center;
+  font-weight: 600;
+  margin-top: 16px;
+}
+
+/* Se o projeto tem um botão ViewTasksButton, ele precisa ser do tipo flex para ocupar espaço */
+.project-card-header .view-tasks-button {
+  flex: 1;
+}
+
+/* Melhoria visual do card com botão ViewTasksButton */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+}
+
+.project-card-body {
+  flex: 1;
+}

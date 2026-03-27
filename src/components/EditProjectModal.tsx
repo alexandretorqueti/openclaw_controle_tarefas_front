@@ -159,6 +159,21 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
     }
   }, [project]);
 
+  // ✨ FECHAR COM ESC - Trattamento de teclado para fechar o modal
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      // Fechar modal ao pressionar ESC (tecla 27)
+      if (event.key === 'Escape' || event.keyCode === 27) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   // Carregar lista de agentes e modelos quando o modal abrir
   useEffect(() => {
     const loadAgents = async () => {

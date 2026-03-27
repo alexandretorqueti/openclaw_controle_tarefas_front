@@ -1,0 +1,224 @@
+/**
+ * ViewTasksButton CSS
+ * 
+ * Estilos para o botão de visualizar tarefas, seguindo o design system existente.
+ * Variáveis CSS para personalizabilidade, transições suaves e WCAG AAA contrast.
+ */
+
+/* Variáveis de customização - pode sobrescrever aqui ou em arquivos que importam este CSS */
+:root {
+  --view-tasks-button-primary-bg: var(--primary-color, #2563eb);
+  --view-tasks-button-primary-hover: var(--primary-dark, #1d4ed8);
+  --view-tasks-button-primary-text: #ffffff;
+  --view-tasks-button-secondary-bg: #dbeafe;
+  --view-tasks-button-secondary-hover: #bfdbfe;
+  --view-tasks-button-secondary-text: #1e40af;
+  --view-tasks-button-text-color: var(--text-primary, #ffffff);
+  --view-tasks-button-disabled-bg: #e5e7eb;
+  --view-tasks-button-disabled-text: #9ca3af;
+  --view-tasks-button-error-bg: #fee2e2;
+  --view-tasks-button-error-text: #dc2626;
+  --view-tasks-badge-bg: #ef4444;
+  --view-tasks-badge-text: #ffffff;
+  --view-tasks-button-spacing-sm: 4px;
+  --view-tasks-button-spacing-md: 8px;
+  --view-tasks-button-border-radius: 8px;
+  --view-tasks-button-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base do botão */
+.view-tasks-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--view-tasks-button-spacing-md);
+  padding: 12px 20px;
+  border: none;
+  border-radius: var(--view-tasks-button-border-radius);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: var(--view-tasks-button-transition);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  overflow: visible;
+}
+
+/* Variants */
+.view-tasks-button--primary {
+  background-color: var(--view-tasks-button-primary-bg);
+  color: var(--view-tasks-button-primary-text);
+}
+
+.view-tasks-button--primary:hover:not(:disabled) {
+  background-color: var(--view-tasks-button-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.view-tasks-button--primary:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.view-tasks-button--secondary {
+  background-color: var(--view-tasks-button-secondary-bg);
+  color: var(--view-tasks-button-secondary-text);
+}
+
+.view-tasks-button--secondary:hover:not(:disabled) {
+  background-color: var(--view-tasks-button-secondary-hover);
+  transform: translateY(-2px);
+}
+
+/* Estados */
+.view-tasks-button--disabled {
+  background-color: var(--view-tasks-button-disabled-bg);
+  color: var(--view-tasks-button-disabled-text);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none !important;
+}
+
+.view-tasks-button--error {
+  background-color: var(--view-tasks-button-error-bg);
+  color: var(--view-tasks-button-error-text);
+}
+
+.view-tasks-button--error:hover:not(:disabled) {
+  background-color: #fecaca;
+}
+
+/* Ícone */
+.view-tasks-button-icon-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.view-tasks-button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--view-tasks-button-spacing-sm);
+}
+
+.view-tasks-button-text {
+  font-weight: 600;
+}
+
+/* Badge com contador */
+.view-tasks-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 2px 8px;
+  background-color: var(--view-tasks-badge-bg);
+  color: var(--view-tasks-badge-text);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Spinner de loading */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Acessibilidade - Foco */
+.view-tasks-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
+}
+
+.view-tasks-button:focus-visible {
+  outline: 2px solid var(--primary-color, #2563eb);
+  outline-offset: 2px;
+}
+
+/* Acessibilidade - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .view-tasks-button,
+  .view-tasks-button--primary:hover,
+  .view-tasks-badge,
+  .loading-spinner {
+    animation: none;
+    transition: none;
+  }
+  
+  .view-tasks-button--primary:hover,
+  .view-tasks-button--secondary:hover {
+    transform: none;
+  }
+}
+
+/* Acessibilidade - High Contrast */
+@media (prefers-contrast: high) {
+  .view-tasks-button {
+    border: 2px solid currentColor;
+  }
+  
+  .view-tasks-button--primary,
+  .view-tasks-button--secondary {
+    border-width: 3px;
+  }
+}
+
+/* Responsividade - Mobile */
+@media (max-width: 768px) {
+  .view-tasks-button {
+    padding: 10px 16px;
+    font-size: 14px;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .view-tasks-button-icon-container {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .view-tasks-button-icon-container svg {
+    font-size: 16px;
+  }
+  
+  .view-tasks-text {
+    font-size: 13px;
+  }
+}
+
+/* Touch devices - Botão maior para facilitar toques */
+@media (hover: none) and (pointer: coarse) {
+  .view-tasks-button {
+    min-height: 50px;
+    min-width: 50px;
+  }
+  
+  .view-tasks-button:active {
+    transform: scale(0.95);
+  }
+}
