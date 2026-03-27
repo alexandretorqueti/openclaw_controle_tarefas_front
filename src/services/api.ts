@@ -518,6 +518,11 @@ class ApiService {
     return this.request(`/task-history/${id}`);
   }
 
+  // Task Execution endpoints
+  async getTaskExecutions(taskId: string) {
+    return this.request(`/task-executions/${taskId}`);
+  }
+
   async createTaskHistory(data: any) {
     return this.request('/task-history', {
       method: 'POST',

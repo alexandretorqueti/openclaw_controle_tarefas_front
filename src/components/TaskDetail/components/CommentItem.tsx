@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { 
-  FaUserCircle, FaTrash, FaEdit, FaReply, 
-  FaCheck, FaTimes, FaEllipsisH, FaClock
-} from 'react-icons/fa';
+import { FaUserCircle, FaTrash, FaEdit, FaReply, FaCheck, FaTimes, FaEllipsisH, FaClock } from 'react-icons/fa';
 import { Comment } from '../../../types/tasks';
 import CommentForm from './CommentForm';
+import { useAuth } from '../../../contexts/AuthContext';
+import api from '../../../services/api';
 
 interface CommentItemProps {
   comment: Comment;
@@ -27,6 +26,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
   onEditComplete,
   isReply = false
 }) => {
+  const { user } = useAuth();
   const [showActions, setShowActions] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -55,9 +55,9 @@ const CommentItem: React.FC<CommentItemProps> = ({
 
   // Verificar se o usuário atual é o autor do comentário
   const isCurrentUserAuthor = () => {
-    // TODO: Implementar verificação real do usuário atual
-    // Por enquanto, assumimos que o usuário atual pode editar/excluir
-    return true;
+    if (!user) return false;
+    // Comparar userId para permitir edição/exclusão
+    return user.id === comment.userId;
   };
 
   const handleEdit = () => {

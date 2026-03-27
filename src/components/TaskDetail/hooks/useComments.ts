@@ -1,12 +1,13 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useContext } from 'react';
 import api from '../../../services/api';
 import { Comment } from '../../../types/tasks';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface UseCommentsReturn {
   comments: Comment[];
   loading: boolean;
   error: string | null;
-  addComment: (content: string, taskId: string, userId: string) => Promise<Comment | null>;
+  addComment: (content: string, taskId: string, parentCommentId?: string | null) => Promise<Comment | null>;
   deleteComment: (commentId: string) => Promise<boolean>;
   updateComment: (commentId: string, content: string) => Promise<Comment | null>;
   refetchComments: (taskId: string) => Promise<void>;
@@ -16,7 +17,8 @@ interface UseCommentsReturn {
  * Hook para gerenciar comentários de uma tarefa
  * Suporta: criar, excluir, editar e listar comentários
  */
-const useComments = (initialTaskId?: string): UseCommentsReturn => {
+export const useComments = (initialTaskId?: string): UseCommentsReturn => {
+  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,8 +42,12 @@ const useComments = (initialTaskId?: string): UseCommentsReturn => {
   }, []);
 
   // Adicionar novo comentário
-  const addComment = useCallback(async (content: string, taskId: string, userId: string): Promise<Comment | null> => {
-    if (!content.trim() || !taskId || !userId) {
+  const addComment = useCallback(async (
+    content: string, 
+    taskId: string, 
+    parentCommentId: string | null = null
+  ): Promise<Comment | null> => {
+    if (!content.trim() || !taskId || !user) {
       setError('Conteúdo, tarefa e usuário são obrigatórios');
       return null;
     }
@@ -53,7 +59,8 @@ const useComments = (initialTaskId?: string): UseCommentsReturn => {
       const newComment = await api.createComment({
         content,
         taskId,
-        userId
+        userId: user.id,
+        parentCommentId
       });
 
       // Atualizar lista localmente
@@ -66,10 +73,15 @@ const useComments = (initialTaskId?: string): UseCommentsReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // Excluir comentário
   const deleteComment = useCallback(async (commentId: string): Promise<boolean> => {
+    if (!user) {
+      setError('Usuário não autenticado');
+      return false;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -81,17 +93,20 @@ const useComments = (initialTaskId?: string): UseCommentsReturn => {
       return true;
     } catch (err) {
       console.error('Erro ao excluir comentário:', err);
-      setError('Erro ao excluir comentário');
+      // Só retorna false se não foi erro de permissão
+      if (!(err as any).response?.status === 403) {
+        setError((err as any).message || 'Erro ao excluir comentário');
+      }
       return false;
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // Editar comentário
   const updateComment = useCallback(async (commentId: string, content: string): Promise<Comment | null> => {
-    if (!content.trim()) {
-      setError('Conteúdo não pode ser vazio');
+    if (!content.trim() || !user) {
+      setError('Conteúdo não pode ser vazio e usuário deve estar autenticado');
       return null;
     }
 
@@ -99,7 +114,10 @@ const useComments = (initialTaskId?: string): UseCommentsReturn => {
     setError(null);
 
     try {
-      const updatedComment = await api.updateComment(commentId, { content });
+      const updatedComment = await api.updateComment(commentId, { 
+        content,
+        userId: user.id
+      });
       
       // Atualizar na lista local
       setComments(prev => prev.map(comment => 
@@ -114,11 +132,11 @@ const useComments = (initialTaskId?: string): UseCommentsReturn => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // Inicializar com comentários se taskId for fornecido
   useState(() => {
-    if (initialTaskId) {
+    if (initialTaskId && user) {
       refetchComments(initialTaskId);
     }
   });

@@ -204,13 +204,16 @@ const AppRoutes = () => {
             projects={[]}
             selectedProject={null}
             onTaskSelect={
-              function (
-                task: Task, 
-                setSelectedTaskDetail: React.Dispatch<React.SetStateAction<Task | null>>,
-                setShowTaskDetailModal: React.Dispatch<React.SetStateAction<boolean>>
-              ): void {
-                setSelectedTaskDetail(task);
-                setShowTaskDetailModal(true);
+              function (task: Task): void {
+                // Navegar para a página de detalhes da tarefa
+                const navigate = typeof window !== 'undefined' ? (window['navigate']) : null;
+                if (navigate && typeof navigate === 'function') {
+                  navigate(`/tasks/${task.id}`);
+                  console.log('\n🔙 [ROUTES] Navegando para /tasks/${task.id} via useNavigate');
+                } else {
+                  window.location.href = `/tasks/${task.id}`;
+                  console.log('\n🔙 [ROUTES] Usando window.location.href para /tasks/${task.id}');
+                }
               }
             }
           />
@@ -231,6 +234,43 @@ const AppRoutes = () => {
         
         {/* Rota para detalhes da tarefa */}
         <Route path="tasks/:id" element={<TaskDetailPage />} />
+        
+        {/* Rota para lista de tarefas (sem parâmetro de projeto) */}
+        <Route path="tasks" element={
+          <TaskList 
+            onBackToProjects={() => {
+              console.log('\n🔙 [ROUTES] onBackToProjects chamada');
+              // Navega para a página de projetos
+              const navigate = typeof window !== 'undefined' ? (window['navigate']) : null;
+              if (navigate && typeof navigate === 'function') {
+                navigate('/projects');
+                console.log('\n🔙 [ROUTES] Navegando para /projects via useNavigate');
+              } else {
+                window.location.href = '/projects';
+                console.log('\n🔙 [ROUTES] Usando window.location.href para /projects');
+              }
+            }}
+            tasks={[]}
+            users={[]}
+            statuses={[]}
+            priorities={[]}
+            projects={[]}
+            selectedProject={null}
+            onTaskSelect={
+              function (task: Task): void {
+                // Navegar para a página de detalhes da tarefa
+                const navigate = typeof window !== 'undefined' ? (window['navigate']) : null;
+                if (navigate && typeof navigate === 'function') {
+                  navigate(`/tasks/${task.id}`);
+                  console.log('\n🔙 [ROUTES] Navegando para /tasks/${task.id} via useNavigate');
+                } else {
+                  window.location.href = `/tasks/${task.id}`;
+                  console.log('\n🔙 [ROUTES] Usando window.location.href para /tasks/${task.id}');
+                }
+              }
+            }
+          />
+        } />
         
         {/* Rota de fallback para página não encontrada */}
         <Route path="*" element={<div>Página não encontrada</div>} />

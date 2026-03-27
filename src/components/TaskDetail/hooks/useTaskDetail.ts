@@ -32,12 +32,12 @@ export const useTaskDetail = (taskId: string): TaskDetailData => {
       try {
         setData(prev => ({ ...prev, loading: true, error: null }));
 
-        // Fetch task básica com relações
+        // Fetch task básica com relações usando métodos específicos da API
         const [taskRes, logsRes, historyRes, commentsRes] = await Promise.all([
-          api.get(`/api/tasks/${taskId}`),
-          api.get(`/api/task-executions/${taskId}`),
-          api.get(`/api/task-history/task/${taskId}`),
-          api.get(`/api/comments/task/${taskId}`),
+          api.getTask(taskId),
+          api.getTaskExecutions(taskId),
+          api.getTaskHistoryByTask(taskId),
+          api.getCommentsByTask(taskId),
         ]);
 
         setData({

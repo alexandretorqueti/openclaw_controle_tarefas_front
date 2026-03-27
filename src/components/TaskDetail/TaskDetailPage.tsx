@@ -91,7 +91,13 @@ const TaskDetailPage: React.FC = () => {
 
   // Função para voltar à lista de tarefas
   const handleBack = () => {
-    navigate('/tasks');
+    // Tentar voltar para a página anterior
+    if (window.history.length > 1) {
+      navigate(-1); // Volta para a página anterior
+    } else {
+      // Fallback: vai para a lista geral de tarefas
+      navigate('/tasks');
+    }
   };
 
   // Função para editar tarefa

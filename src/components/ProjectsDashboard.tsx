@@ -605,7 +605,8 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
               transition: 'transform 0.2s, box-shadow 0.2s',
               display: 'flex',
               flexDirection: 'column',
-              height: '100%'
+              height: '100%',
+              minHeight: '320px'
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-4px)';
@@ -615,6 +616,7 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
               e.currentTarget.style.transform = 'translateY(0)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.08)';
             }}>
+              {/* CABEÇALHO DO CARD */}
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -659,19 +661,6 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <ViewTasksButton 
-                    onClick={() => {
-                      console.log('🔍 Botão Visualizar clicado!');
-                      console.log('🔍 Projeto alvo:', project.name);
-                      handleViewProjectTasks(project);
-                    }}
-                    label="📋 Visualizar Tarefas"
-                    showCount={true}
-                    tasksCount={project.tasks?.filter(t => !t.isCompleted).length || 0}
-                    loading={false}
-                    className="view-tasks-button--card"
-                    variant="primary"
-                  />
                   <button 
                     style={{
                       padding: '8px',
@@ -735,49 +724,103 @@ const ProjectsDashboard: React.FC<ProjectsDashboardProps> = () => {
                 </div>
               </div>
               
-              <div className="project-card-body">
-                <p className="project-description" style={{ marginBottom: '12px' }}>
+              {/* CORPO DO CARD */}
+              <div className="project-card-body" style={{ flex: 1 }}>
+                <p className="project-description" style={{ 
+                  marginBottom: '16px',
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  color: 'var(--text-secondary)',
+                  minHeight: '42px'
+                }}>
                   {project.description || 'Sem descrição'}
                 </p>
                 
-                {project.tasks && project.tasks.length > 0 && (
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: '12px', 
-                    fontSize: '12px',
-                    color: 'var(--text-secondary)',
-                    marginTop: '8px'
-                  }}>
-                    <span>Tarefas: {project.tasks.length}</span>
-                    <span>Concluídas: {project.tasks.filter(t => t.isCompleted).length}</span>
-                  </div>
-                )}
-                
-                {project.agent && (
-                  <div style={{ 
-                    marginTop: '8px',
-                    fontSize: '12px',
-                    color: 'var(--text-secondary)'
-                  }}>
-                    <strong>Agente:</strong> {project.agent}
-                  </div>
-                )}
-              </div>
-              
-              <div className="project-card-footer">
-                <div className="project-meta" style={{ 
-                  display: 'flex', 
+                {/* METADADOS DO PROJETO */}
+                <div style={{ 
+                  display: 'flex',
                   flexDirection: 'column',
-                  gap: '4px',
-                  fontSize: '11px',
-                  color: 'var(--text-tertiary)'
+                  gap: '8px',
+                  marginBottom: '16px'
                 }}>
-                  <span>Criado em: {new Date(project.createdAt).toLocaleDateString('pt-BR')}</span>
-                  <span>Atualizado em: {new Date(project.updatedAt).toLocaleDateString('pt-BR')}</span>
-                  {project.createdBy && (
-                    <span>Criado por: {project.createdBy.name}</span>
+                  {project.tasks && project.tasks.length > 0 && (
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '12px', 
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)'
+                    }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <strong>Tarefas:</strong> {project.tasks.length}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <strong>Concluídas:</strong> {project.tasks.filter(t => t.isCompleted).length}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {project.agent && (
+                    <div style={{ 
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <strong>Agente:</strong> {project.agent}
+                    </div>
+                  )}
+                  
+                  {project.projectTypeId && projectTypes.find(t => t.id === project.projectTypeId) && (
+                    <div style={{ 
+                      fontSize: '13px',
+                      color: 'var(--text-secondary)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <strong>Tipo:</strong> {projectTypes.find(t => t.id === project.projectTypeId)?.name}
+                    </div>
                   )}
                 </div>
+              </div>
+              
+              {/* RODAPÉ DO CARD - BOTÃO VISUALIZAR TAREFAS */}
+              <div className="project-card-footer" style={{ 
+                marginTop: 'auto',
+                paddingTop: '16px',
+                borderTop: '1px solid var(--border-color)'
+              }}>
+                <ViewTasksButton 
+                  onClick={() => {
+                    console.log('🔍 Botão Visualizar clicado!');
+                    console.log('🔍 Projeto alvo:', project.name);
+                    handleViewProjectTasks(project);
+                  }}
+                  label="📋 Visualizar Tarefas"
+                  showCount={true}
+                  tasksCount={project.tasks?.filter(t => !t.isCompleted).length || 0}
+                  loading={false}
+                  className="view-tasks-button--card"
+                  variant="primary"
+                  style={{ width: '100%', justifyContent: 'center' }}
+                />
+              </div>
+              
+              {/* METADADOS INFERIORES */}
+              <div className="project-meta" style={{ 
+                marginTop: '12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                fontSize: '11px',
+                color: 'var(--text-tertiary)'
+              }}>
+                <span>Criado em: {new Date(project.createdAt).toLocaleDateString('pt-BR')}</span>
+                <span>Atualizado em: {new Date(project.updatedAt).toLocaleDateString('pt-BR')}</span>
+                {project.createdBy && (
+                  <span>Criado por: {project.createdBy.name}</span>
+                )}
               </div>
             </div>
           ))}

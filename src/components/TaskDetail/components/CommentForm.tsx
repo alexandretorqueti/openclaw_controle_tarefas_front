@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaPaperPlane, FaTimes, FaUserCircle, FaSpinner } from 'react-icons/fa';
 import api from '../../../services/api';
+import { useAuth } from '../../../contexts/AuthContext';
 
 interface CommentFormProps {
   taskId: string;
@@ -21,29 +22,10 @@ const CommentForm: React.FC<CommentFormProps> = ({
   initialContent = '',
   commentId
 }) => {
+  const { user } = useAuth();
   const [content, setContent] = useState(initialContent);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-
-  // Carregar usuário atual
-  useEffect(() => {
-    const loadCurrentUser = async () => {
-      try {
-        // TODO: Implementar obtenção do usuário atual
-        // Por enquanto, usamos um mock
-        setCurrentUser({
-          id: 'current-user-id',
-          name: 'Usuário Atual',
-          email: 'usuario@exemplo.com'
-        });
-      } catch (err) {
-        console.error('Erro ao carregar usuário:', err);
-      }
-    };
-
-    loadCurrentUser();
-  }, []);
 
   // Atualizar conteúdo quando initialContent mudar
   useEffect(() => {
@@ -58,8 +40,8 @@ const CommentForm: React.FC<CommentFormProps> = ({
       return;
     }
 
-    if (!currentUser) {
-      setError('Usuário não identificado');
+    if (!user) {
+      setError('Usuário não autenticado');
       return;
     }
 
@@ -69,13 +51,16 @@ const CommentForm: React.FC<CommentFormProps> = ({
     try {
       if (mode === 'edit' && commentId) {
         // Editar comentário existente
-        await api.updateComment(commentId, { content });
+        await api.updateComment(commentId, { 
+          content,
+          userId: user.id
+        });
       } else {
         // Criar novo comentário ou resposta
         await api.createComment({
           content,
           taskId,
-          userId: currentUser.id,
+          userId: user.id,
           parentCommentId: parentCommentId || undefined
         });
       }
@@ -128,10 +113,13 @@ const CommentForm: React.FC<CommentFormProps> = ({
     <div className="comment-form">
       {/* Cabeçalho do formulário */}
       <div className="form-header">
-        <div className="user-info">
-          <FaUserCircle className="user-avatar" />
-          <span className="user-name">{currentUser?.name || 'Usuário'}</span>
-        </div>
+        {user && (
+          <div className="user-info">
+            <FaUserCircle className="user-avatar" />
+            <span className="user-name">{user.name || user.username || 'Usuário'}</span>
+            {user.email && <span className="user-email">@{user.email.split('@')[0]}</span>}
+          </div>
+        )}
         
         {onCancel && (
           <button 

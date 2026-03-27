@@ -6,8 +6,7 @@ import { User } from '../types/user';
 import { Agent } from '../types/agent';
 import { getBackendBaseUrl } from '../config/api';
 import TaskCard from './TaskCard';
-import TaskDetail from './Tasks/TaskDetail'; // Adicionar import do TaskDetail
-import FormModal from './shared/FormModal'; // Adicionar import do FormModal
+
 import Card from './shared/Card';
 import Button from './shared/Button';
 import { FaFilter, FaSearch, FaSortAmountDown, FaFlag, FaPlus, FaProjectDiagram, FaArrowLeft, FaExclamationTriangle, FaArrowUp } from 'react-icons/fa';
@@ -29,7 +28,7 @@ interface TaskListProps {
   selectedProject: Project | null;
   selectedParentTask?: Task | null;
   parentHierarchy?: Task[];
-  onTaskSelect: (task: Task, setSelectedTaskDetail: React.Dispatch<React.SetStateAction<Task | null>>, setShowTaskDetailModal: React.Dispatch<React.SetStateAction<boolean>>) => void;
+  onTaskSelect: (task: Task) => void;
   onViewSubtasks?: (task: Task) => void;
   onBackToProjects?: () => void;
   onBackToParent?: () => void;
@@ -104,10 +103,6 @@ const TaskList: React.FC<TaskListProps> = ({
   const [dataError, setDataError] = useState<string | null>(null);
   const [agents, setAgents] = useState<Agent[]>([]);
 
-  // Estado para controle do modal de detalhes da tarefa
-  const [selectedTaskDetail, setSelectedTaskDetail] = useState<Task | null>(null);
-  const [showTaskDetailModal, setShowTaskDetailModal] = useState(false);
-  
   // Estado para forçar re-render quando taskInExecução mudar
   const [forceRender, setForceRender] = useState(false);
   
@@ -809,13 +804,6 @@ const TaskList: React.FC<TaskListProps> = ({
 
       // Atualizar estado local
       setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
-      // 2. ATUALIZAÇÃO NECESSÁRIA: Atualiza o detalhe que está aberto no modal
-      setSelectedTaskDetail(prev => {
-      if (prev && prev.id === id) {
-        return { ...prev, ...updatedTask };
-      }
-      return prev;
-    });
       return updatedTask;
     } catch (error) {
       console.error('❌ Erro ao atualizar tarefa:', error);
@@ -872,9 +860,8 @@ const TaskList: React.FC<TaskListProps> = ({
 
   const handleTaskSelect = (task: Task) => {
     console.log('🔍 TaskList: handleTaskSelect (fallback) chamado', { task });
-    // Abrir modal com detalhes da tarefa
-    setSelectedTaskDetail(task);
-    setShowTaskDetailModal(true);
+    // Navegar para a página de detalhes da tarefa
+    navigate(`/tasks/${task.id}`);
   };
 
   const handleViewSubtasks = (task: Task) => {
@@ -1066,7 +1053,7 @@ const TaskList: React.FC<TaskListProps> = ({
               <React.Fragment key={task.id}>
                 <span style={{ color: 'var(--text-tertiary)' }}>›</span>
                 <span
-                  onClick={() => index < parentHierarchy.length - 1 && onTaskSelect(task, setSelectedTaskDetail, setShowTaskDetailModal)}
+                  onClick={() => index < parentHierarchy.length - 1 && onTaskSelect(task)}
                   style={{
                     cursor: index < parentHierarchy.length - 1 ? 'pointer' : 'default',
                     color: index < parentHierarchy.length - 1 ? 'var(--accent-color)' : 'var(--text-primary)',
@@ -2285,7 +2272,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 statuses={statuses}
                 priorities={priorities}
                 projects={projects}
-                onTaskClick={(t) => onTaskSelect(t, setSelectedTaskDetail, setShowTaskDetailModal)}
+                onTaskClick={(t) => onTaskSelect(t)}
                 onViewSubtasks={onViewSubtasks !== NOOP_FN ? onViewSubtasks : handleViewSubtasks}
                 onUpdateTask={handleUpdateTask}
                 onDeleteTask={handleDeleteTask}
@@ -2334,31 +2321,7 @@ const TaskList: React.FC<TaskListProps> = ({
         )}
       </div>
 
-      {/* Modal de detalhes da tarefa */}
-      <FormModal
-        isOpen={showTaskDetailModal}
-        onClose={() => setShowTaskDetailModal(false)}
-        title="Detalhes da Tarefa"
-        subtitle={selectedTaskDetail?.title}
-        size="xl"
-        hideFooter={true}
-      >
-        {selectedTaskDetail && (
-          <TaskDetail
-            task={selectedTaskDetail}
-            tasks={tasks} // Passar lista de tarefas
-            users={users}
-            statuses={statuses}
-            priorities={priorities}
-            projects={projects}
-            currentUser={null} // Pode ser null se não houver usuário atual
-            onBack={() => setShowTaskDetailModal(false)} // Usar onBack para fechar
-            onUpdateTask={handleUpdateTask}
-            onDeleteTask={handleDeleteTask}
-            onToggleCompletion={handleToggleCompletion}
-          />
-        )}
-      </FormModal>
+
     </div>
   );
 };
