@@ -91,6 +91,9 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
   // Comandos de build
   const [frontendBuildCmd, setFrontendBuildCmd] = useState('');
   const [backendBuildCmd, setBackendBuildCmd] = useState('');
+  // Comandos de teste - NOVOS
+  const [frontendTestCommand, setFrontendTestCommand] = useState('');
+  const [backendTestCommand, setBackendTestCommand] = useState('');
   
   // Estados da UI
   const [isSaving, setIsSaving] = useState(false);
@@ -130,6 +133,9 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
       // Comandos de build
       setFrontendBuildCmd(project.frontendBuildCmd || '');
       setBackendBuildCmd(project.backendBuildCmd || '');
+      // Comandos de teste - NOVOS
+      setFrontendTestCommand(project.frontendTestCommand || '');
+      setBackendTestCommand(project.backendTestCommand || '');
     } else {
       // Modo criação - valores padrão
       setName('');
@@ -156,6 +162,9 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
       // Comandos de build - vazios
       setFrontendBuildCmd('');
       setBackendBuildCmd('');
+      // Comandos de teste - vazios
+      setFrontendTestCommand('');
+      setBackendTestCommand('');
     }
   }, [project]);
 
@@ -240,7 +249,9 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
         programadorBack: programadorBack || null,
         modeloAuxiliar: modeloAuxiliar || null,
         frontendBuildCmd: frontendBuildCmd.trim() || null,
-        backendBuildCmd: backendBuildCmd.trim() || null
+        backendBuildCmd: backendBuildCmd.trim() || null,
+        frontendTestCommand: frontendTestCommand.trim() || null,  // NOVO
+        backendTestCommand: backendTestCommand.trim() || null     // NOVO
       };
       
 
@@ -649,6 +660,49 @@ const EditProjectModal: React.FC<EditProjectModalProps> = ({
                       />
                       <p className="edit-project-modal-help">
                         Comando para build/compilação do backend
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Seção 5: Comandos de Teste */}
+                <div className="edit-project-modal-section">
+                  <h3 className="edit-project-modal-section-title">
+                    <FaVial size={16} />
+                    Comandos de Teste
+                  </h3>
+                  <div className="edit-project-modal-form-grid">
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
+                        <FaVial size={12} />
+                        Comando de Teste Frontend
+                      </label>
+                      <input
+                        type="text"
+                        className="edit-project-modal-input"
+                        value={frontendTestCommand}
+                        onChange={(e) => setFrontendTestCommand(e.target.value)}
+                        placeholder="Ex: npm test, yarn test, pnpm test"
+                      />
+                      <p className="edit-project-modal-help">
+                        Comando para executar testes no frontend (opcional)
+                      </p>
+                    </div>
+
+                    <div className="edit-project-modal-form-group">
+                      <label className="edit-project-modal-label">
+                        <FaVial size={12} />
+                        Comando de Teste Backend
+                      </label>
+                      <input
+                        type="text"
+                        className="edit-project-modal-input"
+                        value={backendTestCommand}
+                        onChange={(e) => setBackendTestCommand(e.target.value)}
+                        placeholder="Ex: npm test, yarn test, pnpm test"
+                      />
+                      <p className="edit-project-modal-help">
+                        Comando para executar testes no backend (opcional)
                       </p>
                     </div>
                   </div>

@@ -19,6 +19,8 @@ interface ProjectData {
   pastaBase?: string;
   frontendBuildCmd?: string;
   backendBuildCmd?: string;
+  frontendTestCommand?: string;  // NOVO
+  backendTestCommand?: string;   // NOVO
   createdById?: string; // Campo opcional para compatibilidade com backend
 }
 
@@ -37,6 +39,8 @@ interface UpdateProjectData {
   pastaBase?: string;
   frontendBuildCmd?: string;
   backendBuildCmd?: string;
+  frontendTestCommand?: string;  // NOVO
+  backendTestCommand?: string;   // NOVO
 }
 
 interface TaskData {

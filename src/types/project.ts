@@ -22,6 +22,8 @@ export interface Project {
   programadorBack?: string;
   frontendBuildCmd?: string;
   backendBuildCmd?: string;
+  frontendTestCommand?: string;  // NOVO CAMPO
+  backendTestCommand?: string;   // NOVO CAMPO
   modeloAuxiliar?: string;
 
   // Relacionamentos
