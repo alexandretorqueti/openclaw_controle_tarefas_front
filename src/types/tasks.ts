@@ -32,6 +32,7 @@ export interface Task {
   arquitetosTerminalContent?: string;
   programadorTerminalContent?: string;
   programadorReportContent?: string;
+  totalSubtasks: number;
   
   // Relacionamentos (opcionais, dependendo da sua consulta)
   attachments?: Attachment[];

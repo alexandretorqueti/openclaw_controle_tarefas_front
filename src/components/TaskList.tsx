@@ -237,7 +237,7 @@ const TaskList: React.FC<TaskListProps> = ({
   const projectsString = safeStringify(projects);
   const selectedProjectString = safeStringify(selectedProject);
   const selectedParentTaskString = safeStringify(finalSelectedParentTask);
-
+  const [sortByCreatedAt, setSortByCreatedAt] = useState<'newest' | 'oldest'>('newest');
   // Buscar dados se não forem fornecidos via props - EVITAR LOOPS
   useEffect(() => {
     console.log('🔄 TaskList: useEffect executando');
@@ -311,12 +311,16 @@ const TaskList: React.FC<TaskListProps> = ({
             filters.projectId = projectId;
           }
           if (finalSelectedParentTask?.id) {
+            // Se há uma tarefa pai selecionada, mostrar apenas suas subtarefas
             filters.parentTaskId = finalSelectedParentTask.id;
+          } else {
+            // Se não há tarefa pai selecionada (estamos na raiz), mostrar apenas tarefas sem pai
+            filters.parentTaskId = null;
           }
           console.log('🔍 Buscando tarefas com os filtros:', filters);
 
           const tasksPromise = propTasks.length === 0
-            ? api.getTasks(filters)
+            ? api.getTasks(filters, 'createdAt', sortByCreatedAt === 'newest' ? 'desc' : 'asc')
             : Promise.resolve({ tasks: propTasks });
 
           const [tasksRes, usersRes, statusesRes, prioritiesRes, projectsRes] = await Promise.allSettled([
@@ -370,6 +374,7 @@ const TaskList: React.FC<TaskListProps> = ({
     };
 
     fetchData();
+  
 
     // Cleanup function
     return () => {
@@ -383,13 +388,15 @@ const TaskList: React.FC<TaskListProps> = ({
     propProjectsString, 
     propSelectedProjectString, 
     projectId, 
-    selectedParentTaskString
+    selectedParentTaskString,
+    sortByCreatedAt
   ]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('');
   const [selectedPriority, setSelectedPriority] = useState<string>('');
   const [sortBy, setSortBy] = useState<'deadline' | 'priority' | 'title'>('deadline');
+
   const [isCreatingTask, setIsCreatingTask] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Estado local para compatibilidade, caso a prop não seja fornecida
@@ -457,6 +464,13 @@ const TaskList: React.FC<TaskListProps> = ({
     } else {
       setLocalShowCompleted(checked);
     }
+  };
+
+  // Handler para mudança de ordenação por data de criação
+  const handleSortByCreatedAtChange = (value: 'newest' | 'oldest') => {
+    setSortByCreatedAt(value);
+    // Se estiver usando ordenação por createdAt, desativar outras ordenações
+    setSortBy('deadline'); // ou manter como está
   };
 
   const [newTaskData, setNewTaskData] = useState<Partial<Task>>({
@@ -530,10 +544,15 @@ const TaskList: React.FC<TaskListProps> = ({
       }
       
       // ATUALIZAR LISTA DE TAREFAS
-      // Verificar se a tarefa atualizada pertence ao projeto atual
+      // Verificar se a tarefa atualizada pertence ao contexto atual
       const shouldUpdateTask = 
         (!projectId || updatedTask.projectId === projectId) &&
-        (!finalSelectedParentTask || updatedTask.parentTaskId === finalSelectedParentTask?.id);
+        (
+          // Se estamos na raiz (sem tarefa pai selecionada), só aceitar tarefas sem pai
+          (!finalSelectedParentTask && updatedTask.parentTaskId === null) ||
+          // Se estamos visualizando subtarefas de uma tarefa pai, só aceitar suas subtarefas
+          (finalSelectedParentTask && updatedTask.parentTaskId === finalSelectedParentTask.id)
+        );
       
       if (shouldUpdateTask) {
         console.log('🔄 TaskList: Atualizando tarefa na lista via SSE:', updatedTask.id);
@@ -545,13 +564,18 @@ const TaskList: React.FC<TaskListProps> = ({
       }
     };
 
-    const handleTaskCreated = (newTask: Task) => {
+    const handleTaskCreated = async (newTask: Task) => {
       console.log('📡 TaskList: Evento task_created recebido via SSE:', newTask.id, newTask.title);
       
-      // Verificar se a nova tarefa pertence ao projeto atual
+      // Verificar se a nova tarefa pertence ao contexto atual
       const shouldAddTask = 
         (!projectId || newTask.projectId === projectId) &&
-        (!finalSelectedParentTask || newTask.parentTaskId === finalSelectedParentTask?.id);
+        (
+          // Se estamos na raiz (sem tarefa pai selecionada), só aceitar tarefas sem pai
+          (!finalSelectedParentTask && newTask.parentTaskId === null) ||
+          // Se estamos visualizando subtarefas de uma tarefa pai, só aceitar suas subtarefas
+          (finalSelectedParentTask && newTask.parentTaskId === finalSelectedParentTask.id)
+        );
       
       if (shouldAddTask) {
         console.log('🆕 TaskList: Adicionando nova tarefa à lista via SSE:', newTask.id);
@@ -564,6 +588,23 @@ const TaskList: React.FC<TaskListProps> = ({
         setTaskInInclusion(newTask);
       } else {
         console.log('ℹ️ TaskList: Nova tarefa não pertence ao contexto atual, ignorando:', newTask.id);
+      }
+
+      // Se a nova tarefa é uma subtarefa (tem parentTaskId), buscar e atualizar a tarefa pai
+      if (newTask.parentTaskId) {
+        try {
+          console.log('🔄 TaskList: Buscando tarefa pai para atualizar subtarefas:', newTask.parentTaskId);
+          const parentTaskResponse = await api.getTaskById(newTask.parentTaskId);
+          if (parentTaskResponse.task) {
+            console.log('🔄 TaskList: Atualizando tarefa pai com novas subtarefas:', parentTaskResponse.task.id);
+            // Atualizar a tarefa pai na lista
+            setTasks(prev => prev.map(task => 
+              task.id === parentTaskResponse.task.id ? { ...task, subtasks: parentTaskResponse.task.subtasks } : task
+            ));
+          }
+        } catch (error) {
+          console.error('❌ TaskList: Erro ao buscar tarefa pai:', error);
+        }
       }
     };
 
@@ -652,6 +693,18 @@ const TaskList: React.FC<TaskListProps> = ({
   }) || [];
 
   const sortedTasks = filteredTasks.sort((a, b) => {
+    // Se estiver usando ordenação por createdAt
+    if (sortByCreatedAt === 'newest') {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA; // Mais novas primeiro
+    } else if (sortByCreatedAt === 'oldest') {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateA - dateB; // Mais antigas primeiro
+    }
+    
+    // Ordenação original por deadline, priority, title
     switch (sortBy) {
       case 'deadline':
         const dateA = a.deadline ? safeParseDate(a.deadline)?.getTime() : Infinity;
@@ -1802,6 +1855,23 @@ const TaskList: React.FC<TaskListProps> = ({
                 <option value="deadline">Ordenar por Prazo</option>
                 <option value="priority">Ordenar por Prioridade</option>
                 <option value="title">Ordenar por Título</option>
+              </select>
+              
+              {/* Seletor de ordenação por data de criação */}
+              <select
+                value={sortByCreatedAt}
+                onChange={(e) => handleSortByCreatedAtChange(e.target.value as 'newest' | 'oldest')}
+                style={{
+                  padding: '8px 12px',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  backgroundColor: 'white',
+                  outline: 'none'
+                }}
+              >
+                <option value="newest">Primeiro as mais novas</option>
+                <option value="oldest">Primeiro as mais antigas</option>
               </select>
             </div>
 

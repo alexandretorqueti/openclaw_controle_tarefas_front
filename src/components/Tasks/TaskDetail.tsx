@@ -279,8 +279,8 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
 
   // ==================== COMPUTED VALUES ====================
   const subtasksCount = useMemo(() => {
-    return task.subtasks?.length || 0;
-  }, [task.subtasks]);
+    return task.totalSubtasks || 0;
+  }, [task.totalSubtasks]);
 
   const commentsCount = comments.length;
   const logsCount = logs.length;

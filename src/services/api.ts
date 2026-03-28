@@ -265,9 +265,17 @@ class ApiService {
   }
 
   // Task endpoints
-  async getTasks(filters: Record<string, any> = {}) {
+  async getTasks(filters: Record<string, any> = {}, sortBy?: string, sortOrder?: 'asc' | 'desc') {
     const queryParams = new URLSearchParams(filters).toString();
-    const endpoint = queryParams ? `/tasks?${queryParams}` : '/tasks';
+    
+    // Adicionar parâmetros de ordenação se fornecidos
+    const sortParams = [];
+    if (sortBy) sortParams.push(`sortBy=${sortBy}`);
+    if (sortOrder) sortParams.push(`sortOrder=${sortOrder}`);
+    
+    const sortQuery = sortParams.length > 0 ? `&${sortParams.join('&')}` : '';
+    const endpoint = queryParams ? `/tasks?${queryParams}${sortQuery}` : `/tasks?${sortQuery}`;
+    
     return this.request(endpoint);
   }
 

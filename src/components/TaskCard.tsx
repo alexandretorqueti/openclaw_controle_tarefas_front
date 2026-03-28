@@ -59,7 +59,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const isOverdue = !task.isCompleted && deadlineDate && deadlineDate < new Date();
   const formattedDeadline = safeFormatDate(task.deadline, "dd 'de' MMMM 'de' yyyy") || 'Sem prazo definido';
 
-  const hasSubtasks = (task as any).subtasks?.length > 0 || (task as any)._count?.subtasks > 0;
+  const hasSubtasks = (task.subtasks?.length || 0) > 0;
 
   const handleToggleCompletion = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -912,7 +912,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 title="Ver subtarefas desta tarefa"
               >
                 <FaTasks size={12} />
-                Subtarefas ({(task as any).subtasks?.length || (task as any)._count?.subtasks || ''})
+                Subtarefas ({task.subtasks?.length || 0})
               </button>
             ) : (
               <button
