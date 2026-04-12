@@ -421,14 +421,23 @@ const TaskList: React.FC<TaskListProps> = ({
     const carregarAgentes = async () => {
       try {
         const response = await api.getAgents();
-        const agentsData: Agent[] = response.data || [];
-        
-        // Ordenar agentes pelo ID em ordem crescente
-        const sortedAgents = [...agentsData].sort((a, b) => {
-          return a.id.localeCompare(b.id);
-        });
-        
+        let agentsList: Agent[] = [];
+        if (response && typeof response === "object") {
+          if (Array.isArray(response.data)) {
+            agentsList = response.data;
+          } else if (Array.isArray(response.agents)) {
+            agentsList = response.agents;
+          }
+        } else if (Array.isArray(response)) {
+          agentsList = response;
+        }
+        const sortedAgents = agentsList.sort((a, b) => String(a.id || "").localeCompare(String(b.id || "")));
         setAgents(sortedAgents);
+      } catch (error) {
+        console.error("Erro ao carregar agentes:", error);
+        setAgents([]);
+      }
+    };
       } catch (error) {
         console.error('Erro ao carregar agentes:', error);
         setAgents([]);
@@ -594,12 +603,16 @@ const TaskList: React.FC<TaskListProps> = ({
       if (newTask.parentTaskId) {
         try {
           console.log('🔄 TaskList: Buscando tarefa pai para atualizar subtarefas:', newTask.parentTaskId);
-          const parentTaskResponse = await api.getTaskById(newTask.parentTaskId);
+          const parentTaskResponse = await api.getTask(newTask.parentTaskId);
           if (parentTaskResponse.task) {
             console.log('🔄 TaskList: Atualizando tarefa pai com novas subtarefas:', parentTaskResponse.task.id);
-            // Atualizar a tarefa pai na lista
+            // Atualizar a tarefa pai na lista com subtasks e totalSubtasks
             setTasks(prev => prev.map(task => 
-              task.id === parentTaskResponse.task.id ? { ...task, subtasks: parentTaskResponse.task.subtasks } : task
+              task.id === parentTaskResponse.task.id ? { 
+                ...task, 
+                subtasks: parentTaskResponse.task.subtasks,
+                totalSubtasks: parentTaskResponse.task.totalSubtasks || parentTaskResponse.task.subtasks?.length || 0
+              } : task
             ));
           }
         } catch (error) {

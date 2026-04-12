@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { Priority } from '../types';
+import { Priority } from '../types/tasks';
 import './PriorityManager.css';
 
 const PriorityManager: React.FC = () => {
@@ -8,6 +8,7 @@ const PriorityManager: React.FC = () => {
   const [editingPriority, setEditingPriority] = useState<Priority | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
   
   // Form state for new priority
   const [newPriority, setNewPriority] = useState({
@@ -73,6 +74,7 @@ const PriorityManager: React.FC = () => {
         name: '',
         weight: priorities.length > 0 ? Math.max(...priorities.map(p => p.weight || 1)) + 1 : 1
       });
+      setShowCreateForm(false);
       loadPriorities();
     } catch (error) {
       console.error('Erro ao criar prioridade:', error);
@@ -160,7 +162,17 @@ const PriorityManager: React.FC = () => {
   return (
     <div className="priority-manager">
       <div className="priority-header">
-        <h1>Gerenciar Prioridades</h1>
+        <div className="priority-header-title">
+          <h1>Gerenciar Prioridades</h1>
+        </div>
+        <div className="priority-header-actions">
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowCreateForm(true)}
+          >
+            Incluir Prioridade
+          </button>
+        </div>
       </div>
 
       {/* Error message */}
@@ -185,61 +197,77 @@ const PriorityManager: React.FC = () => {
         </div>
       )}
 
-      {/* Create form */}
-      <div className="priority-form">
-        <div className="form-group" style={{ flex: 2 }}>
-          <label>Nome da Prioridade *</label>
-          <input
-            type="text"
-            value={newPriority.name}
-            onChange={(e) => handleNewPriorityChange('name', e.target.value)}
-            placeholder="Ex: Crítica, Alta, Média, Baixa"
-          />
-        </div>
-
-        <div className="form-group">
-          <label>Peso (1-10)</label>
-          <div className="weight-picker">
-            <div 
-              className="weight-preview" 
-              style={{ backgroundColor: getPriorityColor(newPriority.weight) }}
-            >
-              {newPriority.weight}
-            </div>
+      {/* Create form - only shown when showCreateForm is true */}
+      {showCreateForm && (
+        <div className="priority-form">
+          <div className="form-group" style={{ flex: 2 }}>
+            <label>Nome da Prioridade *</label>
             <input
-              type="number"
-              value={newPriority.weight}
-              onChange={(e) => handleNewPriorityChange('weight', parseInt(e.target.value) || 1)}
-              min="1"
-              max="10"
-              className="weight-input"
+              type="text"
+              value={newPriority.name}
+              onChange={(e) => handleNewPriorityChange('name', e.target.value)}
+              placeholder="Ex: Crítica, Alta, Média, Baixa"
             />
           </div>
-          <div className="weight-palette">
-            {weightOptions.map(option => (
-              <div
-                key={option.value}
-                className={`weight-option ${newPriority.weight === option.value ? 'selected' : ''}`}
-                style={{ backgroundColor: option.color }}
-                onClick={() => handleWeightSelect(option.value)}
-                title={option.label}
+
+          <div className="form-group">
+            <label>Peso (1-10)</label>
+            <div className="weight-picker">
+              <div 
+                className="weight-preview" 
+                style={{ backgroundColor: getPriorityColor(newPriority.weight) }}
               >
-                {option.value}
+                {newPriority.weight}
               </div>
-            ))}
+              <input
+                type="number"
+                value={newPriority.weight}
+                onChange={(e) => handleNewPriorityChange('weight', parseInt(e.target.value) || 1)}
+                min="1"
+                max="10"
+                className="weight-input"
+              />
+            </div>
+            <div className="weight-palette">
+              {weightOptions.map(option => (
+                <div
+                  key={option.value}
+                  className={`weight-option ${newPriority.weight === option.value ? 'selected' : ''}`}
+                  style={{ backgroundColor: option.color }}
+                  onClick={() => handleWeightSelect(option.value)}
+                  title={option.label}
+                >
+                  {option.value}
+                </div>
+              ))}
+            </div>
+            <div className="weight-description">
+              {getPriorityDescription(newPriority.weight)}
+            </div>
           </div>
-          <div className="weight-description">
-            {getPriorityDescription(newPriority.weight)}
+
+          <div className="form-actions">
+            <button 
+              onClick={handleCreate}
+              disabled={!newPriority.name.trim() || loading}
+            >
+              Adicionar Prioridade
+            </button>
+            <button 
+              onClick={() => {
+                setShowCreateForm(false);
+                setNewPriority({
+                  name: '',
+                  weight: priorities.length > 0 ? Math.max(...priorities.map(p => p.weight || 1)) + 1 : 1
+                });
+              }}
+              className="btn-cancel"
+            >
+              Cancelar
+            </button>
           </div>
         </div>
-
-        <button 
-          onClick={handleCreate}
-          disabled={!newPriority.name.trim() || loading}
-        >
-          Adicionar Prioridade
-        </button>
-      </div>
+      )}
 
       {/* Edit form */}
       {editingPriority && (
@@ -314,7 +342,7 @@ const PriorityManager: React.FC = () => {
         ) : priorities.length === 0 ? (
           <div className="empty-state">
             <p>Nenhuma prioridade cadastrada</p>
-            <p>Use o formulário acima para criar a primeira prioridade</p>
+            <p>Clique no botão "Incluir Prioridade" para criar a primeira prioridade</p>
           </div>
         ) : (
           priorities

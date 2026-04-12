@@ -30,7 +30,7 @@ export const flushPendingErrors = async (): Promise<void> => {
     // Tenta enviar um por um
     for (const errorPayload of pendingErrors) {
       try {
-        const response = await fetch(`${apiUrl}/frontend-errors`, {
+        const response = await fetch(`${apiUrl}/error/frontend-errors`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(errorPayload)
@@ -83,7 +83,7 @@ export const reportErrorToBackend = async (errorData: ErrorData): Promise<void> 
   try {
     const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
     
-    const response = await fetch(`${apiUrl}/frontend-errors`, { 
+    const response = await fetch(`${apiUrl}/error/frontend-errors`, { 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

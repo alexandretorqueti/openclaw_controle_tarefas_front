@@ -272,6 +272,7 @@ const TaskDetail: React.FC<TaskDetailProps> = ({
   const [editingCommentText, setEditingCommentText] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [commentError, setCommentError] = useState<string | null>(null);
+  const [commentSuccess, setCommentSuccess] = useState<string | null>(null);
 
   // ==================== STATE FOR AGENTS ====================
   const [agents, setAgents] = useState<Agent[]>([]);

@@ -16,11 +16,20 @@
   margin-bottom: 24px;
 }
 
+.priority-header-title {
+  flex: 1;
+}
+
 .priority-header h1 {
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
+}
+
+.priority-header-actions {
+  display: flex;
+  gap: 12px;
 }
 
 /* Mensagem de erro */
@@ -50,6 +59,7 @@
 /* Formulário de criação */
 .priority-form {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 24px;
   padding: 20px;
@@ -57,6 +67,14 @@
   border-radius: 8px;
   border: 1px solid var(--border-color);
   align-items: flex-end;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 /* Formulário de edição */
@@ -242,6 +260,54 @@ button:disabled {
 
 button:active:not(:disabled) {
   transform: translateY(0);
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--accent-color);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-cancel {
+  background-color: var(--bg-input);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--text-secondary);
 }
 
 .priority-edit-form-actions button:last-child {

@@ -41,7 +41,7 @@ export const useTaskDetail = (taskId: string): TaskDetailData => {
         ]);
 
         setData({
-          task: taskRes.data,
+          task: taskRes.task,
           executionLogs: logsRes.data || [],
           taskHistory: historyRes.data || [],
           comments: commentsRes.data || [],

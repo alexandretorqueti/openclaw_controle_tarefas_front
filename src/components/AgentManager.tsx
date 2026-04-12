@@ -105,6 +105,7 @@ const AgentCard: React.FC<AgentCardProps> = ({ agent, onEdit, onDelete }) => {
         <div className="agent-info">
           <h3 className="agent-name">{agent.identity.name}</h3>
           <p className="agent-model">{agent.identity.model || 'Modelo não especificado'}</p>
+          <p className="agent-id">ID: {agent.id}</p>
         </div>
       </div>
       
@@ -457,6 +458,22 @@ const EditAgentModal: React.FC<EditAgentModalProps> = ({ isOpen, agent, onClose,
           <div className="modal-body">
             {activeTab === 'identity' ? (
               <>
+                <div className="form-group">
+                  <label className="form-label">
+                    ID do Agente
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={agent.id}
+                    disabled={true}
+                    readOnly
+                  />
+                  <div className="form-help">
+                    Identificador único do agente (somente leitura)
+                  </div>
+                </div>
+                
                 <div className="form-group">
                   <label className="form-label form-label-required">
                     Nome
