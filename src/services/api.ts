@@ -2,6 +2,7 @@ import { convertToCamelCase, convertToSnakeCase } from '../types';
 import { getApiUrl } from '../config/api';
 import { Project } from '../types/project';
 import { reportErrorToBackend, flushPendingErrors } from '../utils/errorReporter';
+import { Agent, AgentsResponse, OperationResponse } from '../types/agent';
 
 // Type definitions for API parameters
 interface ProjectData {
@@ -571,54 +572,54 @@ class ApiService {
   }
 
   // Agent Management
-  async getAgents() {
+  async getAgents(): Promise<AgentsResponse> {
     return this.request('/agents');
   }
 
-  async getAgent(id: string) {
+  async getAgent(id: string): Promise<{ success: boolean; data: Agent }> {
     return this.request(`/agents/${id}`);
   }
 
-  async createAgent(data: { name: string; workspace?: string }) {
+  async createAgent(data: { name: string; workspace?: string }): Promise<OperationResponse> {
     return this.request('/agents', {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
 
-  async updateAgentIdentity(id: string, data: { name?: string; emoji?: string; avatar?: string; model?: string; workspace?: string }) {
+  async updateAgentIdentity(id: string, data: { name?: string; emoji?: string; avatar?: string; model?: string; workspace?: string }): Promise<OperationResponse> {
     return this.request(`/agents/${id}/identity`, {
       method: 'PUT',
       body: JSON.stringify(data)
     });
   }
 
-  async addAgentBinding(id: string, binding: string) {
+  async addAgentBinding(id: string, binding: string): Promise<OperationResponse> {
     return this.request(`/agents/${id}/bindings`, {
       method: 'POST',
       body: JSON.stringify({ binding })
     });
   }
 
-  async removeAgentBinding(id: string, binding: string) {
+  async removeAgentBinding(id: string, binding: string): Promise<OperationResponse> {
     return this.request(`/agents/${id}/bindings`, {
       method: 'DELETE',
       body: JSON.stringify({ binding })
     });
   }
 
-  async deleteAgent(id: string) {
+  async deleteAgent(id: string): Promise<OperationResponse> {
     return this.request(`/agents/${id}`, {
       method: 'DELETE'
     });
   }
 
   // Agent Files
-  async getAgentFile(agentId: string, filename: string) {
+  async getAgentFile(agentId: string, filename: string): Promise<{ success: boolean; data: string; message?: string }> {
     return this.request(`/agents/${agentId}/files/${filename}`);
   }
 
-  async updateAgentFile(agentId: string, filename: string, content: string) {
+  async updateAgentFile(agentId: string, filename: string, content: string): Promise<OperationResponse> {
     return this.request(`/agents/${agentId}/files/${filename}`, {
       method: 'PUT',
       body: JSON.stringify({ content })
@@ -626,11 +627,11 @@ class ApiService {
   }
 
   // Agent Avatar
-  async getAgentAvatar(agentId: string) {
+  async getAgentAvatar(agentId: string): Promise<{ success: boolean; data: { avatarUrl: string } }> {
     return this.request(`/agents/${agentId}/avatar`);
   }
 
-  async uploadAgentAvatar(agentId: string, file: File) {
+  async uploadAgentAvatar(agentId: string, file: File): Promise<{ success: boolean; data: { avatarUrl: string } }> {
     const formData = new FormData();
     formData.append('avatar', file);
     

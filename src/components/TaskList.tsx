@@ -412,40 +412,24 @@ const TaskList: React.FC<TaskListProps> = ({
   const [isTypingProgramador, setIsTypingProgramador] = useState(false);
   const analistaRef = useRef<HTMLDivElement>(null);
   const programadorRef = useRef<HTMLDivElement>(null);
-
-  // Handle scroll to show/hide back to top button
   React.useEffect(() => {
     const handleScroll = () => {
       setShowBackToTop(window.scrollY > 300);
     };
     const carregarAgentes = async () => {
       try {
-        const response = await api.getAgents();
+        const response: AgentsResponse = await api.getAgents();
         let agentsList: Agent[] = [];
-        if (response && typeof response === "object") {
-          if (Array.isArray(response.data)) {
-            agentsList = response.data;
-          } else if (Array.isArray(response.agents)) {
-            agentsList = response.agents;
-          }
-        } else if (Array.isArray(response)) {
-          agentsList = response;
+        if (response && Array.isArray(response.data)) {
+          setAgents(response.data);
         }
-        const sortedAgents = agentsList.sort((a, b) => String(a.id || "").localeCompare(String(b.id || "")));
-        setAgents(sortedAgents);
       } catch (error) {
         console.error("Erro ao carregar agentes:", error);
-        setAgents([]);
       }
     };
-      } catch (error) {
-        console.error('Erro ao carregar agentes:', error);
-        setAgents([]);
-      }
-    }
     carregarAgentes();
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Inicializar terminais com conteúdo da primeira tarefa
