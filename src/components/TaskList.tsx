@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { Task, Status, Priority } from '../types/tasks';
 import { User } from '../types/user';
-import { Agent } from '../types/agent';
+import { Agent, AgentsResponse } from '../types/agent';
 import { getBackendBaseUrl } from '../config/api';
 import TaskCard from './TaskCard';
 
@@ -38,7 +38,13 @@ interface TaskListProps {
   onToggleCompletion?: (id: string) => Promise<void>;
   showCompleted?: boolean;
   onToggleShowCompleted?: (show: boolean) => void;
-  executeurFn?: (taskData: any) => void; // Nova prop para receber dados do backend
+  executeurFn?: (callback: (data: { task?: Task } | null) => void) => void; // Nova prop para receber dados do backend
+}
+
+interface TaskResult extends Request {
+  task: Task;
+  correlationId?: string;
+  message?: string;
 }
 
 const TaskList: React.FC<TaskListProps> = ({
@@ -59,7 +65,7 @@ const TaskList: React.FC<TaskListProps> = ({
   onDeleteTask = NOOP_ASYNC_FN,
   onToggleCompletion = NOOP_ASYNC_FN,
   showCompleted: propShowCompleted = false,
-  onToggleShowCompleted = () => {},
+  onToggleShowCompleted,
   executeurFn = NOOP_FN
 }) => {
   const { projectId } = useParams<{ projectId?: string }>();
@@ -126,7 +132,7 @@ const TaskList: React.FC<TaskListProps> = ({
   };
 
   // Função segura para stringify que evita erros de referência circular
-  const safeStringify = (obj: any): string => {
+  const safeStringify = (obj: unknown): string => {
     try {
       return JSON.stringify(obj);
     } catch (error) {
@@ -189,7 +195,7 @@ const TaskList: React.FC<TaskListProps> = ({
       console.log('🎯 executeurFn disponível, configurando listener');
       
       // Função para processar dados do backend
-      const processExecuteurData = (data: any) => {
+      const processExecuteurData = (data: { task?: Task } | null) => {
         console.log('🎯 Dados recebidos do backend:', data);
         
         if (data && data.task) {
@@ -306,7 +312,7 @@ const TaskList: React.FC<TaskListProps> = ({
         if (shouldFetchBasicData) {
           // Buscar dados básicos em paralelo
           // Construir filtros para tarefas
-          const filters: any = {};
+          const filters: Record<string, string | boolean | number | null> = {};
           if (projectId) {
             filters.projectId = projectId;
           }
@@ -319,16 +325,16 @@ const TaskList: React.FC<TaskListProps> = ({
           }
           console.log('🔍 Buscando tarefas com os filtros:', filters);
 
-          const tasksPromise = propTasks.length === 0
-            ? api.getTasks(filters, 'createdAt', sortByCreatedAt === 'newest' ? 'desc' : 'asc')
-            : Promise.resolve({ tasks: propTasks });
+          const tasksPromise: Promise<{ tasks: Task[] }> = propTasks.length === 0
+            ? api.getTasks(filters, 'createdAt', sortByCreatedAt === 'newest' ? 'desc' : 'asc') as Promise<{ tasks: Task[] }>
+            : Promise.resolve({ tasks: propTasks }) as Promise<{ tasks: Task[] }>;
 
           const [tasksRes, usersRes, statusesRes, prioritiesRes, projectsRes] = await Promise.allSettled([
             tasksPromise,
-            propUsers.length === 0 ? api.getUsers() : Promise.resolve({ users: propUsers }),
-            propStatuses.length === 0 ? api.getStatuses() : Promise.resolve({ statuses: propStatuses }),
-            propPriorities.length === 0 ? api.getPriorities() : Promise.resolve({ priorities: propPriorities }),
-            propProjects.length === 0 ? api.getProjects() : Promise.resolve({ projects: propProjects })
+            propUsers.length === 0 ? api.getUsers() as Promise<{ users: User[] }> : Promise.resolve({ users: propUsers }),
+            propStatuses.length === 0 ? api.getStatuses() as Promise<{ statuses: Status[] }> : Promise.resolve({ statuses: propStatuses }),
+            propPriorities.length === 0 ? api.getPriorities() as Promise<{ priorities: Priority[] }> : Promise.resolve({ priorities: propPriorities }),
+            propProjects.length === 0 ? api.getProjects() as Promise<{ projects: Project[] }> : Promise.resolve({ projects: propProjects })
           ]);
 
           // Processar resultados
@@ -473,16 +479,16 @@ const TaskList: React.FC<TaskListProps> = ({
     statusId: statuses?.find(s => s.name === 'Pendente')?.id || statuses?.[0]?.id || '',
     priorityId: priorities?.find(p => p.name === 'Média')?.id || priorities?.[1]?.id || '',
     assignedToId: users?.length > 0 ? users[0]?.id || '' : '',
-    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
+    deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 
     agent: typeof window !== 'undefined' ? localStorage.getItem('lastUsedAgent') || '' : '',
-    parentTaskId: finalSelectedParentTask?.id || null
+    parentTaskId: finalSelectedParentTask?.id || undefined
   });
 
   // Update parentTaskId when selectedParentTask changes
   React.useEffect(() => {
-    setNewTaskData(prev => ({
+    setNewTaskData((prev : Partial<Task>) => ({
       ...prev,
-      parentTaskId: finalSelectedParentTask?.id || null
+      parentTaskId: finalSelectedParentTask?.id
     }));
   }, [selectedParentTaskString]);
 
@@ -492,7 +498,7 @@ const TaskList: React.FC<TaskListProps> = ({
     const defaultPriority = priorities?.find(p => p.name === 'Média')?.id || priorities?.[1]?.id || '';
     const defaultUser = users?.[0]?.id || '';
 
-    setNewTaskData(prev => ({
+    setNewTaskData((prev : Partial<Task>) => ({
       ...prev,
       statusId: defaultStatus || prev.statusId || '',
       priorityId: defaultPriority || prev.priorityId || '',
@@ -503,16 +509,21 @@ const TaskList: React.FC<TaskListProps> = ({
   // Update projectId when selectedProject changes
   React.useEffect(() => {
     if (selectedProject) {
-      setNewTaskData(prev => ({
+      setNewTaskData((prev : Partial<Task>) => ({
         ...prev,
         projectId: selectedProject.id
       }));
 
       // Set agent to project's programadorContratado if it exists
-      if (selectedProject.programadorContratado) {
-        setNewTaskData(prev => ({
+      if (selectedProject.programadorFront && newTaskData.domain === 'frontend') {
+        setNewTaskData((prev : Partial<Task>) => ({
           ...prev,
-          agent: selectedProject.programadorContratado
+          agent: selectedProject.programadorFront
+        }));
+      } else if (selectedProject.programadorBack && newTaskData.domain === 'backend') {
+        setNewTaskData((prev : Partial<Task>) => ({
+          ...prev,
+          agent: selectedProject.programadorBack
         }));
       }
     }
@@ -587,7 +598,7 @@ const TaskList: React.FC<TaskListProps> = ({
       if (newTask.parentTaskId) {
         try {
           console.log('🔄 TaskList: Buscando tarefa pai para atualizar subtarefas:', newTask.parentTaskId);
-          const parentTaskResponse = await api.getTask(newTask.parentTaskId);
+          const parentTaskResponse: TaskResult = await api.getTask(newTask.parentTaskId) as TaskResult;
           if (parentTaskResponse.task) {
             console.log('🔄 TaskList: Atualizando tarefa pai com novas subtarefas:', parentTaskResponse.task.id);
             // Atualizar a tarefa pai na lista com subtasks e totalSubtasks
@@ -613,7 +624,7 @@ const TaskList: React.FC<TaskListProps> = ({
       setTasks(prev => prev.filter(task => task.id !== deletedTask.id));
     };
 
-    const handleTerminalUpdate = (data: any) => {
+    const handleTerminalUpdate = (data: { type: string; content?: string; target?: string }) => {
       console.log('📡 TaskList: Evento terminal_update recebido via SSE:', data);
 
       if (data.type === 'analista' && data.content) {
@@ -669,8 +680,8 @@ const TaskList: React.FC<TaskListProps> = ({
 
   React.useEffect(() => {
     const lastModel = localStorage.getItem('lastUsedAgent');
-    if (lastModel && (!selectedProject || !selectedProject.programadorContratado)) {
-      setNewTaskData(prev => ({
+    if (lastModel && (!selectedProject || (!selectedProject.programadorFront && !selectedProject.programadorBack))) {
+      setNewTaskData((prev : Partial<Task>) => ({
         ...prev,
         agent: lastModel
       }));
@@ -689,7 +700,7 @@ const TaskList: React.FC<TaskListProps> = ({
     return matchesSearch && matchesStatus && matchesPriority && matchesCompletion;
   }) || [];
 
-  const sortedTasks = filteredTasks.sort((a, b) => {
+  const sortedTasks = filteredTasks.sort((a: Task, b: Task) => {
     // Se estiver usando ordenação por createdAt
     if (sortByCreatedAt === 'newest') {
       const dateA = new Date(a.createdAt).getTime();
@@ -704,8 +715,8 @@ const TaskList: React.FC<TaskListProps> = ({
     // Ordenação original por deadline, priority, title
     switch (sortBy) {
       case 'deadline':
-        const dateA = a.deadline ? safeParseDate(a.deadline)?.getTime() : Infinity;
-        const dateB = b.deadline ? safeParseDate(b.deadline)?.getTime() : Infinity;
+        const dateA = a.deadline ? safeParseDate(a.deadline.toISOString())?.getTime() : Infinity;
+        const dateB = b.deadline ? safeParseDate(b.deadline.toISOString())?.getTime() : Infinity;
         return (dateA || Infinity) - (dateB || Infinity);
       case 'priority':
         const priorityA = priorities?.find(p => p.id === a.priorityId)?.weight || 0;
@@ -737,7 +748,7 @@ const TaskList: React.FC<TaskListProps> = ({
           if (!jaTemaTarefaNaLista) {
             setTasks(prev => [...prev, taskInInclusion]);  
           }
-          setTaskInInclusion(null);
+          setTaskInInclusion(undefined);
         }
         setTimeout(() => {
           setTaskInclusionSemaphore(false);
@@ -765,8 +776,8 @@ const TaskList: React.FC<TaskListProps> = ({
         // createdById will be set by the parent component (App.tsx) or backend
         position: tasks?.length || 0,
         // Ensure agent is null if empty string
-        agent: newTaskData.agent || null
-      };
+        agent: newTaskData.agent || undefined
+      } as Task;
 
       console.log('📤 TaskList: Dados finais para criação:', taskData);
 
@@ -775,7 +786,7 @@ const TaskList: React.FC<TaskListProps> = ({
       // Se a prop onCreateTask foi fornecida e não é a função padrão, use-a
       if (onCreateTask && onCreateTask !== NOOP_ASYNC_TASK_FN) {
         console.log('🔧 TaskList: Usando onCreateTask prop');
-        createdTask = await onCreateTask(taskData);
+        createdTask = await onCreateTask(taskData) as Task;
       } else {
         // Caso contrário, chame a API diretamente
         console.log('🔧 TaskList: Chamando API diretamente (fallback)');
@@ -806,9 +817,9 @@ const TaskList: React.FC<TaskListProps> = ({
         statusId: defaultStatus,
         priorityId: defaultPriority,
         assignedToId: defaultUser,
-        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 dias a partir de agora
+        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 dias a partir de agora
         agent: newTaskData.agent || '', // Keep the same model for next task
-        parentTaskId: finalSelectedParentTask?.id || null
+        parentTaskId: finalSelectedParentTask?.id || undefined
       });
       setIsCreatingTask(false);
 
@@ -839,7 +850,7 @@ const TaskList: React.FC<TaskListProps> = ({
   };
 
   // Handlers para atualização de tarefas
-  const handleUpdateTask = async (id: string, taskData: Partial<Task>) => {
+  const handleUpdateTask = async (id: string, taskData: Task) => {
     console.log('🔄 TaskList: handleUpdateTask chamado', { id, taskData });
     try {
       // Se a prop onUpdateTask foi fornecida e não é a função padrão, use-a
@@ -848,13 +859,16 @@ const TaskList: React.FC<TaskListProps> = ({
       }
 
       // Caso contrário, chame a API diretamente
-      const request = await api.updateTask(id, taskData);
-      const updatedTask = request.task;
+      const updatedTask: Task | unknown = await api.updateTask(id, taskData);
       console.log('✅ Task atualizada via API:', updatedTask);
 
       // Atualizar estado local
-      setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
-      return updatedTask;
+      if (updatedTask && typeof updatedTask === 'object' && 'task' in updatedTask) {
+        setTasks(prev => prev.map(task => task.id === id ? { ...task, ...updatedTask } : task));
+        return updatedTask;
+      } else {
+        return null;
+      }
     } catch (error) {
       console.error('❌ Erro ao atualizar tarefa:', error);
       throw error;
@@ -897,7 +911,7 @@ const TaskList: React.FC<TaskListProps> = ({
         throw new Error('Tarefa não encontrada');
       }
 
-      const updatedTask = await api.updateTask(id, { isCompleted: !task.isCompleted });
+      const updatedTask: Task = await api.updateTask(id, { isCompleted: !task.isCompleted }) as Task;
       console.log('✅ Status de conclusão alterado via API:', updatedTask);
 
       // Atualizar estado local
@@ -1890,7 +1904,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--danger-color)' }}>
                   {tasks?.filter(t => {
                     if (t.isCompleted) return false;
-                    const deadlineDate = safeParseDate(t.deadline || '');
+                    const deadlineDate = t.deadline;
                     return deadlineDate && deadlineDate < new Date();
                   }).length || 0}
                 </div>
@@ -2339,7 +2353,7 @@ const TaskList: React.FC<TaskListProps> = ({
                 statuses={statuses}
                 priorities={priorities}
                 projects={projects}
-                onTaskClick={(t) => onTaskSelect(t)}
+                onTaskClick={(t: Task) => onTaskSelect(t)}
                 onViewSubtasks={onViewSubtasks !== NOOP_FN ? onViewSubtasks : handleViewSubtasks}
                 onUpdateTask={handleUpdateTask}
                 onDeleteTask={handleDeleteTask}

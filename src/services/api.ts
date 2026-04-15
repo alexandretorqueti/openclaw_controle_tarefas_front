@@ -3,6 +3,7 @@ import { getApiUrl } from '../config/api';
 import { Project } from '../types/project';
 import { reportErrorToBackend, flushPendingErrors } from '../utils/errorReporter';
 import { Agent, AgentsResponse, OperationResponse } from '../types/agent';
+import { Task } from '../types/tasks';
 
 // Type definitions for API parameters
 interface ProjectData {
@@ -44,35 +45,11 @@ interface UpdateProjectData {
   backendTestCommand?: string;   // NOVO
 }
 
-interface TaskData {
-  title: string;
-  description: string;
-  projectId: string;
-  statusId: string;
-  priorityId: string;
-  assignedToId: string;
-  deadline: string;
-  parentTaskId?: string | null;
-  position?: number;
-  agent?: string | null;
-}
 
 interface DependencyData {
   taskId: string;
   dependentTaskId: string;
   type?: string;
-}
-
-interface UpdateTaskData {
-  title?: string;
-  description?: string;
-  statusId?: string;
-  priorityId?: string;
-  assignedToId?: string;
-  deadline?: string;
-  position?: number;
-  isCompleted?: boolean;
-  agent?: string | null;
 }
 
 interface UpdateTaskPositionData {
@@ -284,14 +261,14 @@ class ApiService {
     return this.request(`/tasks/${id}`);
   }
 
-  async createTask(data: TaskData) {
+  async createTask(data: Task) {
     return this.request('/tasks', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
-  async updateTask(id: string, data: UpdateTaskData) {
+  async updateTask(id: string, data: Partial<Task>) {
     return this.request(`/tasks/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),

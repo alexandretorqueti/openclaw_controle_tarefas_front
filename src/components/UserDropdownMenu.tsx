@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaUser, FaEdit, FaSignOutAlt, FaCog, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { FaEdit, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '../contexts/AuthContext';
 
 interface UserDropdownMenuProps {
@@ -12,9 +12,8 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fechar o dropdown ao clicar fora
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent): void => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
@@ -26,20 +25,19 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
     };
   }, []);
 
-  const toggleDropdown = () => {
+  const toggleDropdown = (): void => {
     setIsOpen(!isOpen);
   };
 
   return (
     <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
-      {/* Botão do usuário */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: '12px',
           padding: '8px 12px',
-          backgroundColor: 'var(--bg-input)' : 'transparent',
+          backgroundColor: isOpen ? 'var(--bg-input)' : 'transparent',
           borderRadius: '8px',
           cursor: 'pointer',
           transition: 'all 0.2s',
@@ -48,7 +46,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
         }}
         onClick={toggleDropdown}
         onMouseEnter={() => !isOpen && (document.body.style.cursor = 'pointer')}
-        onMouseLeave={() => document.body.style.cursor = 'default'}
+        onMouseLeave={() => (document.body.style.cursor = 'default')}
       >
         <div style={{
           width: '36px',
@@ -102,7 +100,6 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
         />
       </div>
 
-      {/* Menu suspenso */}
       {isOpen && (
         <div style={{
           position: 'absolute',
@@ -117,7 +114,6 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
           border: '1px solid var(--border-color)',
           animation: 'fadeIn 0.2s ease-out'
         }}>
-          {/* Cabeçalho do menu */}
           <div style={{
             padding: '16px',
             backgroundColor: 'var(--bg-input)',
@@ -165,7 +161,6 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
             </div>
           </div>
 
-          {/* Itens do menu */}
           <div style={{ padding: '8px 0' }}>
             <button
               onClick={() => {
@@ -186,8 +181,12 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
                 textAlign: 'left',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-card)';
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+              }}
             >
               <div style={{
                 width: '20px',
@@ -219,8 +218,12 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
                 textAlign: 'left',
                 transition: 'background-color 0.2s'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-card)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-card)';
+              }}
+              onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'transparent';
+              }}
             >
               <div style={{
                 width: '20px',
@@ -234,7 +237,6 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ onLogout, onEditPro
             </button>
           </div>
 
-          {/* Rodapé do menu */}
           <div style={{
             padding: '12px 16px',
             backgroundColor: 'var(--bg-input)',

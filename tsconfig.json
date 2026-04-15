@@ -1,20 +1,32 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "es2019"],
-    "allowJs": true,
-    "skipLibCheck": true,
+    /* Ambiente e Saída */
+    "target": "ES2020",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    
+    /* Módulos e Resolução */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true, // Permite fazer import de arquivos .json nativamente
+    
+    /* React */
+    "jsx": "react-jsx",
+    
+    /* Interoperabilidade */
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    
+    /* Modo de Delegação (Build) */
+    "noEmit": true,
+    "isolatedModules": true,
+    
+    /* Checagem Rigorosa */
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "skipLibCheck": true, // Pula a checagem de tipos dentro da pasta node_modules (acelera MUITO o editor)
+    
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
