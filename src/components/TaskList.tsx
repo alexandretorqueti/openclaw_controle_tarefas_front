@@ -2139,18 +2139,18 @@ const TaskList: React.FC<TaskListProps> = ({
                 </label>
                 <input
                   type="datetime-local"
-                  value={newTaskData.deadline ? safeParseDate(newTaskData.deadline)?.toISOString().slice(0, 16) || '' : ''}
+                  value={newTaskData.deadline ? newTaskData.deadline?.toISOString().slice(0, 16) || '' : ''}
                   onChange={(e) => {
                     const dateValue = e.target.value;
                     if (dateValue) {
                       const date = safeParseDate(dateValue + ':00.000Z'); // Adiciona segundos para formato ISO
                       if (date) {
-                        setNewTaskData({ ...newTaskData, deadline: date.toISOString() });
+                        setNewTaskData({ ...newTaskData, deadline: date });
                       } else {
-                        setNewTaskData({ ...newTaskData, deadline: '' });
+                        setNewTaskData({ ...newTaskData, deadline: undefined });
                       }
                     } else {
-                      setNewTaskData({ ...newTaskData, deadline: '' });
+                      setNewTaskData({ ...newTaskData, deadline: undefined });
                     }
                   }}
                   style={{
@@ -2176,7 +2176,7 @@ const TaskList: React.FC<TaskListProps> = ({
                     const value = e.target.value;
                     setNewTaskData({
                       ...newTaskData,
-                      parentTaskId: value === '' ? null : value
+                      parentTaskId: value === '' ? undefined : value
                     });
                   }}
                   style={{
