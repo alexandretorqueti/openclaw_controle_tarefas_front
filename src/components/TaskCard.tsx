@@ -888,7 +888,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
           {/* Botões de Subtarefas (condicionais ao status de hasSubtasks) */}
           {onViewSubtasks && (
-            hasSubtasks ? (
+            task.subtasks && task.subtasks.length > 0 ? (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -912,7 +912,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 title="Ver subtarefas desta tarefa"
               >
                 <FaTasks size={12} />
-                Subtarefas ({task.totalSubtasks})
+                Subtarefas ({task.subtasks.length})
               </button>
             ) : (
               <button
@@ -923,8 +923,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 style={{
                   padding: '8px 12px',
                   backgroundColor: 'transparent',
-                  color: 'var(--text-secondary)',
-                  border: '1px dashed var(--border-color)',
+                  color: '#8b5cf6',
+                  border: '1px solid #8b5cf6',
                   borderRadius: '6px',
                   fontSize: '12px',
                   cursor: 'pointer',
@@ -934,14 +934,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   transition: 'all 0.2s'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = '#8b5cf6';
-                  e.currentTarget.style.color = '#8b5cf6';
-                  e.currentTarget.style.backgroundColor = 'rgba(139, 92, 246, 0.05)';
+                  e.currentTarget.style.backgroundColor = 'rgba(139, 92, 246, 0.1)';
+                  e.currentTarget.style.color = '#7c3aed';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-color)';
-                  e.currentTarget.style.color = 'var(--text-secondary)';
                   e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = '#8b5cf6';
                 }}
                 title="Criar subtarefas para esta tarefa"
               >
